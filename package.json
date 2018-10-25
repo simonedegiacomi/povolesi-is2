@@ -1,0 +1,19 @@
+{
+  "name": "povolesi-is2",
+  "version": "1.0.0",
+  "description": "\"# povolesi-is2\"",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/simonedegiacomi/povolesi-is2.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/simonedegiacomi/povolesi-is2/issues"
+  },
+  "homepage": "https://github.com/simonedegiacomi/povolesi-is2#readme"
+}
