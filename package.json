@@ -19,5 +19,8 @@
   "homepage": "https://github.com/simonedegiacomi/povolesi-is2#readme",
   "dependencies": {
     "express": "^4.16.4"
+  },
+  "devDependencies": {
+    "jest": "^23.6.0"
   }
 }
