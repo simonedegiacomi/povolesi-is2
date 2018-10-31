@@ -5,5 +5,5 @@
 * **Mattia Simone**
 * **Simone Degiacomi**
 * **Alessio Faieta**
-* **Slava Rublev**
+* **Viatcheslav Facchini Rublev**
 * **Giorgio Segalla**
