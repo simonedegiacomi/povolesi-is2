@@ -1,120 +1,225 @@
-swagger: '2.0'
+#metadata
+swagger: "2.0"
 info:
-  version: '1.0'
-  title: "povolesiis2"
-  description: Polls is a simple API allowing consumers to view polls and vote in them.
-  license:
-    name: MIT
-    url: https://github.com/apiaryio/polls-api/blob/master/LICENSE
-host: polls.apiblueprint.org
-basePath: /
-schemes:
-- http
+  title: PovoLesi API
+  description: API richieste dal corso di ingegneria del software II
+  version: 1.0.0
+
+#We only exchange JSONs
 consumes:
-- application/json
+  - application/json
 produces:
-- application/json
+  - application/json
+  
+#TODO: The host should be adjusted later
+host: api.nowhere.com
+basePath: /v1
+schemes:
+  - https
+
+#All the request will require
+securityDefinitions:
+  ApiTokenAuth:
+    type: apiKey
+    in: header
+    name: X-API-TOKEN
+    description: >
+      In order to use the APIs, you must first get an authentication token (we call 
+      it just "token"). The token is specific to a user. It can be optained by 
+      calling the `/user/register` API and it has to be sent as a `X-API-TOKEN`
+      header with any other API request.
+     
+#All the APIs, except for register, are required to have an api token as a header
+#of their requests
+security:
+  - ApiTokenAuth: []
+
+definitions:
+  User:
+    title: User
+    type: object
+    properties:
+      id:
+        type: integer
+        description: The id that univocally identifies the user
+        example: 42
+      name:
+        type: string
+        description: The full name of the user
+        example: Gianni Morandi
+      badgeNumber:
+        type: string
+        description: The university identifier of this user. It can be the student's "numero di matricola" or the teacher's badge number
+        example: 18123
+      email:
+        type: string
+        description: The user's email
+        example: mail@example.com
+        
+      manageGroups:
+        type: boolean
+        description: Can this user create/edit/delete user groups?
+        
+      canManageTasks:
+        type: boolean
+        description: Can this user create/edit/delete taks?
+        
+      canChangePermissions:
+        type: boolean
+        description: Can this user change other user's permissions?
+        
+      canListUsers:
+        type: boolean
+        description: Can this user access the list of all the users?
+        
+    required:  
+      - id
+      - name
+      - badgeNumber
+      - email
+      - canManageTasks
+      - canChangePermissions
+      - canListUsers
+      
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+        description: A string that describes the error
+      errorMessage:
+        type: string
+        description: A developer-friendly description of what wen wrong
+    required:
+      - code
+      - errorMessage
+
+responses:
+  Unauthorized:
+    description: The called doesn't have the needed authorization 
+    schema:
+      $ref: "#/definitions/Error"
+
+parameters:
+  offsetParam:
+    in: query
+    name: offset
+    required: false
+    type: integer
+    minimum: 0
+    description: The number of items to skip before starting to collect the result set.
+    
+  limitParam:
+    in: query
+    name: limit
+    required: false
+    type: integer
+    minimum: 1
+    maximum: 100
+    default: 20
+    description: The numbers of items to return.
+
 paths:
-  /questions:
-    x-summary: Questions Collection
-    get:
-      summary: List All Questions
+  /register:
+    post:
+      summary: Allows a user to register in order to receive the authentication token 
+      security: [] #this api can be called without the token
+      parameters: 
+        - in: body
+          name: user
+          description: The registration data of the user
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The complete name of the person in "first-name second-name" format
+              email:
+                type: string
+              badgeNumber:
+                type: string
+              password:
+                type: string
+                
       responses:
         200:
-          description: Successful Response
+          description: The user has been inserted and the associated token is generated
+          schema:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 42
+              token:
+                type: string
+                example: AABBCCDDEEFFGG
+        422:
+          description: Could not insert the user. Probably the email is already in use
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /user/:
+    get:
+      summary: Returns all the users of the system
+      description: >
+        Retrieves all the users of the system.
+        
+        
+        NOTE: The caller must have the `listUsers` permission set, otherwise 
+        a `401` error will be issued
+      produces:
+        - application/json
+        
+      parameters: 
+        - in: query
+          name: sortBy
+          type: string
+          enum: [id, name, badgeNumber, email]
+        
+        - $ref: '#/parameters/offsetParam'
+        - $ref: '#/parameters/limitParam'
+
+      responses:
+        200:
+          description: OK
           schema:
             type: array
             items:
-              $ref: '#/definitions/Question'
-          examples:
-            application/json:
-              - question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 2048
-                  - choice: Python
-                    votes: 1024
-                  - choice: Objective-C
-                    votes: 512
-                  - choice: Ruby
-                    votes: 256
-    post:
-      description: >-
-        You may create your own question using this action. It takes a JSON
-        object containing a question and a collection of answers in the
-        form of choices.
-      summary: Create a New Question
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/QuestionRequest'
+              $ref: '#/definitions/User'
+              
+        401:
+          $ref: "#/responses/Unauthorized"
+
+  /user/me:
+    get:
+      summary: Returns information about the authenticated user
+      description: Retrieves the user that is authenticated by the token and returns it's basic data
+      produces:
+        - application/json
       responses:
-        201:
-          description: ''
+        200:
+          description: OK
           schema:
-            $ref: '#/definitions/Question'
-          examples:
-            application/json:
-                question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 0
-                  - choice: Python
-                    votes: 0
-                  - choice: Objective-C
-                    votes: 0
-                  - choice: Ruby
-                    votes: 0
-definitions:
-  Question:
-    title: Question
-    type: object
-    properties:
-      question:
-        type: string
-      published_at:
-        type: string
-      choices:
-        type: array
-        items:
-          $ref: '#/definitions/Choice'
-    required:
-      - question
-      - published_at
-      - choices
-  Choice:
-    title: Choice
-    type: object
-    properties:
-      votes:
-        type: integer
-        format: int32
-      choice:
-        type: string
-    required:
-      - votes
-      - choice
-  QuestionRequest:
-    title: Question Request
-    type: object
-    properties:
-      question:
-        type: string
-      choices:
-        type: array
-        items:
-          type: string
-    required:
-      - question
-      - choices
-    example:
-      question: Favourite programming language?
-      choices:
-        - Swift
-        - Python
-        - Objective-C
-        - Ruby
+            $ref: '#/definitions/User'
+          
+  /users/{userId}:
+    get:
+      summary: Returns a specific user given it's ID
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: integer
+          description: The id of the user
+          
+      responses:
+        200:
+          description: OK
+          schema: 
+            $ref: '#/definitions/User'
+            
+        404:
+          description: No users were found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
