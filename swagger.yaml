@@ -10,14 +10,16 @@ consumes:
   - application/json
 produces:
   - application/json
-  
+
+#TODO: The 401 errors are not set up everywhere. Just remember to do this later
+
 #TODO: The host should be adjusted later
 host: api.nowhere.com
 basePath: /v1
 schemes:
   - https
 
-#All the request will require
+#Almost all the request will require authentication
 securityDefinitions:
   ApiTokenAuth:
     type: apiKey
@@ -42,7 +44,7 @@ definitions:
       id:
         type: integer
         description: The id that univocally identifies the user
-        example: 42
+        example: 84
       name:
         type: string
         description: The full name of the user
@@ -50,11 +52,11 @@ definitions:
       badgeNumber:
         type: string
         description: The university identifier of this user. It can be the student's "numero di matricola" or the teacher's badge number
-        example: 18123
+        example: 111244
       email:
         type: string
         description: The user's email
-        example: mail@example.com
+        example: gianni@morandi.cit
 
     required:
       - id
@@ -108,6 +110,44 @@ definitions:
       - properties
       - name
       - createdBy
+
+  TaskHeader:
+    title: TaskHeader
+    type: object
+    properties:
+      id:
+        type: integer
+        example:
+          42
+
+      question:
+        type: string
+        example: What is the meaning of life?
+
+      type:
+        type: string
+        enum: [openQuestion, multipleAnswer, linkSubmission]
+
+    required:
+      - id
+      - question
+      - type
+
+  TaskPool:
+    title: Task Pool
+    type: object
+    properties:
+      id:
+        type: integer
+
+      name:
+        type: string
+
+      createdBy:
+        $ref: '#/definitions/User'
+
+    required:
+      - name
 
   Error:
     type: object
@@ -184,7 +224,7 @@ paths:
             properties:
               id:
                 type: integer
-                example: 42
+                example: 123
               token:
                 type: string
                 example: AABBCCDDEEFFGG
@@ -254,7 +294,6 @@ paths:
         200:
           description: OK
 
-
   /users/me/email:
     post:
       summary: Changes the email of the authenticated user
@@ -281,7 +320,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-
   /users/me/password:
     post:
       summary: Changes the password of the authenticated user
@@ -307,8 +345,6 @@ paths:
           description: Could not change password because the password is invalid (empty, etc...)
           schema:
             $ref: '#/definitions/Error'
-
-
 
   /users/:
     get:
@@ -341,7 +377,6 @@ paths:
 
         401:
           $ref: "#/responses/Unauthorized"
-
 
   /users/{userId}:
     get:
@@ -482,7 +517,6 @@ paths:
         401:
           $ref: "#/responses/Unauthorized"
 
-
   /groups/{groupId}:
     get:
       summary: Retrieves the group having a given id
@@ -533,7 +567,6 @@ paths:
 
         401:
           $ref: "#/responses/Unauthorized"
-
 
   /groups/{groupId}/users:
     get:
@@ -637,4 +670,155 @@ paths:
             $ref: '#/definitions/Error'
 
 
+###########################
+# TASKS
+###########################
+  /tasks/:
+    get:
+      summary: Returns a list of all the tasks
+      description: >
+        Returns a list of all the tasks
+
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+
+      tags: [Task pool]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskHeader'
+
+        401:
+          $ref: '#/responses/Unauthorized'
+
+
+#TODO post: Come gestire diversi tipi di task?
+
+###########################
+# TASK POOLS
+###########################
+  /task-pools/:
+    get:
+      summary: Returns a list of all the task pools
+      tags: [Task pool]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskPool'
+
+    post:
+      summary: Creates a new task pool
+      tags: [Task pool]
+      parameters:
+        - in: body
+          required: true
+          name: data
+          schema:
+            $ref: '#/definitions/TaskPool'
+
+      responses:
+        201:
+          description: OK
+
+  /task-pools/{poolId}:
+    parameters:
+      - in: path
+        name: poolId
+        required: true
+        type: integer
+
+    get:
+      summary: Returns the task pool having the given id
+      tags: [Task pool]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/TaskPool'
+
+    put:
+      summary: Updates the task pool
+      tags: [Task pool]
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            type: object
+            properties:
+              name:
+                type: string
+
+      responses:
+        200:
+          description: OK
+
+    delete:
+      summary: Deletes the task pool having a given id
+      tags: [Task pool]
+      responses:
+        204:
+          description: OK
+          schema:
+            $ref: '#/definitions/TaskPool'
+
+
+  /task-pools/{poolId}/tasks:
+    get:
+      summary: Returns a list of all the task that are part of this pool
+      tags: [Task pool]
+      parameters:
+      - in: path
+        name: poolId
+        required: true
+        type: integer
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskHeader'
+
+
+  /task-pools/{poolId}/tasks/{taskId}:
+    parameters:
+      - in: path
+        name: poolId
+        required: true
+        type: integer
+
+      - in: path
+        name: taskId
+        required: true
+        type: integer
+
+    put:
+      summary: Adds a new task to the pool
+      tags: [Task pool]
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            type: integer
+
+      responses:
+        201:
+          description: The new task has been created
+
+    delete:
+      summary: Removes a task from the pool
+      tags: [Task pool]
+      responses:
+        204:
+          description: OK
 
