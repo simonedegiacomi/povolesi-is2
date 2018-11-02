@@ -96,7 +96,7 @@ definitions:
 
 responses:
   Unauthorized:
-    description: The called doesn't have the needed authorization
+    description: The caller doesn't have the needed authorization
     schema:
       $ref: "#/definitions/Error"
 
@@ -128,7 +128,7 @@ paths:
         - Unauthenticated
       parameters:
         - in: body
-          name: user
+          name: data
           description: The registration data of the user
           schema:
             type: object
@@ -202,7 +202,7 @@ paths:
       tags: [Current user]
       parameters:
         - in: body
-          name: userData
+          name: data
           schema:
             type: object
             properties:
@@ -225,9 +225,12 @@ paths:
       parameters:
         - in: body
           required: true
-          name: newEmail
+          name: data
           schema:
-            type: string
+            type: object
+            properties:
+              newEmail:
+                type: string
 
       responses:
         200:
@@ -246,9 +249,12 @@ paths:
       parameters:
         - in: body
           required: true
-          name: newEmail
+          name: data
           schema:
-            type: string
+            type: object
+            properties:
+              newPassword:
+                type: string
 
       responses:
         200:
