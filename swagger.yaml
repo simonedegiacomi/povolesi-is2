@@ -177,7 +177,7 @@ paths:
                 type: string
 
       responses:
-        200:
+        201:
           description: The user has been inserted and the associated token is generated
           schema:
             type: object
@@ -188,7 +188,7 @@ paths:
               token:
                 type: string
                 example: AABBCCDDEEFFGG
-        422:
+        400:
           description: Could not insert the user. Probably the email is already in use
           schema:
             $ref: '#/definitions/Error'
@@ -203,7 +203,7 @@ paths:
         Logs the user in. This request is usually used to get a new authentication token associated to the user. After this call the old token (got by `register` or `login` call) is then released and is not valid anymore.
 
       responses:
-        200:
+        201:
           description: The new token has been generated
           schema:
             type: object
@@ -273,7 +273,7 @@ paths:
         200:
           description: OK
 
-        422:
+        400:
           description: Could not change email. Usually because the email is already used by another user.
           schema:
             $ref: '#/definitions/Error'
@@ -297,7 +297,7 @@ paths:
         200:
           description: OK
 
-        422:
+        400:
           description: Could not change password because the password is invalid (empty, etc...)
           schema:
             $ref: '#/definitions/Error'
@@ -400,6 +400,11 @@ paths:
         200:
           description: OK
 
+        400:
+          description: Could not change permissions. Happens when trying to change the permission of the admin
+          schema:
+            $ref: '#/definitions/Error'
+
         401:
           $ref: "#/responses/Unauthorized"
 
@@ -407,12 +412,6 @@ paths:
           description: No users were found with the specified id
           schema:
             $ref: '#/definitions/Error'
-
-        422:
-          description: Could not change permissions. Happens when trying to change the permission of the admin
-          schema:
-            $ref: '#/definitions/Error'
-
 
 
 
@@ -592,7 +591,7 @@ paths:
       summary: Creates a new group
       tags: [Groups]
       responses:
-        200:
+        201:
           description: The group was successfully created. The id of the generated group is then returned.
           schema:
             type: object
