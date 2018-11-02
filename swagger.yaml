@@ -430,6 +430,14 @@ paths:
         NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
 
       tags: [Groups]
+      parameters:
+        - in: query
+          name: sortBy
+          type: string
+          enum: [id, name]
+
+        - $ref: '#/parameters/offsetParam'
+        - $ref: '#/parameters/limitParam'
       responses:
         200:
           description: OK
