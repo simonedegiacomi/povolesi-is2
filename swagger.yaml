@@ -81,6 +81,34 @@ definitions:
       - canChangePermissions
       - canListUsers
 
+  Group:
+    title: Group
+    type: object
+    properties:
+      id:
+        type: integer
+        description: A unique identifier of the group
+
+      name:
+        type: string
+        description: The name associated to this group
+
+      createdBy:
+        $ref: "#/definitions/User"
+
+      users:
+        description: All the users that are part of this groups
+        type: array
+        items:
+          $ref: '#/definitions/User'
+
+    required:
+      - properties
+      - name
+      - createdBy
+      - users
+
+
   Error:
     type: object
     properties:
@@ -120,6 +148,11 @@ parameters:
     description: The numbers of items to return.
 
 paths:
+
+###########################
+# UNAUTHENTICATED
+###########################
+
   /register:
     post:
       summary: Allows a user to register in order to receive the authentication token
@@ -183,6 +216,10 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+
+###########################
+# USERS
+###########################
 
   /users/me:
     get:
@@ -375,5 +412,194 @@ paths:
           description: Could not change permissions. Happens when trying to change the permission of the admin
           schema:
             $ref: '#/definitions/Error'
+
+
+
+
+###########################
+# GROUPS
+###########################
+
+  /groups/:
+    get:
+      summary: Returns a list of all the groups (classes)
+      description: >
+        Returns a list of all the groups of users
+
+
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+
+      tags: [Groups]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Group'
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
+
+  /groups/{groupId}:
+    get:
+      summary: Retrieves a group having a given id
+
+      description: >
+        Retrieves a group having a given id
+
+
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+      tags: [Groups]
+      parameters:
+        - in: path
+          name: groupId
+          type: integer
+          required: true
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Group'
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
+  /groups/{groupId}/add-user:
+    post:
+      summary: Adds a new user to the group
+
+      description: >
+        Adds a new user to the group
+
+
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+      tags: [Groups]
+      parameters:
+        - in: path
+          name: groupId
+          type: integer
+          required: true
+
+        - in: body
+          name: data
+          required: true
+          schema:
+            type: object
+            properties:
+              userId:
+                type: integer
+
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Group'
+
+        400:
+          description: Could not add a user to the group, probably becaus the user is already part of the group
+
+          schema:
+            $ref: '#/definitions/Error'
+
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
+
+  /groups/{groupId}/remove-user:
+    post:
+      summary: removes a user from the group
+
+      description: >
+        Removes a user from the group
+
+
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+      tags: [Groups]
+      parameters:
+        - in: path
+          name: groupId
+          type: integer
+          required: true
+
+        - in: body
+          name: data
+          required: true
+          schema:
+            type: object
+            properties:
+              userId:
+                type: integer
+
+
+      responses:
+        200:
+          description: The use was successfully removed from the group
+          schema:
+            $ref: '#/definitions/Group'
+
+        400:
+          description: Could not remove the user to the group, probably becaus the user is not part of the group
+
+          schema:
+            $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
+
+  /groups/{groupId}/delete:
+    post:
+      summary: deletes the group
+
+      description: >
+        Removes a user from the group
+
+
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+      tags: [Groups]
+      parameters:
+        - in: path
+          name: groupId
+          type: integer
+          required: true
+
+      responses:
+        200:
+          description: The group was successfully deleted
+
+        404:
+          description: The group to delete was not found
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
+
+  /groups/create:
+    post:
+      summary: Creates a new group
+      tags: [Groups]
+      responses:
+        200:
+          description: The group was successfully created. The id of the generated group is then returned.
+          schema:
+            type: object
+            properties:
+              groupId:
+                type: integer
+                example: 12
+
+        400:
+          description: Something went wrong when trying to create a new group. Maybe the name of the groups is not valid or already taken.
+          schema:
+            $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
 
 
