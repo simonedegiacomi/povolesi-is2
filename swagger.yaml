@@ -26,9 +26,9 @@ securityDefinitions:
     description: >
       In order to use the APIs, you must first get an authentication token (we call 
       it just "token"). The token is specific to a user. It can be optained by 
-      calling the `/user/register` API and it has to be sent as a `X-API-TOKEN`
+      calling the `/users/register` API and it has to be sent as a `X-API-TOKEN`
       header with any other API request.
-     
+
 #All the APIs, except for register, are required to have an api token as a header
 #of their requests
 security:
@@ -59,20 +59,20 @@ definitions:
       manageGroups:
         type: boolean
         description: Can this user create/edit/delete user groups?
-        
+
       canManageTasks:
         type: boolean
         description: Can this user create/edit/delete taks?
-        
+
       canChangePermissions:
         type: boolean
         description: Can this user change other user's permissions?
-        
+
       canListUsers:
         type: boolean
         description: Can this user access the list of all the users?
-        
-    required:  
+
+    required:
       - id
       - name
       - badgeNumber
@@ -80,7 +80,7 @@ definitions:
       - canManageTasks
       - canChangePermissions
       - canListUsers
-      
+
   Error:
     type: object
     properties:
@@ -96,7 +96,7 @@ definitions:
 
 responses:
   Unauthorized:
-    description: The called doesn't have the needed authorization 
+    description: The called doesn't have the needed authorization
     schema:
       $ref: "#/definitions/Error"
 
@@ -108,7 +108,7 @@ parameters:
     type: integer
     minimum: 0
     description: The number of items to skip before starting to collect the result set.
-    
+
   limitParam:
     in: query
     name: limit
@@ -122,9 +122,11 @@ parameters:
 paths:
   /register:
     post:
-      summary: Allows a user to register in order to receive the authentication token 
+      summary: Allows a user to register in order to receive the authentication token
       security: [] #this api can be called without the token
-      parameters: 
+      tags:
+        - Unauthenticated
+      parameters:
         - in: body
           name: user
           description: The registration data of the user
@@ -140,7 +142,7 @@ paths:
                 type: string
               password:
                 type: string
-                
+
       responses:
         200:
           description: The user has been inserted and the associated token is generated
@@ -158,25 +160,125 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /login/:
+    post:
+      summary: Generates a new token for an already registered user
+      security: []
+      tags:
+        - Unauthenticated
+      description: >
+        Logs the user in. This request is usually used to get a new authentication token associated to the user. After this call the old token (got by `register` or `login` call) is then released and is not valid anymore.
 
-  /user/:
+      responses:
+        200:
+          description: The new token has been generated
+          schema:
+            type: object
+            properties:
+              token:
+                type: string
+
+        400:
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /users/me:
+    get:
+      summary: Returns information about the authenticated user
+      description: Retrieves the user that is authenticated by the token and
+        returns it's basic data
+      tags: [Current user]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+
+    put:
+      summary: Updates the information about the authenticated user
+      tags: [Current user]
+      parameters:
+        - in: body
+          name: userData
+          schema:
+            type: object
+            properties:
+              name:
+                description: new name to assign to the user
+                type: string
+
+              badgeNumber:
+                type: string
+
+      responses:
+        200:
+          description: OK
+
+
+  /users/me/change-email:
+    post:
+      summary: Changes the email of the authenticated user
+      tags: [Current user]
+      parameters:
+        - in: body
+          required: true
+          name: newEmail
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: OK
+
+        422:
+          description: Could not change email. Usually because the email is already used by another user.
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  /users/me/change-password:
+    post:
+      summary: Changes the password of the authenticated user
+      tags: [Current user]
+      parameters:
+        - in: body
+          required: true
+          name: newEmail
+          schema:
+            type: string
+
+      responses:
+        200:
+          description: OK
+
+        422:
+          description: Could not change password because the password is invalid (empty, etc...)
+          schema:
+            $ref: '#/definitions/Error'
+
+
+
+  /users/:
     get:
       summary: Returns all the users of the system
       description: >
         Retrieves all the users of the system.
-        
-        
-        NOTE: The caller must have the `listUsers` permission set, otherwise 
+
+
+        NOTE: The caller must have the `listUsers` permission set, otherwise
         a `401` error will be issued
-      produces:
-        - application/json
-        
-      parameters: 
+
+      tags: [Users]
+
+      parameters:
         - in: query
           name: sortBy
           type: string
           enum: [id, name, badgeNumber, email]
-        
+
         - $ref: '#/parameters/offsetParam'
         - $ref: '#/parameters/limitParam'
 
@@ -187,39 +289,85 @@ paths:
             type: array
             items:
               $ref: '#/definitions/User'
-              
+
         401:
           $ref: "#/responses/Unauthorized"
 
-  /user/me:
-    get:
-      summary: Returns information about the authenticated user
-      description: Retrieves the user that is authenticated by the token and returns it's basic data
-      produces:
-        - application/json
-      responses:
-        200:
-          description: OK
-          schema:
-            $ref: '#/definitions/User'
-          
+
   /users/{userId}:
     get:
       summary: Returns a specific user given it's ID
+      tags: [Users]
       parameters:
         - in: path
           name: userId
           required: true
           type: integer
           description: The id of the user
-          
+
       responses:
         200:
           description: OK
-          schema: 
+          schema:
             $ref: '#/definitions/User'
-            
+
         404:
           description: No users were found with the specified id
           schema:
             $ref: '#/definitions/Error'
+
+  /users/{userId}/set-permission:
+    put:
+      summary: Grants or revokes a specific permission
+      tags: [Users]
+      description: >
+        Gives or revokes a specific permission from the user.
+
+
+        NOTE: The caller must have the `changePermissions` permission set
+
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: integer
+          description: The id of the user
+
+        - in: body
+          name: permissionData
+          required: true
+          schema:
+            type: object
+            required:
+              - permissionType
+              - value
+            properties:
+              permissionType:
+                type: string
+                description: The type of the permission to give to user
+                enum:
+                  [manageGroups, manageTasks, changePermissions, listUsers]
+
+              value:
+                type: boolean
+                description: >
+                  `true` to give permission, `false` to revoke it
+
+      responses:
+        200:
+          description: OK
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
+        404:
+          description: No users were found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
+
+        422:
+          description: Could not change permissions. Happens when trying to change the permission of the admin
+          schema:
+            $ref: '#/definitions/Error'
+
+
