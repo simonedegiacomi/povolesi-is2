@@ -55,31 +55,39 @@ definitions:
         type: string
         description: The user's email
         example: mail@example.com
-        
-      manageGroups:
-        type: boolean
-        description: Can this user create/edit/delete user groups?
-
-      canManageTasks:
-        type: boolean
-        description: Can this user create/edit/delete taks?
-
-      canChangePermissions:
-        type: boolean
-        description: Can this user change other user's permissions?
-
-      canListUsers:
-        type: boolean
-        description: Can this user access the list of all the users?
 
     required:
       - id
       - name
       - badgeNumber
       - email
-      - canManageTasks
-      - canChangePermissions
-      - canListUsers
+
+  UserPermissions:
+    title: Permissions
+    type: object
+    properties:
+      manageGroups:
+        type: boolean
+        description: Can this user create/edit/delete user groups?
+
+      manageTasks:
+        type: boolean
+        description: Can this user create/edit/delete taks?
+
+      changePermissions:
+        type: boolean
+        description: Can this user change other user's permissions?
+
+      listUsers:
+        type: boolean
+        description: Can this user access the list of all the users?
+
+    required:
+      - manageGroups
+      - manageTasks
+      - changePermissions
+      - listUsers
+
 
   Group:
     title: Group
@@ -96,18 +104,10 @@ definitions:
       createdBy:
         $ref: "#/definitions/User"
 
-      users:
-        description: All the users that are part of this groups
-        type: array
-        items:
-          $ref: '#/definitions/User'
-
     required:
       - properties
       - name
       - createdBy
-      - users
-
 
   Error:
     type: object
@@ -255,9 +255,12 @@ paths:
           description: OK
 
 
-  /users/me/change-email:
+  /users/me/email:
     post:
       summary: Changes the email of the authenticated user
+      description:
+        Changes the email of the authenticated user. The user will receive a
+        confirmation mail.
       tags: [Current user]
       parameters:
         - in: body
@@ -279,9 +282,12 @@ paths:
             $ref: '#/definitions/Error'
 
 
-  /users/me/change-password:
+  /users/me/password:
     post:
       summary: Changes the password of the authenticated user
+      description:
+        Changes the password of the authenticated user. The user will receive an
+        email telling him/her about the password change.
       tags: [Current user]
       parameters:
         - in: body
@@ -359,12 +365,33 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /users/{userId}/set-permission:
+  /users/{userId}/permissions:
+    get:
+      summary: Returns all the permissions of a specific user
+      description: >
+        Returns the permissions of a specific user
+
+        NOTE: The caller must have the `changePermissions` permission set
+      tags: [Users]
+      parameters:
+        - in: path
+          name: userId
+          required: true
+          type: integer
+          description: The id of the user
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/UserPermissions'
+
+
     put:
-      summary: Grants or revokes a specific permission
+      summary: Changes all the permissions of a specific user
       tags: [Users]
       description: >
-        Gives or revokes a specific permission from the user.
+        Changes all the permissions of a specific user
 
 
         NOTE: The caller must have the `changePermissions` permission set
@@ -377,24 +404,10 @@ paths:
           description: The id of the user
 
         - in: body
-          name: permissionData
+          name: data
           required: true
           schema:
-            type: object
-            required:
-              - permissionType
-              - value
-            properties:
-              permissionType:
-                type: string
-                description: The type of the permission to give to user
-                enum:
-                  [manageGroups, manageTasks, changePermissions, listUsers]
-
-              value:
-                type: boolean
-                description: >
-                  `true` to give permission, `false` to revoke it
+            $ref: '#/definitions/UserPermissions'
 
       responses:
         200:
@@ -448,10 +461,31 @@ paths:
         401:
           $ref: "#/responses/Unauthorized"
 
+    post:
+      summary: Creates a new group
+      tags: [Groups]
+      responses:
+        201:
+          description: The group was successfully created. The id of the generated group is then returned.
+          schema:
+            type: object
+            properties:
+              groupId:
+                type: integer
+                example: 12
+
+        400:
+          description: Something went wrong when trying to create a new group. Maybe the name of the groups is not valid or already taken.
+          schema:
+            $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
 
   /groups/{groupId}:
     get:
-      summary: Retrieves a group having a given id
+      summary: Retrieves the group having a given id
 
       description: >
         Retrieves a group having a given id
@@ -474,10 +508,59 @@ paths:
         401:
           $ref: "#/responses/Unauthorized"
 
-  /groups/{groupId}/add-user:
+
+    delete:
+      summary: Deletes the group having a given id
+
+      description: >
+        Deletes the entire group
+
+
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+      tags: [Groups]
+      parameters:
+        - in: path
+          name: groupId
+          type: integer
+          required: true
+
+      responses:
+        204:
+          description: The group was successfully deleted
+
+        404:
+          description: The group to delete was not found
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
+
+  /groups/{groupId}/users:
+    get:
+      summary: Retrieves all the users of a given group
+
+      description: >
+        Retrieves all the users of a give group
+
+
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+      tags: [Groups]
+      parameters:
+        - in: path
+          name: groupId
+          type: integer
+          required: true
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+
     post:
       summary: Adds a new user to the group
-
       description: >
         Adds a new user to the group
 
@@ -499,7 +582,6 @@ paths:
               userId:
                 type: integer
 
-
       responses:
         200:
           description: OK
@@ -512,14 +594,12 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-
         401:
           $ref: "#/responses/Unauthorized"
 
-
-  /groups/{groupId}/remove-user:
-    post:
-      summary: removes a user from the group
+  /groups/{groupId}/users/{userId}:
+    delete:
+      summary: Removes a user from the group
 
       description: >
         Removes a user from the group
@@ -533,80 +613,28 @@ paths:
           type: integer
           required: true
 
-        - in: body
-          name: data
+        - in: path
+          name: userId
+          type: integer
           required: true
-          schema:
-            type: object
-            properties:
-              userId:
-                type: integer
-
 
       responses:
-        200:
-          description: The use was successfully removed from the group
-          schema:
-            $ref: '#/definitions/Group'
+        204:
+          description: The user was successfully removed from the group
 
         400:
-          description: Could not remove the user to the group, probably becaus the user is not part of the group
+          description: Could not remove the user to the group, probably because the user is not part of the group
 
           schema:
             $ref: '#/definitions/Error'
 
         401:
           $ref: "#/responses/Unauthorized"
-
-
-  /groups/{groupId}/delete:
-    post:
-      summary: deletes the group
-
-      description: >
-        Removes a user from the group
-
-
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
-      tags: [Groups]
-      parameters:
-        - in: path
-          name: groupId
-          type: integer
-          required: true
-
-      responses:
-        200:
-          description: The group was successfully deleted
 
         404:
-          description: The group to delete was not found
-
-        401:
-          $ref: "#/responses/Unauthorized"
-
-
-  /groups/create:
-    post:
-      summary: Creates a new group
-      tags: [Groups]
-      responses:
-        201:
-          description: The group was successfully created. The id of the generated group is then returned.
-          schema:
-            type: object
-            properties:
-              groupId:
-                type: integer
-                example: 12
-
-        400:
-          description: Something went wrong when trying to create a new group. Maybe the name of the groups is not valid or already taken.
+          description: User or group not found
           schema:
             $ref: '#/definitions/Error'
-
-        401:
-          $ref: "#/responses/Unauthorized"
 
 
 
