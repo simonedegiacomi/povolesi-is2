@@ -26,8 +26,8 @@ securityDefinitions:
     in: header
     name: X-API-TOKEN
     description: >
-      In order to use the APIs, you must first get an authentication token (we call 
-      it just "token"). The token is specific to a user. It can be optained by 
+      In order to use the APIs, you must first get an authentication token (we call
+      it just "token"). The token is specific to a user. It can be optained by
       calling the `/users/register` API and it has to be sent as a `X-API-TOKEN`
       header with any other API request.
 
@@ -958,6 +958,102 @@ paths:
     delete:
       summary: Removes a task from the pool
       tags: [Task pools]
+      responses:
+        204:
+          description: OK
+
+
+
+###########################
+# ASSIGNMENTS
+###########################
+  /assignments/:
+    get:
+      summary: Returns a list of all the assignments
+      description: >
+        Returns a list of all the assignments
+
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+
+      tags: [Assignments]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Assignment'
+
+        401:
+          $ref: '#/responses/Unauthorized'
+
+    post:
+      summary: Adds a new assignment
+      description: >
+        Adds a new assignment
+
+      tags: [Assignments]
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/Assignment'
+
+      responses:
+        204:
+          description: The new assignment has been successfully created
+
+  /assignments/{assignmentId}:
+    parameters:
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
+
+    get:
+      summary: Returns an assignment with the given id
+      tags: [Assignments]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Assignment'
+
+    put:
+      summary: Updates an assignment with the given id
+      tags: [Assignments]
+      parameters:
+        - in: body
+          name: data
+          schema:
+            $ref: '#/definitions/Assignment'
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Assignment'
+
+    delete:
+      summary: Deletes an assignment with the given id
+      tags: [Assignments]
+      responses:
+        204:
+          description: OK
+
+  /assignments/{assignmentId}/close:
+    post:
+      summary: Closes the assignment with the given id
+      description: Closes the assignment with the given id. No more answers can be submitted.
+      tags: [Assignments]
+      parameters:
+        - in: path
+          required: true
+          name: assignmentId
+          type: integer
       responses:
         204:
           description: OK
