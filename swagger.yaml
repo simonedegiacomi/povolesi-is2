@@ -430,6 +430,18 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+  /users/me/assignments:
+    get:
+      summary: Returns a list of assignments that are associated to the authenticated user
+      tags: [Current user]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Assignment'
+
   /users/:
     get:
       summary: Returns all the users of the system
@@ -485,6 +497,13 @@ paths:
             $ref: '#/definitions/Error'
 
   /users/{userId}/permissions:
+    parameters:
+    - in: path
+      name: userId
+      required: true
+      type: integer
+      description: The id of the user
+
     get:
       summary: Returns all the permissions of a specific user
       description: >
@@ -492,12 +511,6 @@ paths:
 
         NOTE: The caller must have the `changePermissions` permission set
       tags: [Users]
-      parameters:
-        - in: path
-          name: userId
-          required: true
-          type: integer
-          description: The id of the user
 
       responses:
         200:
@@ -516,12 +529,6 @@ paths:
         NOTE: The caller must have the `changePermissions` permission set
 
       parameters:
-        - in: path
-          name: userId
-          required: true
-          type: integer
-          description: The id of the user
-
         - in: body
           name: data
           required: true
@@ -544,6 +551,24 @@ paths:
           description: No users were found with the specified id
           schema:
             $ref: '#/definitions/Error'
+
+  /users/{userId}/assignments:
+    parameters:
+      - in: path
+        required: true
+        name: userId
+        type: integer
+
+    get:
+      summary: Returns a list of assignments that are associated to the specified user
+      tags: [Users]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Assignment'
 
 
 
@@ -654,6 +679,12 @@ paths:
           $ref: "#/responses/Unauthorized"
 
   /groups/{groupId}/users:
+    parameters:
+      - in: path
+        name: groupId
+        type: integer
+        required: true
+
     get:
       summary: Retrieves all the users of a given group
 
@@ -663,11 +694,6 @@ paths:
 
         NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
       tags: [Groups]
-      parameters:
-        - in: path
-          name: groupId
-          type: integer
-          required: true
 
       responses:
         200:
@@ -686,11 +712,6 @@ paths:
         NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
       tags: [Groups]
       parameters:
-        - in: path
-          name: groupId
-          type: integer
-          required: true
-
         - in: body
           name: data
           required: true
@@ -716,25 +737,25 @@ paths:
           $ref: "#/responses/Unauthorized"
 
   /groups/{groupId}/users/{userId}:
+    parameters:
+      - in: path
+        name: groupId
+        type: integer
+        required: true
+
+      - in: path
+        name: userId
+        type: integer
+        required: true
+
     delete:
       summary: Removes a user from the group
-
       description: >
         Removes a user from the group
 
 
         NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
       tags: [Groups]
-      parameters:
-        - in: path
-          name: groupId
-          type: integer
-          required: true
-
-        - in: path
-          name: userId
-          type: integer
-          required: true
 
       responses:
         204:
@@ -1057,3 +1078,84 @@ paths:
       responses:
         204:
           description: OK
+
+  /assignments/{assignmentId}/draws:
+    parameters:
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
+
+    get:
+      summary: Returns all the draws of the assignment
+      tags: [Assignments]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskDraw'
+
+    post:
+      summary: Adds a new draw to the assignment
+      tags: [Assignments]
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/TaskDraw'
+
+      responses:
+        204:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskDraw'
+
+  /assignments/{assignmentId}/draws/{drawId}:
+    parameters:
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
+
+      - in: path
+        required: true
+        name: drawId
+        type: integer
+
+    get:
+      summary: Returns the draw with the given id, associated to the assignment
+      tags: [Assignments]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskDraw'
+
+    put:
+      summary: Updates the draw with the given id, associated to the assignment
+      tags: [Assignments]
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/TaskDraw'
+
+      responses:
+        204:
+          description: OK
+
+    delete:
+      description: Returns the draw with the given id, associated to the assignment
+      responses:
+        204:
+          description: The draw was removed from the assignment
+
+
