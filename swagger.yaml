@@ -111,28 +111,6 @@ definitions:
       - name
       - createdBy
 
-  TaskHeader:
-    title: TaskHeader
-    type: object
-    properties:
-      id:
-        type: integer
-        example:
-          42
-
-      question:
-        type: string
-        example: What is the meaning of life?
-
-      type:
-        type: string
-        enum: [openQuestion, multipleAnswer, linkSubmission]
-
-    required:
-      - id
-      - question
-      - type
-
   TaskPool:
     title: Task Pool
     type: object
@@ -148,6 +126,111 @@ definitions:
 
     required:
       - name
+
+  TaskDraw:
+    title: Task Draw
+    type: object
+    properties:
+      id:
+        type: integer
+
+      poolID:
+        type: integer
+
+      numQuestionsToDraw:
+        type: integer
+
+      minPerQuestionDraw:
+        type: integer
+
+    required:
+      - poolID
+      - numQuestionsToDraw
+      - minPerQuestionDraw
+
+  Task:
+    title: Task
+    type: object
+    properties:
+      id:
+        type: integer
+        example:
+          1234
+
+      question:
+        type: string
+        description: The question of this task
+        example: What is the meaning of life?
+
+      type:
+        type: string
+        enum: [openQuestion, multipleAnswer, linkSubmission]
+        example: multipleAnswer
+
+      numAnswersAllowed:
+        description: >
+          Used in case of multiple answer questions. Is true in case the multiple answers are allowed,
+          false otherwise.
+        type: boolean
+
+      answers:
+        description: >
+          Used in case of multiple answer questions. Holds all the possible values that the user can choose from.
+        type: array
+        items:
+          type: string
+        example:
+          [Happiness, Balance, 42]
+
+      maxLength:
+        description: >
+          Used in case of open questions. It's the maximum amount of characters that is allowed in the answer.
+        type: integer
+
+    required:
+      - id
+      - question
+      - type
+
+
+  Assignment:
+    title: Assignment
+    type: object
+    properties:
+      id:
+        type: integer
+
+      name:
+        type: string
+
+      startsOn:
+        type: integer
+
+      deadline:
+        type: integer
+
+      allowsLateSubmission:
+        type: boolean
+
+      lateSubmissionDeadline:
+        type: integer
+
+      createdByUserId:
+        type: integer
+
+      assignedToGroupId:
+        type: integer
+
+      isClosed:
+        type: boolean
+
+    required:
+      - name
+      - startsOn
+      - deadline
+      - allowsLateSubmission
+      - createdByUserId
+      - assignedToGroupId
 
   Error:
     type: object
@@ -233,7 +316,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /login/:
+  /login:
     post:
       summary: Generates a new token for an already registered user
       security: []
@@ -331,6 +414,7 @@ paths:
         - in: body
           required: true
           name: data
+
           schema:
             type: object
             properties:
@@ -485,6 +569,7 @@ paths:
 
         - $ref: '#/parameters/offsetParam'
         - $ref: '#/parameters/limitParam'
+
       responses:
         200:
           description: OK
@@ -682,7 +767,7 @@ paths:
 
         NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
 
-      tags: [Task pool]
+      tags: [Tasks]
 
       responses:
         200:
@@ -690,13 +775,68 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TaskHeader'
+              $ref: '#/definitions/Task'
 
         401:
           $ref: '#/responses/Unauthorized'
 
+    post:
+      summary: Adds a new task
+      description: >
+        Adds a new task. The task can be expressed in one of 3 different
+        syntaxes, accordingly to the types of the task that you want to create.
 
-#TODO post: Come gestire diversi tipi di task?
+
+        The property `type` is used to distinguish between different types of tasks
+      tags: [Tasks]
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/Task'
+
+      responses:
+        204:
+          description: The new task has been successfully created
+
+  /tasks/{taskId}:
+    parameters:
+      - in: path
+        required: true
+        name: taskId
+        type: integer
+
+    get:
+      summary: Returns a task with the given id
+      tags: [Tasks]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Task'
+
+    put:
+      summary: Updates a task with the given id
+      tags: [Tasks]
+      parameters:
+        - in: body
+          name: data
+          schema:
+            $ref: '#/definitions/Task'
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Task'
+
+    delete:
+      summary: Deletes a task with the given id
+      tags: [Tasks]
+      responses:
+        204:
+          description: OK
 
 ###########################
 # TASK POOLS
@@ -704,7 +844,7 @@ paths:
   /task-pools/:
     get:
       summary: Returns a list of all the task pools
-      tags: [Task pool]
+      tags: [Task pools]
       responses:
         200:
           description: OK
@@ -715,7 +855,7 @@ paths:
 
     post:
       summary: Creates a new task pool
-      tags: [Task pool]
+      tags: [Task pools]
       parameters:
         - in: body
           required: true
@@ -736,7 +876,7 @@ paths:
 
     get:
       summary: Returns the task pool having the given id
-      tags: [Task pool]
+      tags: [Task pools]
       responses:
         200:
           description: OK
@@ -745,7 +885,7 @@ paths:
 
     put:
       summary: Updates the task pool
-      tags: [Task pool]
+      tags: [Task pools]
       parameters:
         - in: body
           name: data
@@ -762,7 +902,7 @@ paths:
 
     delete:
       summary: Deletes the task pool having a given id
-      tags: [Task pool]
+      tags: [Task pools]
       responses:
         204:
           description: OK
@@ -773,7 +913,7 @@ paths:
   /task-pools/{poolId}/tasks:
     get:
       summary: Returns a list of all the task that are part of this pool
-      tags: [Task pool]
+      tags: [Task pools]
       parameters:
       - in: path
         name: poolId
@@ -786,7 +926,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/TaskHeader'
+              $ref: '#/definitions/Task'
 
 
   /task-pools/{poolId}/tasks/{taskId}:
@@ -803,7 +943,7 @@ paths:
 
     put:
       summary: Adds a new task to the pool
-      tags: [Task pool]
+      tags: [Task pools]
       parameters:
         - in: body
           name: data
@@ -817,8 +957,7 @@ paths:
 
     delete:
       summary: Removes a task from the pool
-      tags: [Task pool]
+      tags: [Task pools]
       responses:
         204:
           description: OK
-
