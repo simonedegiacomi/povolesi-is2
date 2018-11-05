@@ -1153,7 +1153,8 @@ paths:
           description: OK
 
     delete:
-      description: Returns the draw with the given id, associated to the assignment
+      description: Deletes the draw with the given id, associated to the assignment
+      tags: [Assignments]
       responses:
         204:
           description: The draw was removed from the assignment
