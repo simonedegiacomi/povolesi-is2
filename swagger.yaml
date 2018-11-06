@@ -1282,7 +1282,35 @@ paths:
       responses:
         204:
           description: The draw was removed from the assignment
-        
+          
+  /assignemnts/{assignmentId}/task-answers:
+    parameters:
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
+
+    get:
+      summary: Returns a list of all task answers given an assignment
+      description: >
+        Returns a list of all task answers given an assignment
+
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+
+      tags: [Task answers]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskAnswer'
+
+        403:
+          $ref: '#/responses/Unauthorized'
+          
 ###########################
 # TASK ANSWERS
 ###########################
@@ -1355,33 +1383,5 @@ paths:
       responses:
         204:
           description: The task answer has been removed
-        403:
-          $ref: '#/responses/Unauthorized'
-  
-  /task-answers/{assignmentId}:
-    parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
-
-    get:
-      summary: Returns a list of all task answers given an assignment
-      description: >
-        Returns a list of all task answers given an assignment
-
-
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
-
-      tags: [Task answers]
-
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TaskAnswer'
-
         403:
           $ref: '#/responses/Unauthorized'
