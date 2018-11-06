@@ -477,17 +477,7 @@ paths:
             items:
               $ref: '#/definitions/Assignment'
 
-  /users/me/tasks:
-    get:
-      summary: Returns a list of tasks that are associated to the authenticated user
-      tags: [Current user]
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Task'
+  /users/me/assignments/{assignmentId}/tasks/{taskId}/answer:
     put:
       summary: Submit an answers to a task
       tags: [Current user]
@@ -497,23 +487,23 @@ paths:
         NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
 
       parameters:
+        - in: path
+          required: true
+          name: assignmentId
+          type: integer
+        - in: path
+          required: true
+          name: taskId
+          type: integer
         - in: body
           name: data
           required: true
           schema:
-            $ref: '#/definitions/Task'
+            $ref: '#/definitions/TaskAnswer'
 
       responses:
         200:
           description: OK
-
-        400:
-          description: Could not change questions. Happens when trying to change questions  without 'manageTasks' set
-          schema:
-            $ref: '#/definitions/Error'
-
-        403:
-          $ref: "#/responses/Unauthorized"
 
         404:
           description: No task was found with the specified id
@@ -532,7 +522,7 @@ paths:
             items:
               $ref: '#/definitions/TaskAnswer'
 
-  /users/me/task-answers/{assignmentId}:
+  /users/me/assignments/{assignmentId}/task-answers:
     parameters:
       - in: path
         required: true
@@ -548,6 +538,10 @@ paths:
             type: array
             items:
               $ref: '#/definitions/TaskAnswer'
+        404:
+          description: No assignment was found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
 
   /users/:
     get:
