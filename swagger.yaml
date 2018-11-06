@@ -246,6 +246,26 @@ definitions:
         type: integer
       submittedOn:
         type: integer
+        
+      response:
+        description: >
+          Used in case of open question answer.
+        type: string
+      
+      selectedAnswers:
+        description: >
+          Used in case of multiple answers question. Holds all the selected answers.
+        type: array
+        items:
+          type: string
+        example:
+          [42]
+          
+      url:
+        description: >
+          Used in case of link sumbission answers
+        type: string
+          
       mark:
         type: integer
       comment:
