@@ -231,6 +231,32 @@ definitions:
       - allowsLateSubmission
       - createdByUserId
       - assignedToGroupId
+  
+  TaskAnswer:
+    title: Task Answer
+    type: object
+    properties:
+      id:
+        type: integer
+      userId:
+        type: integer
+      taskId:
+        type: integer
+      assignmentId:
+        type: integer
+      submittedOn:
+        type: integer
+      mark:
+        type: integer
+      comment:
+        type: string
+        
+    required:
+      - id
+      - userId
+      - taskId
+      - assignmentId
+      - submittedOn
 
   Error:
     type: object
@@ -276,7 +302,7 @@ paths:
 # UNAUTHENTICATED
 ###########################
 
-  /register:
+  /register/:
     post:
       summary: Allows a user to register in order to receive the authentication token
       security: [] #this api can be called without the token
@@ -316,7 +342,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /login:
+  /login/:
     post:
       summary: Generates a new token for an already registered user
       security: []
@@ -344,7 +370,7 @@ paths:
 # USERS
 ###########################
 
-  /users/me:
+  /users/me/:
     get:
       summary: Returns information about the authenticated user
       description: Retrieves the user that is authenticated by the token and
@@ -441,6 +467,79 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Assignment'
+
+  /users/me/tasks:
+    get:
+      summary: Returns a list of tasks that are associated to the authenticated user
+      tags: [Current user]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Task'
+    put:
+      summary: Submit an answers to a task
+      tags: [Current user]
+      description: >
+         Submit an answers to a task
+
+
+        NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
+
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/Task'
+
+      responses:
+        200:
+          description: OK
+
+        400:
+          description: Could not change questions. Happens when trying to change questions  without 'manageTasks' set
+          schema:
+            $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthorized"
+
+        404:
+          description: No task was found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
+
+  /users/me/task-answers:
+    get:
+      summary: Returns a list of task answers that are associated to the authenticated user
+      tags: [Current user]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskAnswer'
+
+  /users/me/task-answers/{assignmentId}:
+    parameters:
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
+    get:
+      summary: Returns a list of task answers that are associated to the authenticated user given an assignment
+      tags: [Current user]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskAnswer'
 
   /users/:
     get:
@@ -1158,5 +1257,107 @@ paths:
       responses:
         204:
           description: The draw was removed from the assignment
+        
+###########################
+# TASK ANSWERS
+###########################
+
+  /task-answers/:
+    get:
+      summary: Returns a list of all task answers
+      description: >
+        Returns a list of all task answers
 
 
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+
+      tags: [Task answers]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskAnswer'
+
+        401:
+          $ref: '#/responses/Unauthorized'
+    post:
+      summary: Adds a new task answer
+      description: >
+        Adds a new task answer
+
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+
+      tags: [Task answers]
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/TaskAnswer'
+
+      responses:
+        201:
+          description: OK
+          
+        401:
+          $ref: '#/responses/Unauthorized'
+          
+    put:
+      summary: Updates the task answer with the given id
+      tags: [Task answers]
+      parameters:
+        - in: body
+          name: data
+          required: true
+          schema:
+            $ref: '#/definitions/TaskAnswer'
+
+      responses:
+        201:
+          description: OK
+        
+        401:
+          $ref: '#/responses/Unauthorized'  
+
+    delete:
+      summary: Deletes the task with the given id
+      description: Deletes the task with the given id
+      tags: [Task answers]
+      responses:
+        204:
+          description: The task answer has been removed
+        401:
+          $ref: '#/responses/Unauthorized'
+  
+  /task-answers/{assignmentId}:
+    parameters:
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
+
+    get:
+      summary: Returns a list of all task answers given an assignment
+      description: >
+        Returns a list of all task answers given an assignment
+
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+
+      tags: [Task answers]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskAnswer'
+
+        401:
+          $ref: '#/responses/Unauthorized'
+  
