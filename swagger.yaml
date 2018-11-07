@@ -497,6 +497,29 @@ paths:
             items:
               $ref: '#/definitions/Assignment'
   
+  /users/me/assignments/{assignmentId}:
+    get:
+      summary: Returns an assignement assigned to me
+      tags: [Current user]
+
+      parameters:
+        - in: path
+          required: true
+          name: assignmentId
+          type: integer
+
+
+      responses:
+        200:
+          description: OK
+          schema: 
+            $ref: '#/definitions/Assignment'
+
+        404:
+          description: The assignement is not found
+          schema:
+            $ref: '#/definitions/Error'
+  
   /users/me/assignments/{assignmentId}/tasks:
     get:
       summary: Returns all tasks of an assignement assigned to me
@@ -521,8 +544,8 @@ paths:
           description: No assignement assigned to me is found
           schema:
             $ref: '#/definitions/Error'
-
-
+            
+  
   /users/me/assignments/{assignmentId}/tasks/{taskId}/answer:
     put:
       summary: Submit an answers to a task
