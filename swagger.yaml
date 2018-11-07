@@ -11,7 +11,7 @@ consumes:
 produces:
   - application/json
 
-#TODO: The 401 errors are not set up everywhere. Just remember to do this later
+#TODO: The 403 errors are not set up everywhere. Just remember to do this later
 
 #TODO: The host should be adjusted later
 host: api.nowhere.com
@@ -246,6 +246,26 @@ definitions:
         type: integer
       submittedOn:
         type: integer
+        
+      response:
+        description: >
+          Used in case of open question answer.
+        type: string
+      
+      selectedAnswers:
+        description: >
+          Used in case of multiple answers question. Holds all the selected answers.
+        type: array
+        items:
+          type: string
+        example:
+          [42]
+          
+      url:
+        description: >
+          Used in case of link sumbission answers
+        type: string
+          
       mark:
         type: integer
       comment:
@@ -266,7 +286,7 @@ definitions:
         description: A string that describes the error
       errorMessage:
         type: string
-        description: A developer-friendly description of what wen wrong
+        description: A developer-friendly description of what went wrong
     required:
       - code
       - errorMessage
@@ -338,7 +358,11 @@ paths:
                 type: string
                 example: AABBCCDDEEFFGG
         400:
-          description: Could not insert the user. Probably the email is already in use
+          description: Could not insert the user. Probably a field is missing.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: The email address is already in use.
           schema:
             $ref: '#/definitions/Error'
 
@@ -404,7 +428,7 @@ paths:
           description: OK
 
   /users/me/email:
-    post:
+    put:
       summary: Changes the email of the authenticated user
       description:
         Changes the email of the authenticated user. The user will receive a
@@ -423,14 +447,19 @@ paths:
       responses:
         200:
           description: OK
-
-        400:
-          description: Could not change email. Usually because the email is already used by another user.
+        
+        400: 
+          description: Could not change email.
+          schema:
+            $ref: '#/definitions/Error'
+      
+        409:
+          description: The email is already used by another user.
           schema:
             $ref: '#/definitions/Error'
 
   /users/me/password:
-    post:
+    put:
       summary: Changes the password of the authenticated user
       description:
         Changes the password of the authenticated user. The user will receive an
@@ -468,17 +497,7 @@ paths:
             items:
               $ref: '#/definitions/Assignment'
 
-  /users/me/tasks:
-    get:
-      summary: Returns a list of tasks that are associated to the authenticated user
-      tags: [Current user]
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Task'
+  /users/me/assignments/{assignmentId}/tasks/{taskId}/answer:
     put:
       summary: Submit an answers to a task
       tags: [Current user]
@@ -488,23 +507,23 @@ paths:
         NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
 
       parameters:
+        - in: path
+          required: true
+          name: assignmentId
+          type: integer
+        - in: path
+          required: true
+          name: taskId
+          type: integer
         - in: body
           name: data
           required: true
           schema:
-            $ref: '#/definitions/Task'
+            $ref: '#/definitions/TaskAnswer'
 
       responses:
         200:
           description: OK
-
-        400:
-          description: Could not change questions. Happens when trying to change questions  without 'manageTasks' set
-          schema:
-            $ref: '#/definitions/Error'
-
-        401:
-          $ref: "#/responses/Unauthorized"
 
         404:
           description: No task was found with the specified id
@@ -523,7 +542,7 @@ paths:
             items:
               $ref: '#/definitions/TaskAnswer'
 
-  /users/me/task-answers/{assignmentId}:
+  /users/me/assignments/{assignmentId}/task-answers:
     parameters:
       - in: path
         required: true
@@ -539,6 +558,10 @@ paths:
             type: array
             items:
               $ref: '#/definitions/TaskAnswer'
+        404:
+          description: No assignment was found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
 
   /users/:
     get:
@@ -548,7 +571,7 @@ paths:
 
 
         NOTE: The caller must have the `listUsers` permission set, otherwise
-        a `401` error will be issued
+        a `403` error will be issued
 
       tags: [Users]
 
@@ -569,7 +592,7 @@ paths:
             items:
               $ref: '#/definitions/User'
 
-        401:
+        403:
           $ref: "#/responses/Unauthorized"
 
   /users/{userId}:
@@ -588,6 +611,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/User'
+            
+        403:
+          $ref: "#/responses/Unauthorized"
 
         404:
           description: No users were found with the specified id
@@ -642,7 +668,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-        401:
+        403:
           $ref: "#/responses/Unauthorized"
 
         404:
@@ -681,7 +707,7 @@ paths:
         Returns a list of all the groups of users
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
 
       tags: [Groups]
       parameters:
@@ -701,7 +727,7 @@ paths:
             items:
               $ref: '#/definitions/Group'
 
-        401:
+        403:
           $ref: "#/responses/Unauthorized"
 
     post:
@@ -722,7 +748,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-        401:
+        403:
           $ref: "#/responses/Unauthorized"
 
   /groups/{groupId}:
@@ -733,7 +759,7 @@ paths:
         Retrieves a group having a given id
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
       tags: [Groups]
       parameters:
         - in: path
@@ -747,7 +773,7 @@ paths:
           schema:
             $ref: '#/definitions/Group'
 
-        401:
+        403:
           $ref: "#/responses/Unauthorized"
 
 
@@ -758,7 +784,7 @@ paths:
         Deletes the entire group
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
       tags: [Groups]
       parameters:
         - in: path
@@ -773,7 +799,7 @@ paths:
         404:
           description: The group to delete was not found
 
-        401:
+        403:
           $ref: "#/responses/Unauthorized"
 
   /groups/{groupId}/users:
@@ -790,7 +816,7 @@ paths:
         Retrieves all the users of a give group
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
       tags: [Groups]
 
       responses:
@@ -807,7 +833,7 @@ paths:
         Adds a new user to the group
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
       tags: [Groups]
       parameters:
         - in: body
@@ -831,7 +857,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-        401:
+        403:
           $ref: "#/responses/Unauthorized"
 
   /groups/{groupId}/users/{userId}:
@@ -852,7 +878,7 @@ paths:
         Removes a user from the group
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
       tags: [Groups]
 
       responses:
@@ -865,7 +891,7 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-        401:
+        403:
           $ref: "#/responses/Unauthorized"
 
         404:
@@ -884,7 +910,7 @@ paths:
         Returns a list of all the tasks
 
 
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
 
       tags: [Tasks]
 
@@ -896,7 +922,7 @@ paths:
             items:
               $ref: '#/definitions/Task'
 
-        401:
+        403:
           $ref: '#/responses/Unauthorized'
 
     post:
@@ -1093,7 +1119,7 @@ paths:
         Returns a list of all the assignments
 
 
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
 
       tags: [Assignments]
 
@@ -1105,7 +1131,7 @@ paths:
             items:
               $ref: '#/definitions/Assignment'
 
-        401:
+        403:
           $ref: '#/responses/Unauthorized'
 
     post:
@@ -1256,19 +1282,21 @@ paths:
       responses:
         204:
           description: The draw was removed from the assignment
-        
-###########################
-# TASK ANSWERS
-###########################
+          
+  /assignemnts/{assignmentId}/task-answers:
+    parameters:
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
 
-  /task-answers/:
     get:
-      summary: Returns a list of all task answers
+      summary: Returns a list of all task answers given an assignment
       description: >
-        Returns a list of all task answers
+        Returns a list of all task answers given an assignment
 
 
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
 
       tags: [Task answers]
 
@@ -1280,7 +1308,33 @@ paths:
             items:
               $ref: '#/definitions/TaskAnswer'
 
-        401:
+        403:
+          $ref: '#/responses/Unauthorized'
+          
+###########################
+# TASK ANSWERS
+###########################
+
+  /task-answers/:
+    get:
+      summary: Returns a list of all task answers
+      description: >
+        Returns a list of all task answers
+
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+
+      tags: [Task answers]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskAnswer'
+
+        403:
           $ref: '#/responses/Unauthorized'
     post:
       summary: Adds a new task answer
@@ -1288,7 +1342,7 @@ paths:
         Adds a new task answer
 
 
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
 
       tags: [Task answers]
       parameters:
@@ -1302,7 +1356,7 @@ paths:
         201:
           description: OK
           
-        401:
+        403:
           $ref: '#/responses/Unauthorized'
           
     put:
@@ -1319,7 +1373,7 @@ paths:
         201:
           description: OK
         
-        401:
+        403:
           $ref: '#/responses/Unauthorized'  
 
     delete:
@@ -1329,33 +1383,5 @@ paths:
       responses:
         204:
           description: The task answer has been removed
-        401:
-          $ref: '#/responses/Unauthorized'
-  
-  /task-answers/{assignmentId}:
-    parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
-
-    get:
-      summary: Returns a list of all task answers given an assignment
-      description: >
-        Returns a list of all task answers given an assignment
-
-
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 401 error will be issued
-
-      tags: [Task answers]
-
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TaskAnswer'
-
-        401:
+        403:
           $ref: '#/responses/Unauthorized'
