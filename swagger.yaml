@@ -7,9 +7,9 @@ info:
 
 #We only exchange JSONs
 consumes:
-  - application/json
+- application/json
 produces:
-  - application/json
+- application/json
 
 #TODO: The 403 errors are not set up everywhere. Just remember to do this later
 
@@ -17,7 +17,7 @@ produces:
 host: api.nowhere.com
 basePath: /v1
 schemes:
-  - https
+- https
 
 #Almost all the request will require authentication
 securityDefinitions:
@@ -31,10 +31,10 @@ securityDefinitions:
       calling the `/users/register` API and it has to be sent as a `X-API-TOKEN`
       header with any other API request.
 
-#All the APIs, except for register, are required to have an api token as a header
+    #All the APIs, except for register, are required to have an api token as a header
 #of their requests
 security:
-  - ApiTokenAuth: []
+- ApiTokenAuth: []
 
 definitions:
   User:
@@ -59,10 +59,10 @@ definitions:
         example: gianni@morandi.cit
 
     required:
-      - id
-      - name
-      - badgeNumber
-      - email
+    - id
+    - name
+    - badgeNumber
+    - email
 
   UserPermissions:
     title: Permissions
@@ -85,10 +85,10 @@ definitions:
         description: Can this user access the list of all the users?
 
     required:
-      - manageGroups
-      - manageTasks
-      - changePermissions
-      - listUsers
+    - manageGroups
+    - manageTasks
+    - changePermissions
+    - listUsers
 
 
   Group:
@@ -107,9 +107,9 @@ definitions:
         $ref: "#/definitions/User"
 
     required:
-      - properties
-      - name
-      - createdBy
+    - properties
+    - name
+    - createdBy
 
   TaskPool:
     title: Task Pool
@@ -125,7 +125,7 @@ definitions:
         $ref: '#/definitions/User'
 
     required:
-      - name
+    - name
 
   TaskDraw:
     title: Task Draw
@@ -144,9 +144,9 @@ definitions:
         type: integer
 
     required:
-      - poolID
-      - numQuestionsToDraw
-      - minPerQuestionDraw
+    - poolID
+    - numQuestionsToDraw
+    - minPerQuestionDraw
 
   Task:
     title: Task
@@ -188,9 +188,9 @@ definitions:
         type: integer
 
     required:
-      - id
-      - question
-      - type
+    - id
+    - question
+    - type
 
 
   Assignment:
@@ -225,12 +225,12 @@ definitions:
         type: boolean
 
     required:
-      - name
-      - startsOn
-      - deadline
-      - allowsLateSubmission
-      - createdByUserId
-      - assignedToGroupId
+    - name
+    - startsOn
+    - deadline
+    - allowsLateSubmission
+    - createdByUserId
+    - assignedToGroupId
 
   TaskAnswer:
     title: Task Answer
@@ -272,11 +272,11 @@ definitions:
         type: string
 
     required:
-      - id
-      - userId
-      - taskId
-      - assignmentId
-      - submittedOn
+    - id
+    - userId
+    - taskId
+    - assignmentId
+    - submittedOn
 
   Error:
     type: object
@@ -288,8 +288,8 @@ definitions:
         type: string
         description: A developer-friendly description of what went wrong
     required:
-      - code
-      - errorMessage
+    - code
+    - errorMessage
 
 responses:
   Unauthorized:
@@ -318,32 +318,32 @@ parameters:
 
 paths:
 
-###########################
-# UNAUTHENTICATED
-###########################
+  ###########################
+  # UNAUTHENTICATED
+  ###########################
 
   /register/:
     post:
       summary: Allows a user to register in order to receive the authentication token
       security: [] #this api can be called without the token
       tags:
-        - Unauthenticated
+      - Unauthenticated
       parameters:
-        - in: body
-          name: data
-          description: The registration data of the user
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
-                description: The complete name of the person in "first-name second-name" format
-              email:
-                type: string
-              badgeNumber:
-                type: string
-              password:
-                type: string
+      - in: body
+        name: data
+        description: The registration data of the user
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The complete name of the person in "first-name second-name" format
+            email:
+              type: string
+            badgeNumber:
+              type: string
+            password:
+              type: string
 
       responses:
         201:
@@ -371,7 +371,7 @@ paths:
       summary: Generates a new token for an already registered user
       security: []
       tags:
-        - Unauthenticated
+      - Unauthenticated
       description: >
         Logs the user in. This request is usually used to get a new authentication token associated to the user. After this call the old token (got by `register` or `login` call) is then released and is not valid anymore.
 
@@ -390,9 +390,9 @@ paths:
             $ref: '#/definitions/Error'
 
 
-###########################
-# USERS
-###########################
+  ###########################
+  # USERS
+  ###########################
 
   /users/me/:
     get:
@@ -411,17 +411,17 @@ paths:
       summary: Updates the information about the authenticated user
       tags: [Current user]
       parameters:
-        - in: body
-          name: data
-          schema:
-            type: object
-            properties:
-              name:
-                description: new name to assign to the user
-                type: string
+      - in: body
+        name: data
+        schema:
+          type: object
+          properties:
+            name:
+              description: new name to assign to the user
+              type: string
 
-              badgeNumber:
-                type: string
+            badgeNumber:
+              type: string
 
       responses:
         200:
@@ -435,14 +435,14 @@ paths:
         confirmation mail.
       tags: [Current user]
       parameters:
-        - in: body
-          required: true
-          name: data
-          schema:
-            type: object
-            properties:
-              newEmail:
-                type: string
+      - in: body
+        required: true
+        name: data
+        schema:
+          type: object
+          properties:
+            newEmail:
+              type: string
 
       responses:
         200:
@@ -466,15 +466,15 @@ paths:
         email telling him/her about the password change.
       tags: [Current user]
       parameters:
-        - in: body
-          required: true
-          name: data
+      - in: body
+        required: true
+        name: data
 
-          schema:
-            type: object
-            properties:
-              newPassword:
-                type: string
+        schema:
+          type: object
+          properties:
+            newPassword:
+              type: string
 
       responses:
         200:
@@ -496,40 +496,40 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Assignment'
-  
+
   /users/me/assignments/{assignmentId}:
     get:
       summary: Returns an assignement assigned to me
       tags: [Current user]
 
       parameters:
-        - in: path
-          required: true
-          name: assignmentId
-          type: integer
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
 
 
       responses:
         200:
           description: OK
-          schema: 
+          schema:
             $ref: '#/definitions/Assignment'
 
         404:
           description: The assignement is not found
           schema:
             $ref: '#/definitions/Error'
-  
+
   /users/me/assignments/{assignmentId}/tasks:
     get:
       summary: Returns all tasks of an assignement assigned to me
       tags: [Current user]
 
       parameters:
-        - in: path
-          required: true
-          name: assignmentId
-          type: integer
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
 
 
       responses:
@@ -544,8 +544,8 @@ paths:
           description: No assignement assigned to me is found
           schema:
             $ref: '#/definitions/Error'
-            
-  
+
+
   /users/me/assignments/{assignmentId}/tasks/{taskId}/answer:
     put:
       summary: Submit an answers to a task
@@ -556,19 +556,19 @@ paths:
         NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
 
       parameters:
-        - in: path
-          required: true
-          name: assignmentId
-          type: integer
-        - in: path
-          required: true
-          name: taskId
-          type: integer
-        - in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/TaskAnswer'
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
+      - in: path
+        required: true
+        name: taskId
+        type: integer
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskAnswer'
 
       responses:
         200:
@@ -593,10 +593,10 @@ paths:
 
   /users/me/assignments/{assignmentId}/task-answers:
     parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
+    - in: path
+      required: true
+      name: assignmentId
+      type: integer
     get:
       summary: Returns a list of task answers that are associated to the authenticated user given an assignment
       tags: [Current user]
@@ -625,13 +625,13 @@ paths:
       tags: [Users]
 
       parameters:
-        - in: query
-          name: sortBy
-          type: string
-          enum: [id, name, badgeNumber, email]
+      - in: query
+        name: sortBy
+        type: string
+        enum: [id, name, badgeNumber, email]
 
-        - $ref: '#/parameters/offsetParam'
-        - $ref: '#/parameters/limitParam'
+      - $ref: '#/parameters/offsetParam'
+      - $ref: '#/parameters/limitParam'
 
       responses:
         200:
@@ -649,11 +649,11 @@ paths:
       summary: Returns a specific user given it's ID
       tags: [Users]
       parameters:
-        - in: path
-          name: userId
-          required: true
-          type: integer
-          description: The id of the user
+      - in: path
+        name: userId
+        required: true
+        type: integer
+        description: The id of the user
 
       responses:
         200:
@@ -702,11 +702,11 @@ paths:
         NOTE: The caller must have the `changePermissions` permission set
 
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/UserPermissions'
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/UserPermissions'
 
       responses:
         200:
@@ -727,10 +727,10 @@ paths:
 
   /users/{userId}/assignments:
     parameters:
-      - in: path
-        required: true
-        name: userId
-        type: integer
+    - in: path
+      required: true
+      name: userId
+      type: integer
 
     get:
       summary: Returns a list of assignments that are associated to the specified user
@@ -745,9 +745,9 @@ paths:
 
 
 
-###########################
-# GROUPS
-###########################
+  ###########################
+  # GROUPS
+  ###########################
 
   /groups/:
     get:
@@ -760,13 +760,13 @@ paths:
 
       tags: [Groups]
       parameters:
-        - in: query
-          name: sortBy
-          type: string
-          enum: [id, name]
+      - in: query
+        name: sortBy
+        type: string
+        enum: [id, name]
 
-        - $ref: '#/parameters/offsetParam'
-        - $ref: '#/parameters/limitParam'
+      - $ref: '#/parameters/offsetParam'
+      - $ref: '#/parameters/limitParam'
 
       responses:
         200:
@@ -811,10 +811,10 @@ paths:
         NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
       tags: [Groups]
       parameters:
-        - in: path
-          name: groupId
-          type: integer
-          required: true
+      - in: path
+        name: groupId
+        type: integer
+        required: true
 
       responses:
         200:
@@ -836,10 +836,10 @@ paths:
         NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
       tags: [Groups]
       parameters:
-        - in: path
-          name: groupId
-          type: integer
-          required: true
+      - in: path
+        name: groupId
+        type: integer
+        required: true
 
       responses:
         204:
@@ -853,10 +853,10 @@ paths:
 
   /groups/{groupId}/users:
     parameters:
-      - in: path
-        name: groupId
-        type: integer
-        required: true
+    - in: path
+      name: groupId
+      type: integer
+      required: true
 
     get:
       summary: Retrieves all the users of a given group
@@ -885,14 +885,14 @@ paths:
         NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
       tags: [Groups]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            type: object
-            properties:
-              userId:
-                type: integer
+      - in: body
+        name: data
+        required: true
+        schema:
+          type: object
+          properties:
+            userId:
+              type: integer
 
       responses:
         200:
@@ -911,15 +911,15 @@ paths:
 
   /groups/{groupId}/users/{userId}:
     parameters:
-      - in: path
-        name: groupId
-        type: integer
-        required: true
+    - in: path
+      name: groupId
+      type: integer
+      required: true
 
-      - in: path
-        name: userId
-        type: integer
-        required: true
+    - in: path
+      name: userId
+      type: integer
+      required: true
 
     delete:
       summary: Removes a user from the group
@@ -949,9 +949,9 @@ paths:
             $ref: '#/definitions/Error'
 
 
-###########################
-# TASKS
-###########################
+  ###########################
+  # TASKS
+  ###########################
   /tasks/:
     get:
       summary: Returns a list of all the tasks
@@ -984,11 +984,11 @@ paths:
         The property `type` is used to distinguish between different types of tasks
       tags: [Tasks]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/Task'
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Task'
 
       responses:
         204:
@@ -996,10 +996,10 @@ paths:
 
   /tasks/{taskId}:
     parameters:
-      - in: path
-        required: true
-        name: taskId
-        type: integer
+    - in: path
+      required: true
+      name: taskId
+      type: integer
 
     get:
       summary: Returns a task with the given id
@@ -1014,10 +1014,10 @@ paths:
       summary: Updates a task with the given id
       tags: [Tasks]
       parameters:
-        - in: body
-          name: data
-          schema:
-            $ref: '#/definitions/Task'
+      - in: body
+        name: data
+        schema:
+          $ref: '#/definitions/Task'
 
       responses:
         200:
@@ -1032,9 +1032,9 @@ paths:
         204:
           description: OK
 
-###########################
-# TASK POOLS
-###########################
+  ###########################
+  # TASK POOLS
+  ###########################
   /task-pools/:
     get:
       summary: Returns a list of all the task pools
@@ -1051,11 +1051,11 @@ paths:
       summary: Creates a new task pool
       tags: [Task pools]
       parameters:
-        - in: body
-          required: true
-          name: data
-          schema:
-            $ref: '#/definitions/TaskPool'
+      - in: body
+        required: true
+        name: data
+        schema:
+          $ref: '#/definitions/TaskPool'
 
       responses:
         201:
@@ -1063,10 +1063,10 @@ paths:
 
   /task-pools/{poolId}:
     parameters:
-      - in: path
-        name: poolId
-        required: true
-        type: integer
+    - in: path
+      name: poolId
+      required: true
+      type: integer
 
     get:
       summary: Returns the task pool having the given id
@@ -1081,14 +1081,14 @@ paths:
       summary: Updates the task pool
       tags: [Task pools]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            type: object
-            properties:
-              name:
-                type: string
+      - in: body
+        name: data
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
 
       responses:
         200:
@@ -1125,25 +1125,25 @@ paths:
 
   /task-pools/{poolId}/tasks/{taskId}:
     parameters:
-      - in: path
-        name: poolId
-        required: true
-        type: integer
+    - in: path
+      name: poolId
+      required: true
+      type: integer
 
-      - in: path
-        name: taskId
-        required: true
-        type: integer
+    - in: path
+      name: taskId
+      required: true
+      type: integer
 
     put:
       summary: Adds a new task to the pool
       tags: [Task pools]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            type: integer
+      - in: body
+        name: data
+        required: true
+        schema:
+          type: integer
 
       responses:
         201:
@@ -1158,9 +1158,9 @@ paths:
 
 
 
-###########################
-# ASSIGNMENTS
-###########################
+  ###########################
+  # ASSIGNMENTS
+  ###########################
   /assignments/:
     get:
       summary: Returns a list of all the assignments
@@ -1190,11 +1190,11 @@ paths:
 
       tags: [Assignments]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/Assignment'
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Assignment'
 
       responses:
         204:
@@ -1202,10 +1202,10 @@ paths:
 
   /assignments/{assignmentId}:
     parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
+    - in: path
+      required: true
+      name: assignmentId
+      type: integer
 
     get:
       summary: Returns an assignment with the given id
@@ -1220,10 +1220,10 @@ paths:
       summary: Updates an assignment with the given id
       tags: [Assignments]
       parameters:
-        - in: body
-          name: data
-          schema:
-            $ref: '#/definitions/Assignment'
+      - in: body
+        name: data
+        schema:
+          $ref: '#/definitions/Assignment'
 
       responses:
         200:
@@ -1244,20 +1244,20 @@ paths:
       description: Closes the assignment with the given id. No more answers can be submitted.
       tags: [Assignments]
       parameters:
-        - in: path
-          required: true
-          name: assignmentId
-          type: integer
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
       responses:
         204:
           description: OK
 
   /assignments/{assignmentId}/draws:
     parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
+    - in: path
+      required: true
+      name: assignmentId
+      type: integer
 
     get:
       summary: Returns all the draws of the assignment
@@ -1274,11 +1274,11 @@ paths:
       summary: Adds a new draw to the assignment
       tags: [Assignments]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/TaskDraw'
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskDraw'
 
       responses:
         204:
@@ -1290,15 +1290,15 @@ paths:
 
   /assignments/{assignmentId}/draws/{drawId}:
     parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
+    - in: path
+      required: true
+      name: assignmentId
+      type: integer
 
-      - in: path
-        required: true
-        name: drawId
-        type: integer
+    - in: path
+      required: true
+      name: drawId
+      type: integer
 
     get:
       summary: Returns the draw with the given id, associated to the assignment
@@ -1315,11 +1315,11 @@ paths:
       summary: Updates the draw with the given id, associated to the assignment
       tags: [Assignments]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/TaskDraw'
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskDraw'
 
       responses:
         204:
@@ -1334,10 +1334,10 @@ paths:
 
   /assignemnts/{assignmentId}/task-answers:
     parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
+    - in: path
+      required: true
+      name: assignmentId
+      type: integer
 
     get:
       summary: Returns a list of all task answers given an assignment
@@ -1360,9 +1360,9 @@ paths:
         403:
           $ref: '#/responses/Unauthorized'
 
-###########################
-# TASK ANSWERS
-###########################
+  ###########################
+  # TASK ANSWERS
+  ###########################
 
   /task-answers/:
     get:
@@ -1392,11 +1392,11 @@ paths:
 
       tags: [Task answers]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/TaskAnswer'
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskAnswer'
       responses:
         201:
           description: OK
