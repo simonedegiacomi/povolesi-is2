@@ -263,7 +263,7 @@ definitions:
 
       url:
         description: >
-          Used in case of link sumbission answers
+          Used in case of link submission answers
         type: string
 
       mark:
@@ -277,6 +277,36 @@ definitions:
     - taskId
     - assignmentId
     - submittedOn
+
+  PeerReview:
+    type: object
+    properties:
+      id:
+        type: integer
+      answerId:
+        type: integer
+      reviewer:
+        $ref: '#/definitions/User'
+      response:
+        description: >
+          Used in case of open question answer.
+        type: string
+      selectedAnswers:
+        description: >
+          Used in case of multiple answers question. Holds all the selected answers.
+        type: array
+        items:
+          type: string
+        example:
+          [42]
+      url:
+        description: >
+          Used in case of link submission answers
+        type: string
+    required:
+    - id
+    - answerId
+    - reviewer
 
   Error:
     type: object
@@ -612,7 +642,57 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /users/:
+  /users/me/peer-rewiews:
+    get:
+      summary: Return the list of peer rewiew already assigned to the authenticated user
+      tags: [Current user]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PeerReview'
+
+  /users/me/assignments/{assignmentId}/peer-rewiews:
+    parameters:
+    - in: path
+      required: true
+      name: assignmentId
+      type: integer
+    get:
+      summary: Return the list of peer review that are associated to the authenticated user given an assignment
+      tags: [Current user]
+        responses:
+          200:
+            description: OK
+            schema:
+              type: array
+              items:
+                $ref: '#/definitions/PeerReview'
+        404:
+          description: No assignment was found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: >
+        Submit an answers to a peer review
+
+        NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
+      parameters:
+      - in: body
+        required: true
+        schema:
+          $ref: '#/definitions/PeerReview'
+      responses:
+        200:
+          description: OK
+        404:
+          description: No task was found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
+
+  /users:
     get:
       summary: Returns all the users of the system
       description: >
@@ -749,7 +829,7 @@ paths:
   # GROUPS
   ###########################
 
-  /groups/:
+  /groups:
     get:
       summary: Returns a list of all the groups (classes)
       description: >
@@ -952,7 +1032,7 @@ paths:
   ###########################
   # TASKS
   ###########################
-  /tasks/:
+  /tasks:
     get:
       summary: Returns a list of all the tasks
       description: >
@@ -1035,7 +1115,7 @@ paths:
   ###########################
   # TASK POOLS
   ###########################
-  /task-pools/:
+  /task-pools:
     get:
       summary: Returns a list of all the task pools
       tags: [Task pools]
@@ -1161,7 +1241,7 @@ paths:
   ###########################
   # ASSIGNMENTS
   ###########################
-  /assignments/:
+  /assignments:
     get:
       summary: Returns a list of all the assignments
       description: >
@@ -1447,5 +1527,47 @@ paths:
       responses:
         204:
           description: The task answer has been removed
+        403:
+          $ref: '#/responses/Unauthorized'
+
+  ###########################
+  # PEER REVIEWS
+  ###########################
+
+  /peer-reviews:
+    get:
+      summary: Returns a list of all peer review
+      description: >
+        Returns a list of all peer reviews
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+      tags: [Peer review]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PeerReview'
+        403:
+          $ref: '#/responses/Unauthorized'
+
+    post:
+      summary: Adds a new peer review
+      description: >
+        Adds a new task answer
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+
+      tags: [Peer review]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/PeerReview'
+      responses:
+        201:
+          description: OK
         403:
           $ref: '#/responses/Unauthorized'
