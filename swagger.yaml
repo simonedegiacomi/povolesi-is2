@@ -663,13 +663,13 @@ paths:
     get:
       summary: Return the list of peer review that are associated to the authenticated user given an assignment
       tags: [Current user]
-        responses:
-          200:
-            description: OK
-            schema:
-              type: array
-              items:
-                $ref: '#/definitions/PeerReview'
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PeerReview'
         404:
           description: No assignment was found with the specified id
           schema:
