@@ -231,7 +231,7 @@ definitions:
       - allowsLateSubmission
       - createdByUserId
       - assignedToGroupId
-  
+
   TaskAnswer:
     title: Task Answer
     type: object
@@ -246,12 +246,12 @@ definitions:
         type: integer
       submittedOn:
         type: integer
-        
+
       response:
         description: >
           Used in case of open question answer.
         type: string
-      
+
       selectedAnswers:
         description: >
           Used in case of multiple answers question. Holds all the selected answers.
@@ -260,17 +260,17 @@ definitions:
           type: string
         example:
           [42]
-          
+
       url:
         description: >
           Used in case of link sumbission answers
         type: string
-          
+
       mark:
         type: integer
       comment:
         type: string
-        
+
     required:
       - id
       - userId
@@ -447,12 +447,12 @@ paths:
       responses:
         200:
           description: OK
-        
-        400: 
+
+        400:
           description: Could not change email.
           schema:
             $ref: '#/definitions/Error'
-      
+
         409:
           description: The email is already used by another user.
           schema:
@@ -503,7 +503,7 @@ paths:
       tags: [Current user]
       description: >
         Submit an answers to a task
-        
+
         NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
 
       parameters:
@@ -611,7 +611,7 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/User'
-            
+
         403:
           $ref: "#/responses/Unauthorized"
 
@@ -1282,7 +1282,7 @@ paths:
       responses:
         204:
           description: The draw was removed from the assignment
-          
+
   /assignemnts/{assignmentId}/task-answers:
     parameters:
       - in: path
@@ -1310,7 +1310,7 @@ paths:
 
         403:
           $ref: '#/responses/Unauthorized'
-          
+
 ###########################
 # TASK ANSWERS
 ###########################
@@ -1321,11 +1321,8 @@ paths:
       description: >
         Returns a list of all task answers
 
-
         NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
-
       tags: [Task answers]
-
       responses:
         200:
           description: OK
@@ -1336,11 +1333,11 @@ paths:
 
         403:
           $ref: '#/responses/Unauthorized'
+
     post:
       summary: Adds a new task answer
       description: >
         Adds a new task answer
-
 
         NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
 
@@ -1351,30 +1348,48 @@ paths:
           required: true
           schema:
             $ref: '#/definitions/TaskAnswer'
-
       responses:
         201:
           description: OK
-          
         403:
           $ref: '#/responses/Unauthorized'
-          
+
+  /task-answers/{taskAnswerId}/:
+    parameters:
+    - in: path
+      required: true
+      name: taskAnswerId
+      type: integer
+
+    get:
+      summary: Return a task answers given an id
+      description: >
+        Return a task answers given an id
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+      tags: [Task answers]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/TaskAnswer'
+        403:
+          $ref: '#/responses/Unauthorized'
+
     put:
       summary: Updates the task answer with the given id
       tags: [Task answers]
       parameters:
-        - in: body
-          name: data
-          required: true
-          schema:
-            $ref: '#/definitions/TaskAnswer'
-
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskAnswer'
       responses:
         201:
           description: OK
-        
         403:
-          $ref: '#/responses/Unauthorized'  
+          $ref: '#/responses/Unauthorized'
 
     delete:
       summary: Deletes the task with the given id
