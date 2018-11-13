@@ -654,7 +654,7 @@ paths:
             items:
               $ref: '#/definitions/PeerReview'
 
-  /users/me/assignments/{assignmentId}/peer-rewiews:
+  /users/me/assignments/{assignmentId}/peer-reviews:
     parameters:
     - in: path
       required: true
@@ -679,6 +679,7 @@ paths:
         Submit an answers to a peer review
 
         NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
+      tags: [Current user]
       parameters:
       - in: body
         name: data
