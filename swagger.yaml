@@ -681,6 +681,7 @@ paths:
         NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
       parameters:
       - in: body
+        name: data
         required: true
         schema:
           $ref: '#/definitions/PeerReview'
