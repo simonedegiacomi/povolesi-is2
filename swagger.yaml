@@ -957,7 +957,7 @@ paths:
             items:
               $ref: '#/definitions/User'
 
-    post:
+    put:
       summary: Adds a new user to the group
       description: >
         Adds a new user to the group
@@ -1351,7 +1351,7 @@ paths:
             items:
               $ref: '#/definitions/TaskDraw'
 
-    post:
+    put:
       summary: Adds a new draw to the assignment
       tags: [Assignments]
       parameters:
