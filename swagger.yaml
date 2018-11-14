@@ -91,8 +91,8 @@ definitions:
     - listUsers
 
 
-  Group:
-    title: Group
+  UserGroup:
+    title: User Group
     type: object
     properties:
       id:
@@ -167,13 +167,13 @@ definitions:
         enum: [openQuestion, multipleAnswer, linkSubmission]
         example: multipleAnswer
 
-      numAnswersAllowed:
+      multipleChoicesAllowed:
         description: >
           Used in case of multiple answer questions. Is true in case the multiple answers are allowed,
           false otherwise.
         type: boolean
 
-      answers:
+      choices:
         description: >
           Used in case of multiple answer questions. Holds all the possible values that the user can choose from.
         type: array
@@ -206,13 +206,16 @@ definitions:
       startsOn:
         type: integer
 
-      deadline:
+      submissionsDeadline:
         type: integer
 
       allowsLateSubmission:
         type: boolean
 
-      lateSubmissionDeadline:
+      lateSubmissionsDeadline:
+        type: integer
+
+      peerReviewsDeadline:
         type: integer
 
       createdByUserId:
@@ -221,14 +224,13 @@ definitions:
       assignedToGroupId:
         type: integer
 
-      isClosed:
-        type: boolean
-
     required:
     - name
     - startsOn
-    - deadline
+    - submissionsDeadline
     - allowsLateSubmission
+    - lateSubmissionsDeadline
+    - peerReviewsDeadline
     - createdByUserId
     - assignedToGroupId
 
@@ -247,7 +249,7 @@ definitions:
       submittedOn:
         type: integer
 
-      response:
+      answer:
         description: >
           Used in case of open question answer.
         type: string
