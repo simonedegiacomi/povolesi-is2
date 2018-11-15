@@ -68,7 +68,7 @@ definitions:
     title: Permissions
     type: object
     properties:
-      manageGroups:
+      manageUserGroups:
         type: boolean
         description: Can this user create/edit/delete user groups?
 
@@ -85,7 +85,7 @@ definitions:
         description: Can this user access the list of all the users?
 
     required:
-    - manageGroups
+    - manageUserGroups
     - manageTasks
     - changePermissions
     - listUsers
@@ -97,11 +97,11 @@ definitions:
     properties:
       id:
         type: integer
-        description: A unique identifier of the group
+        description: A unique identifier of the group of users
 
       name:
         type: string
-        description: The name associated to this group
+        description: The name associated to this group of users
 
       createdBy:
         $ref: "#/definitions/User"
@@ -221,7 +221,7 @@ definitions:
       createdByUserId:
         type: integer
 
-      assignedToGroupId:
+      assignedToUserGroupId:
         type: integer
 
     required:
@@ -232,7 +232,7 @@ definitions:
     - lateSubmissionsDeadline
     - peerReviewsDeadline
     - createdByUserId
-    - assignedToGroupId
+    - assignedToUserGroupId
 
   TaskAnswer:
     title: Task Answer
@@ -830,19 +830,19 @@ paths:
 
 
   ###########################
-  # GROUPS
+  # USER GROUPS
   ###########################
 
-  /groups:
+  /user-groups:
     get:
-      summary: Returns a list of all the groups (classes)
+      summary: Returns a list of all the groups of users (classes)
       description: >
-        Returns a list of all the groups of users
+        Returns a list of all the groups of users (classes)
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
+        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
 
-      tags: [Groups]
+      tags: [User Groups]
       parameters:
       - in: query
         name: sortBy
@@ -858,45 +858,45 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Group'
+              $ref: '#/definitions/UserGroup'
 
         403:
           $ref: "#/responses/Unauthorized"
 
     post:
-      summary: Creates a new group
-      tags: [Groups]
+      summary: Creates a new group of users
+      tags: [User Groups]
       responses:
         201:
-          description: The group was successfully created. The id of the generated group is then returned.
+          description: The group of users was successfully created. The id of the generated group is then returned.
           schema:
             type: object
             properties:
-              groupId:
+              userGroupId:
                 type: integer
                 example: 12
 
         400:
-          description: Something went wrong when trying to create a new group. Maybe the name of the groups is not valid or already taken.
+          description: Something went wrong when trying to create a new group of users. Maybe the name of the group is not valid or already taken.
           schema:
             $ref: '#/definitions/Error'
 
         403:
           $ref: "#/responses/Unauthorized"
 
-  /groups/{groupId}:
+  /user-groups/{userGroupId}:
     get:
-      summary: Retrieves the group having a given id
+      summary: Retrieves the group of users having a given id
 
       description: >
-        Retrieves a group having a given id
+        Retrieves a group of users having a given id
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
-      tags: [Groups]
+        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
+      tags: [User Groups]
       parameters:
       - in: path
-        name: groupId
+        name: userGroupId
         type: integer
         required: true
 
@@ -904,41 +904,41 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/Group'
+            $ref: '#/definitions/UserGroup'
 
         403:
           $ref: "#/responses/Unauthorized"
 
 
     delete:
-      summary: Deletes the group having a given id
+      summary: Deletes the group of users having a given id
 
       description: >
-        Deletes the entire group
+        Deletes the entire group of users
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
-      tags: [Groups]
+        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
+      tags: [User Groups]
       parameters:
       - in: path
-        name: groupId
+        name: userGroupId
         type: integer
         required: true
 
       responses:
         204:
-          description: The group was successfully deleted
+          description: The group of users was successfully deleted
 
         404:
-          description: The group to delete was not found
+          description: The group of users to delete was not found
 
         403:
           $ref: "#/responses/Unauthorized"
 
-  /groups/{groupId}/users:
+  /user-groups/{userGroupId}/users:
     parameters:
     - in: path
-      name: groupId
+      name: userGroupId
       type: integer
       required: true
 
@@ -949,8 +949,8 @@ paths:
         Retrieves all the users of a give group
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
-      tags: [Groups]
+        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
+      tags: [User Groups]
 
       responses:
         200:
@@ -966,8 +966,8 @@ paths:
         Adds a new user to the group
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
-      tags: [Groups]
+        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
+      tags: [User Groups]
       parameters:
       - in: body
         name: data
@@ -982,10 +982,10 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/Group'
+            $ref: '#/definitions/UserGroup'
 
         400:
-          description: Could not add a user to the group, probably becaus the user is already part of the group
+          description: Could not add a user to the group, probably because the user is already part of the group
 
           schema:
             $ref: '#/definitions/Error'
@@ -993,10 +993,10 @@ paths:
         403:
           $ref: "#/responses/Unauthorized"
 
-  /groups/{groupId}/users/{userId}:
+  /user-groups/{userGroupId}/users/{userId}:
     parameters:
     - in: path
-      name: groupId
+      name: userGroupId
       type: integer
       required: true
 
@@ -1011,15 +1011,15 @@ paths:
         Removes a user from the group
 
 
-        NOTE: The caller must have the `manageGroups` permission set, otherwise a 403 error will be issued
-      tags: [Groups]
+        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
+      tags: [User Groups]
 
       responses:
         204:
           description: The user was successfully removed from the group
 
         400:
-          description: Could not remove the user to the group, probably because the user is not part of the group
+          description: Could not remove the user from the group, probably because the user is not part of the group
 
           schema:
             $ref: '#/definitions/Error'
@@ -1028,7 +1028,7 @@ paths:
           $ref: "#/responses/Unauthorized"
 
         404:
-          description: User or group not found
+          description: User or group of users not found
           schema:
             $ref: '#/definitions/Error'
 
