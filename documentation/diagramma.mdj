@@ -1039,7 +1039,7 @@
 											"top": 350,
 											"width": 201.4619140625,
 											"height": 13,
-											"text": "+assignees: Group",
+											"text": "+assignees: UserGroup",
 											"horizontalAlignment": 0
 										},
 										{
@@ -3554,7 +3554,7 @@
 											"top": 399,
 											"width": 127,
 											"height": 13,
-											"text": "Group"
+											"text": "UserGroup"
 										},
 										{
 											"_type": "LabelView",
@@ -9403,7 +9403,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFmhivuoqR2ZKs="
 							},
-							"name": "peerReviewsDeadline"
+							"name": "peerReviewsDeadline",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -9599,7 +9600,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFmyS5hm+55UE4="
 							},
-							"name": "multipleChoicesAllowed"
+							"name": "multipleChoicesAllowed",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -9607,7 +9609,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFmyS5hm+55UE4="
 							},
-							"name": "choices[]"
+							"name": "choices[]",
+							"type": ""
 						}
 					],
 					"operations": [
@@ -9863,7 +9866,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFmyTRM6e+mEnY="
 							},
-							"name": "selectedAnswers[]"
+							"name": "selectedAnswers[]",
+							"type": ""
 						}
 					],
 					"operations": [
@@ -9906,7 +9910,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFmyTX4evHi6S4="
 							},
-							"name": "answers"
+							"name": "answers",
+							"type": ""
 						}
 					],
 					"operations": [
@@ -10153,7 +10158,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "Group",
+					"name": "UserGroup",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
