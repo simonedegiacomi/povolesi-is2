@@ -64,31 +64,36 @@ definitions:
     - badgeNumber
     - email
 
-  UserPermissions:
-    title: Permissions
+  UserPermission:
+    title: UserPermission
     type: object
     properties:
-      manageUserGroups:
-        type: boolean
-        description: Can this user create/edit/delete user groups?
+      userId:
+        type: integer
+        description: Id of the user
+
+      groupId:
+        type: integer
+        description: Id of the group for wchich this permission applies
 
       manageTasks:
         type: boolean
-        description: Can this user create/edit/delete taks?
+        description: Can this user add/remove/edit taks of assignments of this group?
+
+      manageUsers:
+        type: boolean
+        description: Can this user add/remove/list users of this group?
 
       changePermissions:
         type: boolean
-        description: Can this user change other user's permissions?
-
-      listUsers:
-        type: boolean
-        description: Can this user access the list of all the users?
+        description: Can this user change permissions of other users of this group?
 
     required:
-    - manageUserGroups
+    - userId
+    - groupId
     - manageTasks
+    - manageUsers
     - changePermissions
-    - listUsers
 
 
   UserGroup:
@@ -105,6 +110,12 @@ definitions:
 
       createdBy:
         $ref: "#/definitions/User"
+
+      users:
+        type: array
+        items:
+          $ref: '#/definitions/UserPermission'
+
 
     required:
     - properties
@@ -694,62 +705,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/User'
-
-        403:
-          $ref: "#/responses/Unauthorized"
-
-        404:
-          description: No users were found with the specified id
-          schema:
-            $ref: '#/definitions/Error'
-
-  /users/{userId}/permissions:
-    parameters:
-    - in: path
-      name: userId
-      required: true
-      type: integer
-      description: The id of the user
-
-    get:
-      summary: Returns all the permissions of a specific user
-      description: >
-        Returns the permissions of a specific user
-
-        NOTE: The caller must have the `changePermissions` permission set
-      tags: [Users]
-
-      responses:
-        200:
-          description: OK
-          schema:
-            $ref: '#/definitions/UserPermissions'
-
-
-    put:
-      summary: Changes all the permissions of a specific user
-      tags: [Users]
-      description: >
-        Changes all the permissions of a specific user
-
-
-        NOTE: The caller must have the `changePermissions` permission set
-
-      parameters:
-      - in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/UserPermissions'
-
-      responses:
-        200:
-          description: OK
-
-        400:
-          description: Could not change permissions. Happens when trying to change the permission of the admin
-          schema:
-            $ref: '#/definitions/Error'
 
         403:
           $ref: "#/responses/Unauthorized"
