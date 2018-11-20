@@ -289,26 +289,18 @@ definitions:
         type: integer
       reviewer:
         $ref: '#/definitions/User'
-      response:
-        description: >
-          Used in case of open question answer.
+
+      mark:
+        type: integer
+        description: A mark from 1 to 10. Returns 0 if the peer review is not filled.
+        example: 10
+      comment:
         type: string
-      selectedAnswers:
-        description: >
-          Used in case of multiple answers question. Holds all the selected answers.
-        type: array
-        items:
-          type: string
-        example:
-          [42]
-      url:
-        description: >
-          Used in case of link submission answers
-        type: string
+        description: An optional comment. Returns null if the peer review is not filled.
+
     required:
-    - id
     - answerId
-    - reviewer
+    - comment
 
   Error:
     type: object
@@ -613,18 +605,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /users/me/task-answers:
-    get:
-      summary: Returns a list of task answers that are associated to the authenticated user
-      tags: [Current user]
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TaskAnswer'
-
   /users/me/assignments/{assignmentId}/task-answers:
     parameters:
     - in: path
@@ -646,9 +626,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /users/me/peer-rewiews:
+  /users/me/peer-reviews:
     get:
-      summary: Return the list of peer rewiew already assigned to the authenticated user
+      summary: Return the list of peer reviews that the authenticated users can work on, grouped by the assignments
       tags: [Current user]
       responses:
         200:
@@ -656,47 +636,15 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/PeerReview'
+              type: object
+              properties:
+                assignment:
+                  $ref: '#/definitions/Assignment'
 
-  /users/me/assignments/{assignmentId}/peer-reviews:
-    parameters:
-    - in: path
-      required: true
-      name: assignmentId
-      type: integer
-    get:
-      summary: Return the list of peer review that are associated to the authenticated user given an assignment
-      tags: [Current user]
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/PeerReview'
-        404:
-          description: No assignment was found with the specified id
-          schema:
-            $ref: '#/definitions/Error'
-    put:
-      summary: >
-        Submit an answers to a peer review
-
-        NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
-      tags: [Current user]
-      parameters:
-      - in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/PeerReview'
-      responses:
-        200:
-          description: OK
-        404:
-          description: No task was found with the specified id
-          schema:
-            $ref: '#/definitions/Error'
+                peerReviews:
+                  type: array
+                  items:
+                    $ref: '#/definitions/PeerReview'
 
   /users:
     get:
@@ -1558,44 +1506,43 @@ paths:
         403:
           $ref: '#/responses/Unauthorized'
 
-  ###########################
-  # PEER REVIEWS
-  ###########################
+  /peer-reviews/{reviewId}:
+    parameters:
+    - in: path
+      required: true
+      name: reviewId
+      type: integer
 
-  /peer-reviews:
     get:
-      summary: Returns a list of all peer review
-      description: >
-        Returns a list of all peer reviews
-
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
-      tags: [Peer review]
+      summary: Returns a single peer review.
+      tags: [Peer reviews]
       responses:
         200:
           description: OK
           schema:
-            type: array
-            items:
-              $ref: '#/definitions/PeerReview'
-        403:
-          $ref: '#/responses/Unauthorized'
+            $ref: '#/definitions/PeerReview'
 
-    post:
-      summary: Adds a new peer review
-      description: >
-        Adds a new task answer
+        404:
+          description: No peer review was found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
 
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+    put:
+      summary: >
+        Submits a peer review. The user can only submit peer reviews that are assigned to him/her.
 
-      tags: [Peer review]
+      tags: [Current user]
       parameters:
       - in: body
         name: data
         required: true
         schema:
           $ref: '#/definitions/PeerReview'
+
       responses:
-        201:
+        200:
           description: OK
-        403:
-          $ref: '#/responses/Unauthorized'
+        404:
+          description: No task was found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
