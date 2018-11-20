@@ -557,86 +557,6 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
-  /users/me/assignments/{assignmentId}/tasks:
-    get:
-      summary: Returns all tasks of an assignement assigned to me
-      tags: [Current user]
-
-      parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
-
-
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Task'
-
-        404:
-          description: No assignement assigned to me is found
-          schema:
-            $ref: '#/definitions/Error'
-
-
-  /users/me/assignments/{assignmentId}/tasks/{taskId}/answer:
-    put:
-      summary: Submit an answers to a task
-      tags: [Current user]
-      description: >
-        Submit an answers to a task
-
-        NOTE: If the caller hasn't the 'manageTasks' set can only submit the answers
-
-      parameters:
-      - in: path
-        required: true
-        name: assignmentId
-        type: integer
-      - in: path
-        required: true
-        name: taskId
-        type: integer
-      - in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/TaskAnswer'
-
-      responses:
-        200:
-          description: OK
-
-        404:
-          description: No task was found with the specified id
-          schema:
-            $ref: '#/definitions/Error'
-
-  /users/me/assignments/{assignmentId}/task-answers:
-    parameters:
-    - in: path
-      required: true
-      name: assignmentId
-      type: integer
-    get:
-      summary: Returns a list of task answers that are associated to the authenticated user given an assignment
-      tags: [Current user]
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TaskAnswer'
-        404:
-          description: No assignment was found with the specified id
-          schema:
-            $ref: '#/definitions/Error'
-
   /users/me/peer-reviews:
     get:
       summary: Return the list of peer reviews that the authenticated users can work on, grouped by the assignments
@@ -731,8 +651,6 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Assignment'
-
-
 
   ###########################
   # USER GROUPS
@@ -839,104 +757,6 @@ paths:
 
         403:
           $ref: "#/responses/Unauthorized"
-
-  /user-groups/{userGroupId}/users:
-    parameters:
-    - in: path
-      name: userGroupId
-      type: integer
-      required: true
-
-    get:
-      summary: Retrieves all the users of a given group
-
-      description: >
-        Retrieves all the users of a give group
-
-
-        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
-      tags: [User Groups]
-
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/User'
-
-    put:
-      summary: Adds a new user to the group
-      description: >
-        Adds a new user to the group
-
-
-        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
-      tags: [User Groups]
-      parameters:
-      - in: body
-        name: data
-        required: true
-        schema:
-          type: object
-          properties:
-            userId:
-              type: integer
-
-      responses:
-        200:
-          description: OK
-          schema:
-            $ref: '#/definitions/UserGroup'
-
-        400:
-          description: Could not add a user to the group, probably because the user is already part of the group
-
-          schema:
-            $ref: '#/definitions/Error'
-
-        403:
-          $ref: "#/responses/Unauthorized"
-
-  /user-groups/{userGroupId}/users/{userId}:
-    parameters:
-    - in: path
-      name: userGroupId
-      type: integer
-      required: true
-
-    - in: path
-      name: userId
-      type: integer
-      required: true
-
-    delete:
-      summary: Removes a user from the group
-      description: >
-        Removes a user from the group
-
-
-        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
-      tags: [User Groups]
-
-      responses:
-        204:
-          description: The user was successfully removed from the group
-
-        400:
-          description: Could not remove the user from the group, probably because the user is not part of the group
-
-          schema:
-            $ref: '#/definitions/Error'
-
-        403:
-          $ref: "#/responses/Unauthorized"
-
-        404:
-          description: User or group of users not found
-          schema:
-            $ref: '#/definitions/Error'
-
 
   ###########################
   # TASKS
