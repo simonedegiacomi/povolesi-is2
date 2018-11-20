@@ -383,7 +383,7 @@ paths:
           schema:
             type: object
             properties:
-              id:
+              userId:
                 type: integer
                 example: 123
               token:
@@ -413,6 +413,8 @@ paths:
           schema:
             type: object
             properties:
+              userId:
+                type: string
               token:
                 type: string
 
@@ -1077,6 +1079,13 @@ paths:
       responses:
         204:
           description: The new task has been successfully created
+          schema:
+            type: object
+            properties:
+              taskId:
+                type: integer
+                example: 12
+
 
   /tasks/{taskId}:
     parameters:
@@ -1144,6 +1153,13 @@ paths:
       responses:
         201:
           description: OK
+          schema:
+            type: object
+            properties:
+              taskPoolId:
+                type: integer
+                example: 12
+
 
   /task-pools/{poolId}:
     parameters:
@@ -1281,8 +1297,15 @@ paths:
           $ref: '#/definitions/Assignment'
 
       responses:
-        204:
+        201:
           description: The new assignment has been successfully created
+          schema:
+            type: object
+            properties:
+              assignmentId:
+                type: integer
+                example: 12
+
 
   /assignments/{assignmentId}:
     parameters:
@@ -1484,6 +1507,7 @@ paths:
       responses:
         201:
           description: OK
+
         403:
           $ref: '#/responses/Unauthorized'
 
