@@ -68,6 +68,10 @@ definitions:
     title: UserPermission
     type: object
     properties:
+      id:
+        type: integer
+        description: Id of the permission
+
       userId:
         type: integer
         description: Id of the user
@@ -84,16 +88,15 @@ definitions:
         type: boolean
         description: Can this user add/remove/list users of this group?
 
-      changePermissions:
+      manageGroup:
         type: boolean
-        description: Can this user change permissions of other users of this group?
+        description: Can this user rename the user group
 
     required:
     - userId
     - groupId
     - manageTasks
     - manageUsers
-    - changePermissions
 
 
   UserGroup:
@@ -657,6 +660,86 @@ paths:
             items:
               $ref: '#/definitions/Assignment'
 
+  ###########################
+  # USER PERMISSION
+  ###########################
+  /user-permission:
+    get:
+      summary: Returns the list of permissions of the users in a group
+      tags: [User Permission]
+      description: >
+        Returns the list of permissions of the users in a group
+
+        NOTE: The caller must be in the specified group and must have the `manageUsers` permission set, otherwise a 403 error will be issued
+
+      parameters:
+      - in: query
+        required: true
+        name: groupId
+        type: integer
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserPermission'
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    post:
+      summary: Adds a new user to a group
+      tags: [User Permission]
+      description: >
+        Adds a new user to a group
+
+        NOTE: The caller must be in the specified group and must have the `manageUsers` permission set, otherwise a 403 error will be issued
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/UserPermission'
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  /user-permission/{permissionId}:
+    parameters:
+    - in: path
+      required: true
+      name: permissionId
+      type: integer
+
+    put:
+      summary: Updates the permission of a user in a group
+      tags: [User Permission]
+      description: >
+        Updates the permission of a user in a group
+
+        NOTE: The caller must be in the specified group and must have the `manageUsers` permission set, otherwise a 403 error will be issued
+      responses:
+        200:
+          description: OK
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    delete:
+      summary: Removes a user from a group
+      tags: [User Permission]
+      description: >
+        Removes a user from a group
+
+        NOTE: The caller must be in the specified group and must have the `manageUsers` permission set, otherwise a 403 error will be issued
+      responses:
+        200:
+          description: OK
+
+        403:
+          $ref: "#/responses/Unauthorized"
 
 
   ###########################
@@ -739,6 +822,31 @@ paths:
         403:
           $ref: "#/responses/Unauthorized"
 
+    put:
+      summary: Update the group
+
+      description: >
+        Updates the group ofusers
+
+
+        NOTE: The caller must be in the group and must have the `manageGroup` permission set, otherwise a 403 error will be issued
+
+      tags: [User Groups]
+      parameters:
+      - in: path
+        name: userGroupId
+        type: integer
+        required: true
+
+      responses:
+        204:
+          description: The group of users was successfully updated
+
+        404:
+          description: The group of users to update was not found
+
+        403:
+          $ref: "#/responses/Unauthorized"
 
     delete:
       summary: Deletes the group of users having a given id
@@ -747,7 +855,7 @@ paths:
         Deletes the entire group of users
 
 
-        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
+        NOTE: The caller must the creator of the group, otherwise a 403 error will be issued
       tags: [User Groups]
       parameters:
       - in: path
@@ -765,104 +873,6 @@ paths:
         403:
           $ref: "#/responses/Unauthorized"
 
-  /user-groups/{userGroupId}/users:
-    parameters:
-    - in: path
-      name: userGroupId
-      type: integer
-      required: true
-
-    get:
-      summary: Retrieves all the users of a given group
-
-      description: >
-        Retrieves all the users of a give group
-
-
-        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
-      tags: [User Groups]
-
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/User'
-
-    put:
-      summary: Adds a new user to the group
-      description: >
-        Adds a new user to the group
-
-
-        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
-      tags: [User Groups]
-      parameters:
-      - in: body
-        name: data
-        required: true
-        schema:
-          type: object
-          properties:
-            userId:
-              type: integer
-
-      responses:
-        200:
-          description: OK
-          schema:
-            $ref: '#/definitions/UserGroup'
-
-        400:
-          description: Could not add a user to the group, probably because the user is already part of the group
-
-          schema:
-            $ref: '#/definitions/Error'
-
-        403:
-          $ref: "#/responses/Unauthorized"
-
-  /user-groups/{userGroupId}/users/{userId}:
-    parameters:
-    - in: path
-      name: userGroupId
-      type: integer
-      required: true
-
-    - in: path
-      name: userId
-      type: integer
-      required: true
-
-    delete:
-      summary: Removes a user from the group
-      description: >
-        Removes a user from the group
-
-
-        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
-      tags: [User Groups]
-
-      responses:
-        204:
-          description: The user was successfully removed from the group
-
-        400:
-          description: Could not remove the user from the group, probably because the user is not part of the group
-
-          schema:
-            $ref: '#/definitions/Error'
-
-        403:
-          $ref: "#/responses/Unauthorized"
-
-        404:
-          description: User or group of users not found
-          schema:
-            $ref: '#/definitions/Error'
-
-
   ###########################
   # TASKS
   ###########################
@@ -870,12 +880,13 @@ paths:
     get:
       summary: Returns a list of all the tasks
       description: >
-        Returns a list of all the tasks
-
-
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+        Returns a list of all the tasks created or that the user can edit
 
       tags: [Tasks]
+
+      parameters:
+      - $ref: '#/parameters/offsetParam'
+      - $ref: '#/parameters/limitParam'
 
       responses:
         200:
@@ -884,9 +895,6 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Task'
-
-        403:
-          $ref: '#/responses/Unauthorized'
 
     post:
       summary: Adds a new task
@@ -925,15 +933,30 @@ paths:
     get:
       summary: Returns a task with the given id
       tags: [Tasks]
+      description: >
+        Returns a task with the given id
+
+
+        NOTE: The caller must have created the task or the task be in an assignment of a group in which this user has the  `manageTasks` permission, otherwise a 403 error will be issued
+
       responses:
         200:
           description: OK
           schema:
             $ref: '#/definitions/Task'
 
+        403:
+          $ref: "#/responses/Unauthorized"
+
     put:
       summary: Updates a task with the given id
       tags: [Tasks]
+      description: >
+        Updates a task with the given id
+
+
+        NOTE: The caller must have created the task or the task be in an assignment of a group in which this user has the  `manageTasks` permission, otherwise a 403 error will be issued
+
       parameters:
       - in: body
         name: data
@@ -946,12 +969,24 @@ paths:
           schema:
             $ref: '#/definitions/Task'
 
+        403:
+          $ref: "#/responses/Unauthorized"
+
     delete:
       summary: Deletes a task with the given id
       tags: [Tasks]
+      description: >
+        Deletes a task with the given id
+
+
+        NOTE: The caller must have created the task or the task be in an assignment of a group in which this user has the  `manageTasks` permission, otherwise a 403 error will be issued
+
       responses:
         204:
           description: OK
+
+        403:
+          $ref: "#/responses/Unauthorized"
 
   ###########################
   # TASK POOLS
