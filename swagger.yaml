@@ -114,11 +114,6 @@ definitions:
       createdBy:
         $ref: "#/definitions/User"
 
-      users:
-        type: array
-        items:
-          $ref: '#/definitions/UserPermission'
-
 
     required:
     - properties
@@ -474,6 +469,10 @@ paths:
 
     put:
       summary: Updates the information about the authenticated user
+      description: >
+        Updates the information about the authenticated user
+
+        NOTE: With this API you can't change your password or email. For that, see the relative APIs.
       tags: [Current user]
       parameters:
       - in: body
@@ -560,7 +559,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/AssignmentWithTasks'
+              $ref: '#/definitions/Assignment'
 
   /users/me/assignments/{assignmentId}:
     get:
@@ -588,13 +587,6 @@ paths:
   /users:
     get:
       summary: Returns all the users of the system
-      description: >
-        Retrieves all the users of the system.
-
-
-        NOTE: The caller must have the `listUsers` permission set, otherwise
-        a `403` error will be issued
-
       tags: [Users]
 
       parameters:
@@ -614,9 +606,6 @@ paths:
             items:
               $ref: '#/definitions/User'
 
-        403:
-          $ref: "#/responses/Unauthorized"
-
   /users/{userId}:
     get:
       summary: Returns a specific user given it's ID
@@ -634,9 +623,6 @@ paths:
           schema:
             $ref: '#/definitions/User'
 
-        403:
-          $ref: "#/responses/Unauthorized"
-
         404:
           description: No users were found with the specified id
           schema:
@@ -650,7 +636,9 @@ paths:
       type: integer
 
     get:
-      summary: Returns a list of assignments that are associated to the specified user
+      summary: Returns a list of assignments that are associated to the specified
+      description: >
+        Returns a list of assignments that are associated to the specified user that the logged in user can see. That is: the assignments of groups you created or groups in which you have the 'manageTasks' permission
       tags: [Users]
       responses:
         200:
@@ -1163,10 +1151,10 @@ paths:
       summary: Returns the draws associated to the assignment with a given id.
       tags: [Draws]
       parameters:
-        - in: query
-          name: assignmentId
-          required: true
-          type: integer
+      - in: query
+        name: assignmentId
+        required: true
+        type: integer
 
       responses:
         200:
@@ -1249,15 +1237,15 @@ paths:
       summary: Returns the answers given by a specified user in a specific assignment
       tags: [Task Answers]
       parameters:
-        - in: query
-          name: userId
-          required: true
-          type: integer
+      - in: query
+        name: userId
+        required: true
+        type: integer
 
-        - in: query
-          name: assignmentId
-          required: true
-          type: integer
+      - in: query
+        name: assignmentId
+        required: true
+        type: integer
 
       responses:
         200:
@@ -1330,15 +1318,15 @@ paths:
       summary: Returns the peer-reviews assigned to a given user in a given assignment
       tags: [Peer Reviews]
       parameters:
-        - in: query
-          name: userId
-          required: true
-          type: integer
+      - in: query
+        name: userId
+        required: true
+        type: integer
 
-        - in: query
-          name: assignmentId
-          required: true
-          type: integer
+      - in: query
+        name: assignmentId
+        required: true
+        type: integer
 
       responses:
         200:
