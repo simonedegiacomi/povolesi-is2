@@ -64,8 +64,8 @@ definitions:
     - badgeNumber
     - email
 
-  UserPermission:
-    title: UserPermission
+  Partecipation:
+    title: Partecipation
     type: object
     properties:
       id:
@@ -701,7 +701,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/UserPermission'
+              $ref: '#/definitions/Partecipation'
 
         401:
           $ref: "#/responses/Unauthenticated"
@@ -721,7 +721,7 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/UserPermission'
+            $ref: '#/definitions/Partecipation'
 
         401:
           $ref: "#/responses/Unauthenticated"

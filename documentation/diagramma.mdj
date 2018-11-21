@@ -8711,7 +8711,7 @@
 											"top": 487,
 											"width": 121.037109375,
 											"height": 13,
-											"text": "UserPermission"
+											"text": "Participation"
 										},
 										{
 											"_type": "LabelView",
@@ -8851,13 +8851,30 @@
 											"height": 13,
 											"text": "+changePermissions",
 											"horizontalAlignment": 0
+										},
+										{
+											"_type": "UMLAttributeView",
+											"_id": "AAAAAAFnNYrQxeDiPuo=",
+											"_parent": {
+												"$ref": "AAAAAAFnMylGNkT79xw="
+											},
+											"model": {
+												"$ref": "AAAAAAFnNYrQn+C7Yjc="
+											},
+											"font": "Arial;13;0",
+											"left": 101,
+											"top": 585,
+											"width": 121.037109375,
+											"height": 13,
+											"text": "+receiveTasks",
+											"horizontalAlignment": 0
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 96,
 									"top": 505,
 									"width": 131.037109375,
-									"height": 83
+									"height": 98
 								},
 								{
 									"_type": "UMLOperationCompartmentView",
@@ -8870,7 +8887,7 @@
 									},
 									"font": "Arial;13;0",
 									"left": 96,
-									"top": 588,
+									"top": 603,
 									"width": 131.037109375,
 									"height": 10
 								},
@@ -8910,7 +8927,7 @@
 							"left": 96,
 							"top": 480,
 							"width": 131.037109375,
-							"height": 118,
+							"height": 133,
 							"nameCompartment": {
 								"$ref": "AAAAAAFnMylGNUT2YVU="
 							},
@@ -8949,7 +8966,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 145,
-									"top": 627,
+									"top": 635,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 15,
@@ -8970,7 +8987,7 @@
 									"visible": null,
 									"font": "Arial;13;0",
 									"left": 130,
-									"top": 627,
+									"top": 635,
 									"height": 13,
 									"alpha": 1.5707963267948966,
 									"distance": 30,
@@ -8991,7 +9008,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 174,
-									"top": 628,
+									"top": 636,
 									"height": 13,
 									"alpha": -1.5707963267948966,
 									"distance": 15,
@@ -9075,7 +9092,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 145,
-									"top": 617,
+									"top": 632,
 									"height": 13,
 									"alpha": -0.5235987755982988,
 									"distance": 30,
@@ -9095,7 +9112,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 131,
-									"top": 620,
+									"top": 635,
 									"height": 13,
 									"alpha": -0.7853981633974483,
 									"distance": 40,
@@ -9115,7 +9132,7 @@
 									"visible": false,
 									"font": "Arial;13;0",
 									"left": 172,
-									"top": 613,
+									"top": 628,
 									"height": 13,
 									"alpha": 0.5235987755982988,
 									"distance": 25,
@@ -9160,7 +9177,7 @@
 								"$ref": "AAAAAAFmhiazm6O9KGI="
 							},
 							"lineStyle": 1,
-							"points": "160:671;160:598",
+							"points": "160:671;160:613",
 							"showVisibility": true,
 							"nameLabel": {
 								"$ref": "AAAAAAFnMysXjU7Wh3Q="
@@ -11522,7 +11539,7 @@
 					"_parent": {
 						"$ref": "AAAAAAFF+qBWK6M3Z8Y="
 					},
-					"name": "UserPermission",
+					"name": "Participation",
 					"ownedElements": [
 						{
 							"_type": "UMLAssociation",
@@ -11560,7 +11577,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFnMylGNETzAK8="
 							},
-							"name": "userId"
+							"name": "userId",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -11568,7 +11586,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFnMylGNETzAK8="
 							},
-							"name": "groupId"
+							"name": "groupId",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -11576,7 +11595,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFnMylGNETzAK8="
 							},
-							"name": "manageTasks"
+							"name": "manageTasks",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -11584,7 +11604,8 @@
 							"_parent": {
 								"$ref": "AAAAAAFnMylGNETzAK8="
 							},
-							"name": "manageUsers"
+							"name": "manageUsers",
+							"type": ""
 						},
 						{
 							"_type": "UMLAttribute",
@@ -11592,7 +11613,16 @@
 							"_parent": {
 								"$ref": "AAAAAAFnMylGNETzAK8="
 							},
-							"name": "changePermissions"
+							"name": "changePermissions",
+							"type": ""
+						},
+						{
+							"_type": "UMLAttribute",
+							"_id": "AAAAAAFnNYrQn+C7Yjc=",
+							"_parent": {
+								"$ref": "AAAAAAFnMylGNETzAK8="
+							},
+							"name": "receiveTasks"
 						}
 					]
 				}
