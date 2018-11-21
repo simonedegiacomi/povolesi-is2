@@ -350,6 +350,11 @@ definitions:
     - errorMessage
 
 responses:
+  Unauthenticated:
+    description: The caller is not authenticated. That is, the caller didn't provide the authentication token or the token isn't valid
+    schema:
+      $ref: "#/definitions/Error"
+
   Unauthorized:
     description: The caller doesn't have the needed authorization
     schema:
@@ -466,6 +471,8 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/User'
+        401:
+          $ref: "#/responses/Unauthenticated"
 
     put:
       summary: Updates the information about the authenticated user
@@ -490,6 +497,8 @@ paths:
       responses:
         200:
           description: OK
+        401:
+          $ref: "#/responses/Unauthenticated"
 
   /users/me/email:
     put:
@@ -516,6 +525,9 @@ paths:
           description: Could not change email.
           schema:
             $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         409:
           description: The email is already used by another user.
@@ -549,6 +561,9 @@ paths:
           schema:
             $ref: '#/definitions/Error'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
   /users/me/assignments:
     get:
       summary: Returns a list of assignments with tasks that are associated to the authenticated user
@@ -560,6 +575,8 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Assignment'
+        401:
+          $ref: "#/responses/Unauthenticated"
 
   /users/me/assignments/{assignmentId}:
     get:
@@ -578,6 +595,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/AssignmentWithTasks'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         404:
           description: The assignement is not found
@@ -606,6 +626,9 @@ paths:
             items:
               $ref: '#/definitions/User'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
   /users/{userId}:
     get:
       summary: Returns a specific user given it's ID
@@ -622,6 +645,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/User'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         404:
           description: No users were found with the specified id
@@ -647,6 +673,9 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Assignment'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
   ###########################
   # USER PERMISSION
@@ -674,6 +703,9 @@ paths:
             items:
               $ref: '#/definitions/UserPermission'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
         403:
           $ref: "#/responses/Unauthorized"
 
@@ -690,6 +722,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/UserPermission'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         403:
           $ref: "#/responses/Unauthorized"
@@ -712,6 +747,9 @@ paths:
         200:
           description: OK
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
         403:
           $ref: "#/responses/Unauthorized"
 
@@ -725,6 +763,9 @@ paths:
       responses:
         200:
           description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         403:
           $ref: "#/responses/Unauthorized"
@@ -761,6 +802,9 @@ paths:
             items:
               $ref: '#/definitions/UserGroup'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
         403:
           $ref: "#/responses/Unauthorized"
 
@@ -781,6 +825,9 @@ paths:
           description: Something went wrong when trying to create a new group of users. Maybe the name of the group is not valid or already taken.
           schema:
             $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         403:
           $ref: "#/responses/Unauthorized"
@@ -807,6 +854,9 @@ paths:
           schema:
             $ref: '#/definitions/UserGroup'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
         403:
           $ref: "#/responses/Unauthorized"
 
@@ -829,6 +879,9 @@ paths:
       responses:
         204:
           description: The group of users was successfully updated
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         404:
           description: The group of users to update was not found
@@ -854,6 +907,9 @@ paths:
       responses:
         204:
           description: The group of users was successfully deleted
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         404:
           description: The group of users to delete was not found
@@ -884,6 +940,9 @@ paths:
             items:
               $ref: '#/definitions/Task'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
     post:
       summary: Adds a new task
       description: >
@@ -901,14 +960,13 @@ paths:
           $ref: '#/definitions/Task'
 
       responses:
-        204:
+        201:
           description: The new task has been successfully created
           schema:
-            type: object
-            properties:
-              taskId:
-                type: integer
-                example: 12
+            $ref: '#/definitions/Task'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
 
   /tasks/{taskId}:
@@ -932,6 +990,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/Task'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         403:
           $ref: "#/responses/Unauthorized"
@@ -957,6 +1018,9 @@ paths:
           schema:
             $ref: '#/definitions/Task'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
         403:
           $ref: "#/responses/Unauthorized"
 
@@ -972,6 +1036,9 @@ paths:
       responses:
         204:
           description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         403:
           $ref: "#/responses/Unauthorized"
@@ -1010,6 +1077,9 @@ paths:
               taskPoolId:
                 type: integer
                 example: 12
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
 
   /task-pools/{poolId}:
@@ -1054,6 +1124,9 @@ paths:
           schema:
             $ref: '#/definitions/TaskPool'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
 
   ###########################
   # ASSIGNMENTS
@@ -1076,6 +1149,9 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Assignment'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         403:
           $ref: '#/responses/Unauthorized'
@@ -1103,6 +1179,9 @@ paths:
                 type: integer
                 example: 12
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
 
   /assignments/{assignmentId}:
     parameters:
@@ -1120,6 +1199,9 @@ paths:
           schema:
             $ref: '#/definitions/Assignment'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
     put:
       summary: Updates an assignment with the given id
       tags: [Assignments]
@@ -1135,12 +1217,18 @@ paths:
           schema:
             $ref: '#/definitions/Assignment'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
     delete:
       summary: Deletes an assignment with the given id
       tags: [Assignments]
       responses:
         204:
           description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
   ###########################
   # DRAWS
@@ -1164,6 +1252,9 @@ paths:
             items:
               $ref: '#/definitions/TaskDraw'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
     post:
       summary: Adds a new draw
       description: >
@@ -1186,6 +1277,9 @@ paths:
             properties:
               drawId:
                 type: integer
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         403:
           $ref: '#/responses/Unauthorized'
@@ -1220,6 +1314,9 @@ paths:
         200:
           description: OK
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
     delete:
       summary: Deletes the draw having a given id
       tags: [Draws]
@@ -1228,6 +1325,9 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/TaskDraw'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
   ###########################
   # TASK ANSWERS
@@ -1255,6 +1355,9 @@ paths:
             items:
               $ref: '#/definitions/TaskAnswer'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
     post:
       summary: Adds a new answer
       tags: [Task Answers]
@@ -1273,6 +1376,9 @@ paths:
             properties:
               drawId:
                 type: integer
+
+        401:
+          $ref: "#/responses/Unauthenticated"
 
         403:
           $ref: '#/responses/Unauthorized'
@@ -1298,6 +1404,9 @@ paths:
         200:
           description: OK
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
     delete:
       summary: Deletes the answer having a given id. Students cannot delete tasks once the assignment is finished.
       tags: [Task Answers]
@@ -1307,8 +1416,8 @@ paths:
           schema:
             $ref: '#/definitions/TaskAnswer'
 
-
-
+        401:
+          $ref: "#/responses/Unauthenticated"
 
   ###########################
   # PEER REVIEWS
@@ -1336,6 +1445,9 @@ paths:
             items:
               $ref: '#/definitions/PeerReview'
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
 
   /peer-reviews/{reviewId}:
     parameters:
@@ -1358,6 +1470,9 @@ paths:
         200:
           description: OK
 
+        401:
+          $ref: "#/responses/Unauthenticated"
+
     get:
       summary: Returns a peer review with the given id
       tags: [Peer Reviews]
@@ -1366,3 +1481,6 @@ paths:
           description: OK
           schema:
             $ref: '#/definitions/PeerReview'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
