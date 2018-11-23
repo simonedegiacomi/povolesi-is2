@@ -6,7 +6,7 @@ const randomstring = require("randomstring");
 
 const BCRYPT_SALT_RAUNDS = 10;
 
-const User = require('../../models').User;
+const { sequelize, User } = require('../../models');
 
 function generateToken() {
     return randomstring.generate({
@@ -56,6 +56,12 @@ module.exports = {
                     userId: user.id,
                     token : user.authToken
                 });
+            }).catch((error) => {
+                if (error instanceof sequelize.UniqueConstraintError) {
+                    res.status(409).send();
+                } else {
+                    res.status(500).send();
+                }
             });
     },
 
