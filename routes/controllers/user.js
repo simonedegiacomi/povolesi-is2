@@ -54,7 +54,7 @@ module.exports = {
             .then(user => {
                 res.status(201).send({
                     userId: user.id,
-                    token: user.authToken
+                    token : user.authToken
                 });
             });
     },
@@ -94,14 +94,13 @@ module.exports = {
                         });
                     }
 
-                    return user.update({
+                    user.update({
                         authToken: generateToken()
-                    })
-                })
-                .then((user) => res.status(200).send({
-                    userId: user.id,
-                    token : user.authToken
-                }));
+                    }).then((user) => res.status(200).send({
+                        userId: user.id,
+                        token : user.authToken
+                    }))
+                });
         });
     }
 };
