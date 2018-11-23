@@ -15,7 +15,7 @@ function setupUnauthenticatedRoutes (app) {
     const router = express.Router();
 
     router.post('/register', userController.register);
-    router.get('/login', userController.login);
+    router.post('/login', userController.login);
 
     app.use('/api/v1', router);
 }
