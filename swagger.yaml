@@ -1,120 +1,1486 @@
-swagger: '2.0'
+#metadata
+swagger: "2.0"
 info:
-  version: '1.0'
-  title: "povolesiis2"
-  description: Polls is a simple API allowing consumers to view polls and vote in them.
-  license:
-    name: MIT
-    url: https://github.com/apiaryio/polls-api/blob/master/LICENSE
-host: polls.apiblueprint.org
-basePath: /
-schemes:
-- http
+  title: PovoLesi API
+  description: API richieste dal corso di ingegneria del software II
+  version: 1.0.0
+
+#We only exchange JSONs
 consumes:
 - application/json
 produces:
 - application/json
-paths:
-  /questions:
-    x-summary: Questions Collection
-    get:
-      summary: List All Questions
-      responses:
-        200:
-          description: Successful Response
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Question'
-          examples:
-            application/json:
-              - question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 2048
-                  - choice: Python
-                    votes: 1024
-                  - choice: Objective-C
-                    votes: 512
-                  - choice: Ruby
-                    votes: 256
-    post:
-      description: >-
-        You may create your own question using this action. It takes a JSON
-        object containing a question and a collection of answers in the
-        form of choices.
-      summary: Create a New Question
-      parameters:
-        - name: body
-          in: body
-          required: true
-          schema:
-            $ref: '#/definitions/QuestionRequest'
-      responses:
-        201:
-          description: ''
-          schema:
-            $ref: '#/definitions/Question'
-          examples:
-            application/json:
-                question: Favourite programming language?
-                published_at: '2015-08-05T08:40:51.620Z'
-                choices:
-                  - choice: Swift
-                    votes: 0
-                  - choice: Python
-                    votes: 0
-                  - choice: Objective-C
-                    votes: 0
-                  - choice: Ruby
-                    votes: 0
+
+#TODO: The 403 errors are not set up everywhere. Just remember to do this later
+
+#TODO: The host should be adjusted later
+host: api.nowhere.com
+basePath: /v1
+schemes:
+- https
+
+#Almost all the request will require authentication
+securityDefinitions:
+  ApiTokenAuth:
+    type: apiKey
+    in: header
+    name: X-API-TOKEN
+    description: >
+      In order to use the APIs, you must first get an authentication token (we call
+      it just "token"). The token is specific to a user. It can be optained by
+      calling the `/users/register` API and it has to be sent as a `X-API-TOKEN`
+      header with any other API request.
+
+    #All the APIs, except for register, are required to have an api token as a header
+#of their requests
+security:
+- ApiTokenAuth: []
+
 definitions:
-  Question:
-    title: Question
+  User:
+    title: User
     type: object
     properties:
-      question:
+      id:
+        type: integer
+        description: The id that univocally identifies the user
+        example: 84
+      name:
         type: string
-      published_at:
+        description: The full name of the user
+        example: Gianni Morandi
+      badgeNumber:
         type: string
-      choices:
+        description: The university identifier of this user. It can be the student's "numero di matricola" or the teacher's badge number
+        example: 111244
+      email:
+        type: string
+        description: The user's email
+        example: gianni@morandi.cit
+
+    required:
+    - id
+    - name
+    - badgeNumber
+    - email
+
+  Partecipation:
+    title: Partecipation
+    type: object
+    properties:
+      id:
+        type: integer
+        description: Id of the permission
+
+      userId:
+        type: integer
+        description: Id of the user
+
+      groupId:
+        type: integer
+        description: Id of the group for wchich this permission applies
+
+      manageTasks:
+        type: boolean
+        description: Can this user add/remove/edit taks of assignments of this group?
+
+      manageUsers:
+        type: boolean
+        description: Can this user add/remove/list users of this group?
+
+      manageGroup:
+        type: boolean
+        description: Can this user rename the user group
+
+    required:
+    - userId
+    - groupId
+    - manageTasks
+    - manageUsers
+
+
+  UserGroup:
+    title: User Group
+    type: object
+    properties:
+      id:
+        type: integer
+        description: A unique identifier of the group of users
+
+      name:
+        type: string
+        description: The name associated to this group of users
+
+      createdBy:
+        $ref: "#/definitions/User"
+
+
+    required:
+    - properties
+    - name
+    - createdBy
+
+  TaskPool:
+    title: Task Pool
+    type: object
+    properties:
+      id:
+        type: integer
+
+      name:
+        type: string
+
+      tasks:
         type: array
         items:
-          $ref: '#/definitions/Choice'
+          $ref: '#/definitions/Task'
+
+      createdBy:
+        $ref: '#/definitions/User'
+
     required:
-      - question
-      - published_at
-      - choices
-  Choice:
-    title: Choice
+    - name
+    - tasks
+
+  TaskDraw:
+    title: Task Draw
     type: object
     properties:
-      votes:
+      id:
         type: integer
-        format: int32
-      choice:
-        type: string
+
+      assignmentId:
+        type: integer
+
+      poolIDd:
+        type: integer
+
+      numQuestionsToDraw:
+        type: integer
+
+      minPerQuestionDraw:
+        type: integer
+
     required:
-      - votes
-      - choice
-  QuestionRequest:
-    title: Question Request
+    - assignmentId
+    - poolId
+    - numQuestionsToDraw
+    - minPerQuestionDraw
+
+  Task:
+    title: Task
     type: object
     properties:
+      id:
+        type: integer
+        example:
+          1234
+
       question:
         type: string
+        description: The question of this task
+        example: What is the meaning of life?
+
+      type:
+        type: string
+        enum: [openQuestion, multipleAnswer, linkSubmission]
+        example: multipleAnswer
+
+      multipleChoicesAllowed:
+        description: >
+          Used in case of multiple answer questions. Is true in case the multiple answers are allowed,
+          false otherwise.
+        type: boolean
+
       choices:
+        description: >
+          Used in case of multiple answer questions. Holds all the possible values that the user can choose from.
         type: array
         items:
           type: string
+        example:
+          [Happiness, Balance, 42]
+
+      maxLength:
+        description: >
+          Used in case of open questions. It's the maximum amount of characters that is allowed in the answer.
+        type: integer
+
     required:
-      - question
-      - choices
-    example:
-      question: Favourite programming language?
-      choices:
-        - Swift
-        - Python
-        - Objective-C
-        - Ruby
+    - id
+    - question
+    - type
+
+
+  Assignment:
+    title: Assignment
+    type: object
+    properties:
+      id:
+        type: integer
+
+      name:
+        type: string
+
+      startsOn:
+        type: integer
+
+      submissionsDeadline:
+        type: integer
+
+      allowsLateSubmission:
+        type: boolean
+
+      lateSubmissionsDeadline:
+        type: integer
+
+      peerReviewsDeadline:
+        type: integer
+
+      createdByUserId:
+        type: integer
+
+      assignedToUserGroupId:
+        type: integer
+
+    required:
+    - name
+    - startsOn
+    - submissionsDeadline
+    - allowsLateSubmission
+    - lateSubmissionsDeadline
+    - peerReviewsDeadline
+    - createdByUserId
+    - assignedToUserGroupId
+
+  AssignmentWithTasks:
+    title: Assignment with tasks
+    type: object
+    description: An object containg the assignment assigned to a user and the user-specific tasks
+    properties:
+      assignment:
+        $ref: '#/definitions/Assignment'
+      tasks:
+        type: array
+        items:
+          $ref: '#/definitions/Task'
+
+  TaskAnswer:
+    title: Task Answer
+    type: object
+    properties:
+      id:
+        type: integer
+      userId:
+        type: integer
+      taskId:
+        type: integer
+      assignmentId:
+        type: integer
+      submittedOn:
+        type: integer
+
+      answer:
+        description: >
+          Used in case of open question answer.
+        type: string
+
+      selectedAnswers:
+        description: >
+          Used in case of multiple answers question. Holds all the selected answers.
+        type: array
+        items:
+          type: string
+        example:
+          [42]
+
+      url:
+        description: >
+          Used in case of link submission answers
+        type: string
+
+      mark:
+        type: integer
+      comment:
+        type: string
+
+    required:
+    - id
+    - userId
+    - taskId
+    - assignmentId
+    - submittedOn
+
+  PeerReview:
+    type: object
+    properties:
+      id:
+        type: integer
+
+      answerId:
+        type: integer
+
+      reviewer:
+        $ref: '#/definitions/User'
+
+      mark:
+        type: integer
+        description: A mark from 1 to 10. Returns 0 if the peer review is not filled.
+        example: 10
+      comment:
+        type: string
+        description: An optional comment. Returns null if the peer review is not filled.
+
+    required:
+    - answerId
+    - mark
+    - comment
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: string
+        description: A string that describes the error
+      errorMessage:
+        type: string
+        description: A developer-friendly description of what went wrong
+    required:
+    - code
+    - errorMessage
+
+responses:
+  Unauthenticated:
+    description: The caller is not authenticated. That is, the caller didn't provide the authentication token or the token isn't valid
+    schema:
+      $ref: "#/definitions/Error"
+
+  Unauthorized:
+    description: The caller doesn't have the needed authorization
+    schema:
+      $ref: "#/definitions/Error"
+
+parameters:
+  offsetParam:
+    in: query
+    name: offset
+    required: false
+    type: integer
+    minimum: 0
+    description: The number of items to skip before starting to collect the result set.
+
+  limitParam:
+    in: query
+    name: limit
+    required: false
+    type: integer
+    minimum: 1
+    maximum: 100
+    default: 20
+    description: The numbers of items to return.
+
+paths:
+
+  ###########################
+  # UNAUTHENTICATED
+  ###########################
+
+  /register:
+    post:
+      summary: Allows a user to register in order to receive the authentication token
+      security: [] #this api can be called without the token
+      tags:
+      - Unauthenticated
+      parameters:
+      - in: body
+        name: data
+        description: The registration data of the user
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              description: The complete name of the person in "first-name second-name" format
+            email:
+              type: string
+            badgeNumber:
+              type: string
+            password:
+              type: string
+
+      responses:
+        201:
+          description: The user has been inserted and the associated token is generated
+          schema:
+            type: object
+            properties:
+              userId:
+                type: integer
+                example: 123
+              token:
+                type: string
+                example: AABBCCDDEEFFGG
+        400:
+          description: Could not insert the user. Probably a field is missing.
+          schema:
+            $ref: '#/definitions/Error'
+        409:
+          description: The email address is already in use.
+          schema:
+            $ref: '#/definitions/Error'
+
+  /login:
+    post:
+      summary: Generates a new token for an already registered user
+      security: []
+      tags:
+      - Unauthenticated
+      description: >
+        Logs the user in. This request is usually used to get a new authentication token associated to the user. After this call the old token (got by `register` or `login` call) is then released and is not valid anymore.
+
+      responses:
+        201:
+          description: The new token has been generated
+          schema:
+            type: object
+            properties:
+              userId:
+                type: string
+              token:
+                type: string
+
+        400:
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/Error'
+
+
+  ###########################
+  # USERS
+  ###########################
+
+  /users/me:
+    get:
+      summary: Returns information about the authenticated user
+      description: Retrieves the user that is authenticated by the token and
+        returns it's basic data
+      tags: [Current user]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    put:
+      summary: Updates the information about the authenticated user
+      description: >
+        Updates the information about the authenticated user
+
+        NOTE: With this API you can't change your password or email. For that, see the relative APIs.
+      tags: [Current user]
+      parameters:
+      - in: body
+        name: data
+        schema:
+          type: object
+          properties:
+            name:
+              description: new name to assign to the user
+              type: string
+
+            badgeNumber:
+              type: string
+
+      responses:
+        200:
+          description: OK
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+  /users/me/email:
+    put:
+      summary: Changes the email of the authenticated user
+      description:
+        Changes the email of the authenticated user. The user will receive a
+        confirmation mail.
+      tags: [Current user]
+      parameters:
+      - in: body
+        required: true
+        name: data
+        schema:
+          type: object
+          properties:
+            newEmail:
+              type: string
+
+      responses:
+        200:
+          description: OK
+
+        400:
+          description: Could not change email.
+          schema:
+            $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        409:
+          description: The email is already used by another user.
+          schema:
+            $ref: '#/definitions/Error'
+
+  /users/me/password:
+    put:
+      summary: Changes the password of the authenticated user
+      description:
+        Changes the password of the authenticated user. The user will receive an
+        email telling him/her about the password change.
+      tags: [Current user]
+      parameters:
+      - in: body
+        required: true
+        name: data
+
+        schema:
+          type: object
+          properties:
+            newPassword:
+              type: string
+
+      responses:
+        200:
+          description: OK
+
+        400:
+          description: Could not change password because the password is invalid (empty, etc...)
+          schema:
+            $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+  /users/me/assignments:
+    get:
+      summary: Returns a list of assignments with tasks that are associated to the authenticated user
+      tags: [Current user]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Assignment'
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+  /users/me/assignments/{assignmentId}:
+    get:
+      summary: Returns a specified assignement assigned to the current user, having it's tasks
+      tags: [Current user]
+
+      parameters:
+      - in: path
+        required: true
+        name: assignmentId
+        type: integer
+
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/AssignmentWithTasks'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        404:
+          description: The assignement is not found
+          schema:
+            $ref: '#/definitions/Error'
+
+  /users:
+    get:
+      summary: Returns all the users of the system
+      tags: [Users]
+
+      parameters:
+      - in: query
+        name: sortBy
+        type: string
+        enum: [id, name, badgeNumber, email]
+
+      - $ref: '#/parameters/offsetParam'
+      - $ref: '#/parameters/limitParam'
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/User'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+  /users/{userId}:
+    get:
+      summary: Returns a specific user given it's ID
+      tags: [Users]
+      parameters:
+      - in: path
+        name: userId
+        required: true
+        type: integer
+        description: The id of the user
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/User'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        404:
+          description: No users were found with the specified id
+          schema:
+            $ref: '#/definitions/Error'
+
+  /users/{userId}/assignments:
+    parameters:
+    - in: path
+      required: true
+      name: userId
+      type: integer
+
+    get:
+      summary: Returns a list of assignments that are associated to the specified
+      description: >
+        Returns a list of assignments that are associated to the specified user that the logged in user can see. That is: the assignments of groups you created or groups in which you have the 'manageTasks' permission
+      tags: [Users]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Assignment'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+  ###########################
+  # USER PERMISSION
+  ###########################
+  /user-permission:
+    get:
+      summary: Returns the list of permissions of the users in a group
+      tags: [User Permission]
+      description: >
+        Returns the list of permissions of the users in a group
+
+        NOTE: The caller must be in the specified group and must have the `manageUsers` permission set, otherwise a 403 error will be issued
+
+      parameters:
+      - in: query
+        required: true
+        name: groupId
+        type: integer
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Partecipation'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    post:
+      summary: Adds a new user to a group
+      tags: [User Permission]
+      description: >
+        Adds a new user to a group
+
+        NOTE: The caller must be in the specified group and must have the `manageUsers` permission set, otherwise a 403 error will be issued
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Partecipation'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  /user-permission/{permissionId}:
+    parameters:
+    - in: path
+      required: true
+      name: permissionId
+      type: integer
+
+    put:
+      summary: Updates the permission of a user in a group
+      tags: [User Permission]
+      description: >
+        Updates the permission of a user in a group
+
+        NOTE: The caller must be in the specified group and must have the `manageUsers` permission set, otherwise a 403 error will be issued
+      responses:
+        200:
+          description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    delete:
+      summary: Removes a user from a group
+      tags: [User Permission]
+      description: >
+        Removes a user from a group
+
+        NOTE: The caller must be in the specified group and must have the `manageUsers` permission set, otherwise a 403 error will be issued
+      responses:
+        200:
+          description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+
+  ###########################
+  # USER GROUPS
+  ###########################
+
+  /user-groups:
+    get:
+      summary: Returns a list of all the groups of users (classes)
+      description: >
+        Returns a list of all the groups of users (classes)
+
+
+        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
+
+      tags: [User Groups]
+      parameters:
+      - in: query
+        name: sortBy
+        type: string
+        enum: [id, name]
+
+      - $ref: '#/parameters/offsetParam'
+      - $ref: '#/parameters/limitParam'
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/UserGroup'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    post:
+      summary: Creates a new group of users
+      tags: [User Groups]
+      responses:
+        201:
+          description: The group of users was successfully created. The id of the generated group is then returned.
+          schema:
+            type: object
+            properties:
+              userGroupId:
+                type: integer
+                example: 12
+
+        400:
+          description: Something went wrong when trying to create a new group of users. Maybe the name of the group is not valid or already taken.
+          schema:
+            $ref: '#/definitions/Error'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  /user-groups/{userGroupId}:
+    get:
+      summary: Retrieves the group of users having a given id
+
+      description: >
+        Retrieves a group of users having a given id
+
+
+        NOTE: The caller must have the `manageUserGroups` permission set, otherwise a 403 error will be issued
+      tags: [User Groups]
+      parameters:
+      - in: path
+        name: userGroupId
+        type: integer
+        required: true
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/UserGroup'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    put:
+      summary: Update the group
+
+      description: >
+        Updates the group ofusers
+
+
+        NOTE: The caller must be in the group and must have the `manageGroup` permission set, otherwise a 403 error will be issued
+
+      tags: [User Groups]
+      parameters:
+      - in: path
+        name: userGroupId
+        type: integer
+        required: true
+
+      responses:
+        204:
+          description: The group of users was successfully updated
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        404:
+          description: The group of users to update was not found
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    delete:
+      summary: Deletes the group of users having a given id
+
+      description: >
+        Deletes the entire group of users
+
+
+        NOTE: The caller must the creator of the group, otherwise a 403 error will be issued
+      tags: [User Groups]
+      parameters:
+      - in: path
+        name: userGroupId
+        type: integer
+        required: true
+
+      responses:
+        204:
+          description: The group of users was successfully deleted
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        404:
+          description: The group of users to delete was not found
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  ###########################
+  # TASKS
+  ###########################
+  /tasks:
+    get:
+      summary: Returns a list of all the tasks
+      description: >
+        Returns a list of all the tasks created or that the user can edit
+
+      tags: [Tasks]
+
+      parameters:
+      - $ref: '#/parameters/offsetParam'
+      - $ref: '#/parameters/limitParam'
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Task'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    post:
+      summary: Adds a new task
+      description: >
+        Adds a new task. The task can be expressed in one of 3 different
+        syntaxes, accordingly to the types of the task that you want to create.
+
+
+        The property `type` is used to distinguish between different types of tasks
+      tags: [Tasks]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Task'
+
+      responses:
+        201:
+          description: The new task has been successfully created
+          schema:
+            $ref: '#/definitions/Task'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+
+  /tasks/{taskId}:
+    parameters:
+    - in: path
+      required: true
+      name: taskId
+      type: integer
+
+    get:
+      summary: Returns a task with the given id
+      tags: [Tasks]
+      description: >
+        Returns a task with the given id
+
+
+        NOTE: The caller must have created the task or the task be in an assignment of a group in which this user has the  `manageTasks` permission, otherwise a 403 error will be issued
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Task'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    put:
+      summary: Updates a task with the given id
+      tags: [Tasks]
+      description: >
+        Updates a task with the given id
+
+
+        NOTE: The caller must have created the task or the task be in an assignment of a group in which this user has the  `manageTasks` permission, otherwise a 403 error will be issued
+
+      parameters:
+      - in: body
+        name: data
+        schema:
+          $ref: '#/definitions/Task'
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Task'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+    delete:
+      summary: Deletes a task with the given id
+      tags: [Tasks]
+      description: >
+        Deletes a task with the given id
+
+
+        NOTE: The caller must have created the task or the task be in an assignment of a group in which this user has the  `manageTasks` permission, otherwise a 403 error will be issued
+
+      responses:
+        204:
+          description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: "#/responses/Unauthorized"
+
+  ###########################
+  # TASK POOLS
+  ###########################
+  /task-pools:
+    get:
+      summary: Returns a list of all the task pools
+      tags: [Task pools]
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskPool'
+
+    post:
+      summary: Creates a new task pool
+      tags: [Task pools]
+      parameters:
+      - in: body
+        required: true
+        name: data
+        schema:
+          $ref: '#/definitions/TaskPool'
+
+      responses:
+        201:
+          description: OK
+          schema:
+            type: object
+            properties:
+              taskPoolId:
+                type: integer
+                example: 12
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+
+  /task-pools/{poolId}:
+    parameters:
+    - in: path
+      name: poolId
+      required: true
+      type: integer
+
+    get:
+      summary: Returns the task pool having the given id
+      tags: [Task pools]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/TaskPool'
+
+    put:
+      summary: Updates the task pool
+      tags: [Task pools]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+
+      responses:
+        200:
+          description: OK
+
+    delete:
+      summary: Deletes the task pool having a given id
+      tags: [Task pools]
+      responses:
+        204:
+          description: OK
+          schema:
+            $ref: '#/definitions/TaskPool'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+
+  ###########################
+  # ASSIGNMENTS
+  ###########################
+  /assignments:
+    get:
+      summary: Returns a list of all the assignments
+      description: >
+        Returns a list of all the assignments
+
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+
+      tags: [Assignments]
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Assignment'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: '#/responses/Unauthorized'
+
+    post:
+      summary: Adds a new assignment
+      description: >
+        Adds a new assignment
+
+      tags: [Assignments]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/Assignment'
+
+      responses:
+        201:
+          description: The new assignment has been successfully created
+          schema:
+            type: object
+            properties:
+              assignmentId:
+                type: integer
+                example: 12
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+
+  /assignments/{assignmentId}:
+    parameters:
+    - in: path
+      required: true
+      name: assignmentId
+      type: integer
+
+    get:
+      summary: Returns an assignment with the given id
+      tags: [Assignments]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Assignment'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    put:
+      summary: Updates an assignment with the given id
+      tags: [Assignments]
+      parameters:
+      - in: body
+        name: data
+        schema:
+          $ref: '#/definitions/Assignment'
+
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/Assignment'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    delete:
+      summary: Deletes an assignment with the given id
+      tags: [Assignments]
+      responses:
+        204:
+          description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+  ###########################
+  # DRAWS
+  ###########################
+
+  /draws:
+    get:
+      summary: Returns the draws associated to the assignment with a given id.
+      tags: [Draws]
+      parameters:
+      - in: query
+        name: assignmentId
+        required: true
+        type: integer
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskDraw'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    post:
+      summary: Adds a new draw
+      description: >
+        Adds a new draw to a specified assignment having specified instructions on the number of tasks to draw.
+
+        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
+
+      tags: [Draws]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskDraw'
+      responses:
+        201:
+          description: OK
+          schema:
+            type: object
+            properties:
+              drawId:
+                type: integer
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: '#/responses/Unauthorized'
+
+  /draws/{drawId}:
+    parameters:
+    - in: path
+      name: drawId
+      required: true
+      type: integer
+
+    get:
+      summary: Returns the draw having the given id
+      tags: [Draws]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/TaskDraw'
+
+    put:
+      summary: Updates the draw
+      tags: [Draws]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskDraw'
+
+      responses:
+        200:
+          description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    delete:
+      summary: Deletes the draw having a given id
+      tags: [Draws]
+      responses:
+        204:
+          description: OK
+          schema:
+            $ref: '#/definitions/TaskDraw'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+  ###########################
+  # TASK ANSWERS
+  ###########################
+  /task-answers:
+    get:
+      summary: Returns the answers given by a specified user in a specific assignment
+      tags: [Task Answers]
+      parameters:
+      - in: query
+        name: userId
+        required: true
+        type: integer
+
+      - in: query
+        name: assignmentId
+        required: true
+        type: integer
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/TaskAnswer'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    post:
+      summary: Adds a new answer
+      tags: [Task Answers]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskAnswer'
+
+      responses:
+        201:
+          description: OK
+          schema:
+            type: object
+            properties:
+              drawId:
+                type: integer
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+        403:
+          $ref: '#/responses/Unauthorized'
+
+  /task-answers/{taskAnswerId}:
+    parameters:
+    - in: path
+      name: taskAnswerId
+      required: true
+      type: integer
+
+    put:
+      summary: Updates the answer with the given id
+      tags: [Task Answers]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/TaskAnswer'
+
+      responses:
+        200:
+          description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    delete:
+      summary: Deletes the answer having a given id. Students cannot delete tasks once the assignment is finished.
+      tags: [Task Answers]
+      responses:
+        204:
+          description: OK
+          schema:
+            $ref: '#/definitions/TaskAnswer'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+  ###########################
+  # PEER REVIEWS
+  ###########################
+  /peer-reviews:
+    get:
+      summary: Returns the peer-reviews assigned to a given user in a given assignment
+      tags: [Peer Reviews]
+      parameters:
+      - in: query
+        name: userId
+        required: true
+        type: integer
+
+      - in: query
+        name: assignmentId
+        required: true
+        type: integer
+
+      responses:
+        200:
+          description: OK
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/PeerReview'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+
+  /peer-reviews/{reviewId}:
+    parameters:
+    - in: path
+      name: reviewId
+      required: true
+      type: integer
+
+    put:
+      summary: Updates the peer review
+      tags: [Peer Reviews]
+      parameters:
+      - in: body
+        name: data
+        required: true
+        schema:
+          $ref: '#/definitions/PeerReview'
+
+      responses:
+        200:
+          description: OK
+
+        401:
+          $ref: "#/responses/Unauthenticated"
+
+    get:
+      summary: Returns a peer review with the given id
+      tags: [Peer Reviews]
+      responses:
+        200:
+          description: OK
+          schema:
+            $ref: '#/definitions/PeerReview'
+
+        401:
+          $ref: "#/responses/Unauthenticated"
