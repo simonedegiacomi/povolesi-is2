@@ -4,6 +4,8 @@ const express = require('express');
 
 const userController = require('./controllers/user');
 
+const authenticationMiddleware = require('./middlewares/authentication');
+
 module.exports = (app) => {
 
     setupUnauthenticatedRoutes(app);
@@ -22,6 +24,10 @@ function setupUnauthenticatedRoutes (app) {
 
 function setupAuthenticatedRoutes (app) {
     const router = express.Router();
+
+    router.use(authenticationMiddleware);
+
+    router.get('/secure', (req, res) => res.status(200).send(`Hi ${req.user.name}!`));
 
     app.use('/api/v1', router);
 }
