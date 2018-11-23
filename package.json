@@ -19,8 +19,10 @@
   },
   "homepage": "https://github.com/simonedegiacomi/povolesi-is2#readme",
   "dependencies": {
+    "bcrypt": "^3.0.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "randomstring": "^1.1.5",
     "sequelize": "^4.41.2",
     "sqlite3": "^4.0.4",
     "validator": "^10.9.0"

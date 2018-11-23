@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+        password: {
+            type: DataTypes.STRING,
+            allowNull: false,
+        },
         badgeNumber: {
             type: DataTypes.STRING,
             allowNull: false,
@@ -15,6 +19,11 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
+
+        authToken: {
+            type: DataTypes.STRING,
+            allowNull: true
+        }
     });
 
 

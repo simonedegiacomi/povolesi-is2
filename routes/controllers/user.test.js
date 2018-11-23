@@ -15,14 +15,16 @@ describe('Test the user registration', () => {
             })
             .expect(201)
             .then(response => {
-                expect(response.body.name).toBe('Mario Rossi');
-                expect(response.body.email).toBe('mario@rossi.it');
-                expect(response.body.badgeNumber).toBe('000000');
+                expect(response.body.token).toBeDefined();
+                expect(response.body.userId).toBeDefined();
                 done();
             });
     });
 
 
+});
+
+describe('Test the user login', () => {
     test('It should let the user login, responding with a new token', (done) => {
         request(app)
             .post('/api/v1/login')
@@ -33,8 +35,8 @@ describe('Test the user registration', () => {
             .expect(200)
             .then(response => {
                 expect(response.body.token).toBeDefined();
+                expect(response.body.userId).toBeDefined();
                 done();
             });
     });
-
 });
