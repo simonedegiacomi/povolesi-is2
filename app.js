@@ -1,14 +1,16 @@
-const express = require('express');
+const express    = require('express');
+const bodyParser = require('body-parser');
 
 const models = require('./models');
 
-const app  = express();
-const PORT = process.env.PORT || 3000;
+const app = express();
+app.use(bodyParser.json());
 
 require('./routes')(app);
 
 models.sequelize.sync().then(() => {
     console.log('[APP] Database initialized');
-
-    app.listen(PORT, () => console.log(`[APP] Listening on port ${PORT}`));
+    app.emit('databaseInitialized');
 });
+
+module.exports = app;

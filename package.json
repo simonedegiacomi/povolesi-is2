@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "jest",
-    "start": "node app.js",
-    "start-dev": "nodemon app.js"
+    "start": "node server.js",
+    "start-dev": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -19,13 +19,16 @@
   },
   "homepage": "https://github.com/simonedegiacomi/povolesi-is2#readme",
   "dependencies": {
+    "body-parser": "^1.18.3",
     "express": "^4.16.4",
     "sequelize": "^4.41.2",
-    "sqlite3": "^4.0.4"
+    "sqlite3": "^4.0.4",
+    "validator": "^10.9.0"
   },
   "devDependencies": {
     "jest": "^23.6.0",
-    "nodemon": "^1.18.6"
+    "nodemon": "^1.18.6",
+    "supertest": "^3.3.0"
   },
   "jest": {
     "verbose": true,
