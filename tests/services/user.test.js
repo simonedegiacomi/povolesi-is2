@@ -21,3 +21,7 @@ describe('Test the user registration', () => {
     });
 
 });
+
+describe('Test user email update', () => {
+    // TODO: 1) Write some tests that call the 'updateUserEmail' method on the UserService
+});

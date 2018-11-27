@@ -91,3 +91,7 @@ describe('Test the user login', () => {
             });
     });
 });
+
+describe('Test user email update', () => {
+    // TODO: 3) Write some tests that send the PUT to '/users/me/email'
+});

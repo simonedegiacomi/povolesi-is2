@@ -64,5 +64,9 @@ module.exports = {
         return randomstring.generate({
             length: 40
         });
+    },
+
+    updateUserEmail () {
+        // TODO: 2) Implement the method to make the tests in /tests/services/user.test.js pass
     }
 };

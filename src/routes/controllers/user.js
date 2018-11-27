@@ -72,5 +72,11 @@ module.exports = {
                     return res.status(500).send();
                 }
             });
+    },
+
+    updateEmail: function (req, res) {
+        // TODO: 4) Implement the controller to make the tests in /tests/routes/controllers/user.test.js pass:
+        // validate the request, call the logic method on  the service object and return an appropriate response.
+        // NOTE: If a request arrives here, it's already authenticated and you can find the logged in user in req.user
     }
 };
