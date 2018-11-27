@@ -1,5 +1,3 @@
-const User = require('../../models/user').User;
-const authenticationMiddleware = require('../middlewares/authentication');
 
 module.exports = {
     me: function (req, res) {
@@ -10,4 +8,4 @@ module.exports = {
             email: req.user.email
         });
     }
-}
+};
