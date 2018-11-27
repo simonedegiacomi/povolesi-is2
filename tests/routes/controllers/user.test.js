@@ -91,3 +91,17 @@ describe('Test the user login', () => {
             });
     });
 });
+
+describe('test the /users path', () => {
+    urlVer="/api/v1"
+
+    test('app module should be defined', () => {
+        expect(app).toBeDefined();
+    });
+      
+    test('GET /users should return 200', async () => {
+        const response = await request(app).get(urlVer+'/users');
+        expect(response.statusCode).toBe(200);
+    });
+
+});

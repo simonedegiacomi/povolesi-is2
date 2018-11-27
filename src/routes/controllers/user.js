@@ -75,8 +75,8 @@ module.exports = {
     },
 
     getAllUsers: async function (req, res) {
-        var users = await UserService.getAllUsers()
+        var users =await UserService.getAllUsers()
 
-        return res.status(200).send(users);
+        res.status(200).send(users);
     }
 };
