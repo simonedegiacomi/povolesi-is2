@@ -27,7 +27,7 @@ function setupAuthenticatedRoutes (app) {
 
     router.use(authenticationMiddleware);
 
-    router.post('/users/me/email', userController.updateEmail);
+    router.put('/users/me/email', userController.updateEmail);
 
     app.use('/api/v1', router);
 }
