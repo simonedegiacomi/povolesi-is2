@@ -1,10 +1,9 @@
 const validator    = require('validator');
 const bcrypt       = require('bcrypt');
 const randomstring = require("randomstring");
+const UserService = require('../../services/user');
 
-const BCRYPT_SALT_RAUNDS = 10;
-
-const { sequelize, User } = require('../../models');
+const {sequelize, User} = require('../../models');
 
 function generateToken() {
     return randomstring.generate({
@@ -36,31 +35,12 @@ module.exports = {
             });
         }
 
-        if (!json.password || json.password.length < 6) {
-            return res.status(400).send({
-                errorMessage: "Field 'password' is missing or it's too short (at least 6 characters)"
-            });
-        }
-
-        bcrypt.hash(json.password, BCRYPT_SALT_RAUNDS)
-            .then(hash => {
-                json.password  = hash;
-                json.authToken = generateToken();
-
-                return User.create(json)
-            })
-            .then(user => {
-                res.status(201).send({
-                    userId: user.id,
-                    token : user.authToken
-                });
-            }).catch((error) => {
-                if (error instanceof sequelize.UniqueConstraintError) {
-                    res.status(409).send();
-                } else {
-                    res.status(500).send();
-                }
-            });
+        UserService.registerUser(json)
+            .then(user => res.status(201).send({
+                userId: user.id,
+                token : user.authToken
+            }))
+            .catch(_ => res.status(409).send());
     },
 
     login: function (req, res) {
