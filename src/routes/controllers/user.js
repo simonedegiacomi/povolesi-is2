@@ -1,32 +1,30 @@
-const validator   = require('validator');
+const Joi         = require('joi');
 const UserService = require('../../services/user');
 
+const userSchema = Joi.object().keys({
+    name       : Joi.string().min(3).max(30).required(),
+    email      : Joi.string().email(),
+    badgeNumber: Joi.string().min(1).max(45).required(),
+    password   : Joi.string()
+});
+
+const loginSchema = Joi.object().keys({
+    email   : Joi.string().email(),
+    password: Joi.string()
+});
 
 module.exports = {
 
     register: function (req, res) {
-        const json = req.body;
+        const {error, value} = Joi.validate(req.body, userSchema);
 
-        if (!json.name || validator.isEmpty(json.name)) {
+        if (error != null) {
             return res.status(400).send({
-                errorMessage: "Field 'name' is missing or it's empty"
+                errorMessage: error.details[0].message
             });
         }
 
-        if (!json.email || !validator.isEmail(json.email)) {
-            return res.status(400).send({
-                errorMessage: "Field 'email' is missing or it's not a valid email address"
-            });
-        }
-
-
-        if (!json.badgeNumber || validator.isEmpty(json.badgeNumber)) {
-            return res.status(400).send({
-                errorMessage: "Field 'badgeNumber' is missing or it's empty"
-            });
-        }
-
-        UserService.registerUser(json)
+        UserService.registerUser(value)
             .then(user => res.status(201).send({
                 userId: user.id,
                 token : user.authToken
@@ -52,21 +50,15 @@ module.exports = {
     },
 
     login: function (req, res) {
-        const json = req.body;
+        const {error, value} = Joi.validate(req.body, loginSchema);
 
-        if (!json.email) {
+        if (error != null) {
             return res.status(400).send({
-                errorMessage: "Field 'email' is missing"
+                errorMessage: error.details[0].message
             });
         }
 
-        if (!json.password) {
-            return res.status(400).send({
-                errorMessage: "Field 'password' is missing"
-            });
-        }
-
-        UserService.loginUser(json.email, json.password)
+        UserService.loginUser(value.email, value.password)
             .then(user => res.status(200).send({
                 userId: user.id,
                 token : user.authToken
