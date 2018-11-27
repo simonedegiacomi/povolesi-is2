@@ -1,15 +1,6 @@
-const validator    = require('validator');
-const bcrypt       = require('bcrypt');
-const randomstring = require("randomstring");
+const validator   = require('validator');
 const UserService = require('../../services/user');
 
-const {sequelize, User} = require('../../models/index');
-
-function generateToken() {
-    return randomstring.generate({
-        length: 40
-    });
-}
 
 module.exports = {
 
@@ -40,7 +31,24 @@ module.exports = {
                 userId: user.id,
                 token : user.authToken
             }))
-            .catch(_ => res.status(409).send());
+            .catch(error => {
+                switch (error.message) {
+                    case UserService.errors.EMAIL_ALREADY_IN_USE:
+                        res.status(409).send({
+                            errorMessage: UserService.errors.EMAIL_ALREADY_IN_USE
+                        });
+                        break;
+
+                    case UserService.errors.PASSWORD_TOO_SHORT:
+                        res.status(400).send({
+                            errorMessage: "Field 'password' is missing or it's too short (at least 6 characters)"
+                        });
+                        break;
+
+                    default:
+                        res.status(500).send();
+                }
+            });
     },
 
     login: function (req, res) {
@@ -58,33 +66,19 @@ module.exports = {
             });
         }
 
-
-        User.find({
-            where: {
-                email: json.email
-            }
-        }).then(user => {
-            if (user == null) {
-                return res.status(400).send({
-                    errorMessage: "Invalid credentials"
-                });
-            }
-
-            bcrypt.compare(json.password, user.password)
-                .then(equals => {
-                    if (!equals) {
-                        return res.status(400).send({
-                            errorMessage: "Invalid credentials"
-                        });
-                    }
-
-                    user.update({
-                        authToken: generateToken()
-                    }).then((user) => res.status(200).send({
-                        userId: user.id,
-                        token : user.authToken
-                    }))
-                });
-        });
+        UserService.loginUser(json.email, json.password)
+            .then(user => res.status(200).send({
+                userId: user.id,
+                token : user.authToken
+            }))
+            .catch(error => {
+                if (error.message === UserService.errors.INVALID_CREDENTIALS) {
+                    return res.status(400).send({
+                        errorMessage: UserService.errors.INVALID_CREDENTIALS
+                    });
+                } else {
+                    return res.status(500).send();
+                }
+            });
     }
 };
