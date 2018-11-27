@@ -2,8 +2,8 @@ const UserService = require('../../src/services/user');
 const Models      = require('../../src/models/index');
 
 beforeEach((done) => {
-
     Models.sequelize.sync().then(_ => done())
+    Models.reinit();
 });
 
 describe('Test the user registration', () => {
@@ -21,3 +21,13 @@ describe('Test the user registration', () => {
     });
 
 });
+
+test('Should return zero users if no users are registered',  (done) => {
+    UserService.getAllUsers().then(users => {
+        expect(users).toEqual([]);
+        done();
+    });
+    
+});
+
+

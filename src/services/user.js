@@ -1,7 +1,8 @@
 const bcrypt       = require('bcrypt');
 const randomstring = require("randomstring");
 
-const {sequelize, User} = require('../models/index');
+const {sequelize} = require('../models/index');
+const User = require('../models/index').models.User;
 
 const BCRYPT_SALT_RAUNDS = 10;
 
@@ -60,9 +61,14 @@ module.exports = {
         });
     },
 
-    _generateToken() {
+    _generateToken(){
         return randomstring.generate({
             length: 40
         });
+    },
+
+    getAllUsers(){
+        return User.findAll()
     }
+
 };

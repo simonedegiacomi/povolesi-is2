@@ -72,5 +72,11 @@ module.exports = {
                     return res.status(500).send();
                 }
             });
+    },
+
+    getAllUsers: async function (req, res) {
+        var users = await UserService.getAllUsers()
+
+        return res.status(200).send(users);
     }
 };

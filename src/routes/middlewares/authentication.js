@@ -1,6 +1,6 @@
 'use strict';
 
-const User = require('../../models/index').User;
+const User = require('../../models/index').models.User;
 
 module.exports = function (req, res, next) {
     const token = req.header('X-API-TOKEN');
