@@ -27,7 +27,7 @@ describe('Test the user registration', () => {
             .send({
                 name       : 'Mario Rossi 2',
                 email      : 'mario2@rossi.it',
-                badgeNumber: "000000",
+                badgeNumber: '000002',
                 password   : 'password'
             })
             .expect(201)
@@ -40,7 +40,7 @@ describe('Test the user registration', () => {
                     .send({
                         name       : 'Mario Rossi 2',
                         email      : 'mario2@rossi.it',
-                        badgeNumber: "000000",
+                        badgeNumber: '000001',
                         password   : 'password'
                     })
                     .expect(409)

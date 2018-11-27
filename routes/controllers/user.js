@@ -1,5 +1,3 @@
-'use strict';
-
 const validator    = require('validator');
 const bcrypt       = require('bcrypt');
 const randomstring = require("randomstring");
