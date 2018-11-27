@@ -3,7 +3,6 @@ const Models      = require('../../src/models/index');
 
 beforeEach((done) => {
     Models.sequelize.sync().then(_ => done())
-    Models.reinit();
 });
 
 test('Should return zero users if no users are registered',  (done) => {

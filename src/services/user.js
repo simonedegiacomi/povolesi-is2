@@ -1,8 +1,7 @@
 const bcrypt       = require('bcrypt');
 const randomstring = require("randomstring");
 
-const {sequelize} = require('../models/index');
-const User = require('../models/index').models.User;
+const {sequelize, User} = require('../models/index');
 
 const BCRYPT_SALT_RAUNDS = 10;
 
