@@ -1,5 +1,5 @@
-const UserService = require('./user');
-const Models      = require('../models');
+const UserService = require('../../src/services/user');
+const Models      = require('../../src/models/index');
 
 beforeEach((done) => {
 

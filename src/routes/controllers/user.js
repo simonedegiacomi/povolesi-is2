@@ -3,7 +3,7 @@ const bcrypt       = require('bcrypt');
 const randomstring = require("randomstring");
 const UserService = require('../../services/user');
 
-const {sequelize, User} = require('../../models');
+const {sequelize, User} = require('../../models/index');
 
 function generateToken() {
     return randomstring.generate({
