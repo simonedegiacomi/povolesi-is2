@@ -64,9 +64,15 @@ module.exports = {
         });
     },
 
-    _generateToken() {
+    _generateToken(){
         return randomstring.generate({
             length: 40
         });
+    },
+
+    //don't need any control of error because there is no problem
+    getAllUsers(){
+        return User.findAll()
     }
+
 };

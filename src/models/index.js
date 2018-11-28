@@ -6,7 +6,8 @@ const basename = path.basename(__filename);
 const db       = {};
 
 const sequelize = new Sequelize('database', 'username', 'password', {
-    dialect: 'sqlite'
+    dialect: 'sqlite',
+    logging: false
 });
 
 fs
