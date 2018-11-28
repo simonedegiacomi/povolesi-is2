@@ -1,15 +1,25 @@
-const {sequelize} = require('../src/models/index');
+const {sequelize} = require('../src/models');
+const UserService = require('../src/services/user');
 
-beforeEach(() => {
-    dropAndCreateTables();
-    importTestData();
+beforeEach(async (done) => {
+    await dropAndCreateTables();
+    await importTestData();
+    done();
 });
 
 
-function dropAndCreateTables() {
-    sequelize.sync({sync: true});
+async function dropAndCreateTables() {
+    await sequelize.sync({
+        force: true
+    });
 }
 
-function importTestData () {
-    // TODO: Implement
+async function importTestData() {
+    await Promise.all([{
+        name       : 'Mario Rossi',
+        password   : 'password',
+        email      : 'mario@rossi.it',
+        badgeNumber: '000001'
+    }].map((user) => UserService.registerUser(user)));
 }
+

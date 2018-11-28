@@ -1,6 +1,7 @@
 const request = require('supertest');
 
-const app = require('../../../src/app');
+const {User} = require('../../../src/models');
+const app    = require('../../../src/app');
 
 describe('Test the user registration', () => {
 
@@ -8,9 +9,9 @@ describe('Test the user registration', () => {
         request(app)
             .post('/api/v1/register')
             .send({
-                name       : 'Mario Rossi',
-                email      : 'mario@rossi.it',
-                badgeNumber: "000000",
+                name       : 'Mario Blu',
+                email      : 'mario@blu.it',
+                badgeNumber: 'AAAAAA',
                 password   : 'password'
             })
             .expect(201)
@@ -21,43 +22,33 @@ describe('Test the user registration', () => {
             });
     });
 
-    test('Should not register two users with the same email', (done) => {
+    test('Should not register two users with the same email', async (done) => {
+        const existingUser = await User.findOne();
+
         request(app)
             .post('/api/v1/register')
             .send({
-                name       : 'Mario Rossi 2',
-                email      : 'mario2@rossi.it',
-                badgeNumber: '000002',
+                name       : 'Mario Rossi',
+                email      : existingUser.email,
+                badgeNumber: 'AAAAAA',
                 password   : 'password'
             })
-            .expect(201)
-            .then(response => {
-                expect(response.body.token).toBeDefined();
-                expect(response.body.userId).toBeDefined();
-
-                request(app)
-                    .post('/api/v1/register')
-                    .send({
-                        name       : 'Mario Rossi 2',
-                        email      : 'mario2@rossi.it',
-                        badgeNumber: '000001',
-                        password   : 'password'
-                    })
-                    .expect(409)
-                    .then(() => done());
-            });
+            .expect(409)
+            .then(() => done());
     });
 
 
 });
 
 describe('Test the user login', () => {
-    test('It should let the user login, responding with a new token', (done) => {
+    test('It should let the user login, responding with a new token', async (done) => {
+        const existingUser = await User.findOne();
+
         request(app)
             .post('/api/v1/login')
             .send({
-                email      : 'mario@rossi.it',
-                password   : 'password'
+                email   : existingUser.email,
+                password: 'password'
             })
             .expect(200)
             .then(response => {
@@ -68,11 +59,13 @@ describe('Test the user login', () => {
     });
 
     test('It should not login a user with a wrong password', (done) => {
+        const existingUser = User.findOne();
+
         request(app)
             .post('/api/v1/login')
             .send({
-                email      : 'mario@rossi.it',
-                password   : 'wrongPassword'
+                email   : existingUser.email,
+                password: 'wrongPassword'
             })
             .expect(400)
             .then(() => done());
@@ -82,8 +75,8 @@ describe('Test the user login', () => {
         request(app)
             .post('/api/v1/login')
             .send({
-                email      : 'luigi@rossi.it',
-                password   : 'password'
+                email   : 'notexisting@user.it',
+                password: 'password'
             })
             .expect(400)
             .then(() => {
@@ -93,14 +86,14 @@ describe('Test the user login', () => {
 });
 
 describe('test the /users path', () => {
-    urlVer="/api/v1"
+    urlVer = "/api/v1"
 
     test('app module should be defined', () => {
         expect(app).toBeDefined();
     });
-      
+
     test('GET /users should return 200', async () => {
-        const response = await request(app).get(urlVer+'/users');
+        const response = await request(app).get(urlVer + '/users');
         expect(response.statusCode).toBe(200);
     });
 
