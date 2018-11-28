@@ -1,5 +1,6 @@
 const Joi         = require('joi');
 const UserService = require('../../services/user');
+const ErrorMapper = require('./error_mapper');
 
 const userSchema = Joi.object().keys({
     name       : Joi.string().min(3).max(30).required(),
@@ -15,7 +16,7 @@ const loginSchema = Joi.object().keys({
 
 module.exports = {
 
-    register: function (req, res) {
+    register: function (req, res, next) {
         const {error, value} = Joi.validate(req.body, userSchema);
 
         if (error != null) {
@@ -24,29 +25,22 @@ module.exports = {
             });
         }
 
-        UserService.registerUser(value)
+
+        return UserService.registerUser(value)
             .then(user => res.status(201).send({
                 userId: user.id,
                 token : user.authToken
             }))
-            .catch(error => {
-                switch (error.message) {
-                    case UserService.errors.EMAIL_ALREADY_IN_USE:
-                        res.status(409).send({
-                            errorMessage: UserService.errors.EMAIL_ALREADY_IN_USE
-                        });
-                        break;
-
-                    case UserService.errors.PASSWORD_TOO_SHORT:
-                        res.status(400).send({
-                            errorMessage: "Field 'password' is missing or it's too short (at least 6 characters)"
-                        });
-                        break;
-
-                    default:
-                        res.status(500).send();
-                }
-            });
+            .catch(error => ErrorMapper.map(res, error, [{
+                error: UserService.errors.EMAIL_ALREADY_IN_USE,
+                status : 409
+            }, {
+                error: UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
+                status : 409
+            }, {
+                error: UserService.errors.PASSWORD_TOO_SHORT,
+                status : 400
+            }]))
     },
 
     login: function (req, res) {
@@ -63,19 +57,14 @@ module.exports = {
                 userId: user.id,
                 token : user.authToken
             }))
-            .catch(error => {
-                if (error.message === UserService.errors.INVALID_CREDENTIALS) {
-                    return res.status(400).send({
-                        errorMessage: UserService.errors.INVALID_CREDENTIALS
-                    });
-                } else {
-                    return res.status(500).send();
-                }
-            });
+            .catch(error => ErrorMapper.map(res, error, [{
+                error: UserService.errors.INVALID_CREDENTIALS,
+                status : 400
+            }]));
     },
 
     getAllUsers: async function (req, res) {
-        var users =await UserService.getAllUsers()
+        const users = await UserService.getAllUsers();
 
         res.status(200).send(users);
     }

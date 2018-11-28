@@ -9,6 +9,7 @@ module.exports = {
 
     errors: {
         EMAIL_ALREADY_IN_USE: "email already in use",
+        BADGE_NUMBER_ALREADY_IN_USE: "",
         PASSWORD_TOO_SHORT  : "password too short",
 
         INVALID_CREDENTIALS: "invalid credentials"
@@ -20,7 +21,7 @@ module.exports = {
 
     registerUser(user) {
         if (user.password.length < this.constants.MIN_PASSWORD_LENGTH) {
-            throw new Error(this.errors.PASSWORD_TOO_SHORT);
+            throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
         }
 
         return bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS)
