@@ -14,6 +14,10 @@ const loginSchema = Joi.object().keys({
     password: Joi.string()
 });
 
+const updateEmailSchema = Joi.object().keys({
+    newEmail   : Joi.string().email()
+});
+
 module.exports = {
 
     register: function (req, res, next) {
@@ -67,5 +71,23 @@ module.exports = {
         const users = await UserService.getAllUsers();
 
         res.status(200).send(users);
+    },
+
+    updateEmail (req, res) {
+        const {error, value} = Joi.validate(req.body, updateEmailSchema);
+
+        if (error != null) {
+            return res.status(400).send({
+                errorMessage: error.details[0].message
+            });
+        }
+
+
+        return UserService.updateUserEmail(req.user, value.newEmail)
+            .then(user => res.status(200).send())
+            .catch(error => ErrorMapper.map(res, error, [{
+                error: UserService.errors.EMAIL_ALREADY_IN_USE,
+                status : 409
+            }]))
     }
 };

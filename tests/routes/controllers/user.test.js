@@ -98,3 +98,21 @@ describe('test the /users path', () => {
     });
 
 });
+
+
+describe('Test user email update', () => {
+    // TODO: 3) Write some tests that send the PUT to '/users/me/email'
+    test('CHANGE', (done) => {
+        User.findOne().then(user => {
+            return request(app)
+                .put('/api/v1/users/me/email')
+                .set('X-API-TOKEN', user.authToken)
+                .send({
+                    newEmail   : 'luca@bianchi.com'
+                })
+                .expect(200)
+                .then(() => done());
+        })
+
+    });
+});
