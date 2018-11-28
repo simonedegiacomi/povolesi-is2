@@ -14,8 +14,12 @@ module.exports = {
         INVALID_CREDENTIALS: "invalid credentials"
     },
 
+    constants: {
+        MIN_PASSWORD_LENGTH: 6
+    },
+
     registerUser(user) {
-        if (!user.password || user.password.length < 6) {
+        if (user.password.length < this.constants.MIN_PASSWORD_LENGTH) {
             throw new Error(this.errors.PASSWORD_TOO_SHORT);
         }
 

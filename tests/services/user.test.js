@@ -1,10 +1,5 @@
 const UserService = require('../../src/services/user');
-const Models      = require('../../src/models/index');
 
-beforeEach((done) => {
-
-    Models.sequelize.sync().then(_ => done())
-});
 
 describe('Test the user registration', () => {
 
