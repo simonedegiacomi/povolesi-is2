@@ -27,7 +27,7 @@ describe('Test current user operations', () => {
             .get('/api/v1/user/me')
             .expect(401)
             .then(() => { done(); })
-    })
+    });
 
     test('Test get current user data', (done) => {
         request(app)
