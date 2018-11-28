@@ -35,6 +35,7 @@
   },
   "jest": {
     "verbose": true,
-    "collectCoverage": true
+    "collectCoverage": true,
+    "setupTestFrameworkScriptFile": "<rootDir>/tests/test_setup.js"
   }
 }
