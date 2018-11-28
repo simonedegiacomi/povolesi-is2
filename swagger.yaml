@@ -495,7 +495,7 @@ paths:
               type: string
 
       responses:
-        200:
+        204:
           description: OK
         401:
           $ref: "#/responses/Unauthenticated"

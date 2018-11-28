@@ -30,7 +30,8 @@ function setupAuthenticatedRoutes (app) {
     router.use(authenticationMiddleware);
 
     router.get('/secure', (req, res) => res.status(200).send(`Hi ${req.user.name}!`));
-    router.get('/user/me', userOperationsController.me);
+    router.get('/user/me', userOperationsController.getCurrentUserData);
+    router.put('/user/me', userOperationsController.updateCurrentUserData);
 
     app.use('/api/v1', router);
 }

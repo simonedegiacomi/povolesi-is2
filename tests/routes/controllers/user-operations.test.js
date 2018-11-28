@@ -22,6 +22,13 @@ beforeAll(() => {
 
 describe('Test current user operations', () => {
 
+    test('Test user operations without a valid token',(done) => {
+        request(app)
+            .get('/api/v1/user/me')
+            .expect(401)
+            .then(() => { done(); })
+    })
+
     test('Test get current user data', (done) => {
         request(app)
             .get('/api/v1/user/me')
@@ -36,4 +43,27 @@ describe('Test current user operations', () => {
             })
     });
 
+    test('Test update data on current user', (done) => {
+        request(app)
+            .put('/api/v1/user/me')
+            .set('X-API-TOKEN', testToken)
+            .send({
+                name: 'Mario Bianchi',
+                badgeNumber: '111111'
+            })
+            .expect(204)
+            .then(() => { done(); })
+
+    });
+
+    test('Test missing data on user update', (done) => {
+        request(app)
+            .put('/api/v1/user/me')
+            .set('X-API-TOKEN', testToken)
+            .send({
+                name: 'Mario Bianchi'
+            })
+            .expect(400)
+            .then(() => { done(); })
+    })
 });
