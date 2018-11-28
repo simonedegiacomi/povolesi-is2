@@ -27,7 +27,6 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             unique   : true
         },
-
         authToken: {
             type     : DataTypes.STRING(AUTH_TOKEN_LENGTH),
             allowNull: true

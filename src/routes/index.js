@@ -2,15 +2,14 @@
 
 const express = require('express');
 
-const userController = require('./controllers/user');
+const userController       = require('./controllers/user');
+const userGroupsController = require('./controllers/user_group');
 
 const authenticationMiddleware = require('./middlewares/authentication');
 
 module.exports = (app) => {
-
     setupUnauthenticatedRoutes(app);
     setupAuthenticatedRoutes(app);
-
 };
 
 function setupUnauthenticatedRoutes (app) {
@@ -21,6 +20,9 @@ function setupUnauthenticatedRoutes (app) {
 
     //TODO: sposta nell autheticated
     router.get('/users', userController.getAllUsers);
+
+    router.get ('/groups', userGroupsController.getAllGroups);
+    router.post('/groups', userGroupsController.createUserGroup);
 
     app.use('/api/v1', router);
 }

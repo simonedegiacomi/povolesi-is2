@@ -1,26 +1,13 @@
+const User      = require('./user');
+const UserGroup = require('./user_group');
+
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('UserPermission', {
+    let UserPermission = sequelize.define('UserPermission', {
         id                  : {
             type         : DataTypes.INTEGER(11),
             allowNull    : false,
             primaryKey   : true,
             autoIncrement: true
-        },
-        groupId             : {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'user_group',
-                key  : 'id'
-            }
-        },
-        userId              : {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'user',
-                key  : 'id'
-            }
         },
         canManageTasks      : {
             type     : DataTypes.BOOLEAN,
@@ -37,4 +24,16 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         tableName: 'user_permission'
     });
+
+    //User
+    let User_ = User(sequelize, DataTypes);
+    UserPermission.belongsTo(User_, {as: 'User'});
+
+    User_.belongsToMany(UserPermission, {through: 'Permissions'});
+
+    //UserGroup
+    let UserGroup_ = UserGroup(sequelize, DataTypes);
+    UserGroup_.belongsToMany(UserPermission, {through: 'Permissions'});
+
+    return UserPermission;
 };
