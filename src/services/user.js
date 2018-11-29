@@ -6,12 +6,22 @@ const {sequelize, User} = require('../models/index');
 const BCRYPT_SALT_RAUNDS = 10;
 
 module.exports = {
+
+    errors: {
+        EMAIL_ALREADY_IN_USE: "email already in use",
+        PASSWORD_TOO_SHORT  : "password too short",
+
+        INVALID_CREDENTIALS: "invalid credentials"
+    },
+
+    constants: {
+        MIN_PASSWORD_LENGTH: 6
+    },
+
     registerUser(user) {
-       /* if (!user.password || user.password.length < 6) {
-            return res.status(400).send({
-                errorMessage: "Field 'password' is missing or it's too short (at least 6 characters)"
-            });
-        }*/
+        if (user.password.length < this.constants.MIN_PASSWORD_LENGTH) {
+            throw new Error(this.errors.PASSWORD_TOO_SHORT);
+        }
 
         return bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS)
             .then(hash => {
@@ -20,18 +30,49 @@ module.exports = {
 
                 return User.create(user)
             })
-            /*.catch((error) => {
+            .catch((error) => {
                 if (error instanceof sequelize.UniqueConstraintError) {
-                    res.status(409).send();
+                    throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
                 } else {
-                    res.status(500).send();
+                    throw error;
                 }
-            });*/
+            });
     },
 
-    _generateToken() {
+    loginUser(email, password) {
+        return User.find({
+            where: {
+                email
+            }
+        }).then(user => {
+            if (user == null) {
+                throw new Error(this.errors.INVALID_CREDENTIALS);
+            }
+
+            return bcrypt.compare(password, user.password)
+                .then(equals => {
+                    if (!equals) {
+                        throw new Error(this.errors.INVALID_CREDENTIALS);
+                    }
+
+                    user.update({
+                        authToken: this._generateToken()
+                    });
+
+                    return user;
+                });
+        });
+    },
+
+    _generateToken(){
         return randomstring.generate({
             length: 40
         });
+    },
+
+    //don't need any control of error because there is no problem
+    getAllUsers(){
+        return User.findAll()
     }
+
 };

@@ -1,24 +1,23 @@
-module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('UserGroup', {
+const User = require('./user');
+
+let UserGroup = function (sequelize, DataTypes) {
+    let UserGroup = sequelize.define('UserGroup', {
         id       : {
             type         : DataTypes.INTEGER(11),
             allowNull    : false,
             primaryKey   : true,
             autoIncrement: true
         },
-        groupName: {
+        name: {
             type     : DataTypes.STRING(200),
             allowNull: false
-        },
-        createdBy: {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'user',
-                key  : 'id'
-            }
         }
-    }, {
-        tableName: 'user_group'
     });
+
+    let User_ = User(sequelize, DataTypes);
+    UserGroup.belongsTo(User_, {as: 'Creator'});
+
+    return UserGroup;
 };
+
+module.exports = UserGroup;

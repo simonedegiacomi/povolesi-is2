@@ -1,90 +1,82 @@
-const validator    = require('validator');
-const bcrypt       = require('bcrypt');
-const randomstring = require("randomstring");
+const Joi         = require('joi');
 const UserService = require('../../services/user');
 
-const {sequelize, User} = require('../../models/index');
+const userSchema = Joi.object().keys({
+    name       : Joi.string().min(3).max(30).required(),
+    email      : Joi.string().email(),
+    badgeNumber: Joi.string().min(1).max(45).required(),
+    password   : Joi.string()
+});
 
-function generateToken() {
-    return randomstring.generate({
-        length: 40
-    });
-}
+const loginSchema = Joi.object().keys({
+    email   : Joi.string().email(),
+    password: Joi.string()
+});
 
 module.exports = {
 
     register: function (req, res) {
-        const json = req.body;
+        const {error, value} = Joi.validate(req.body, userSchema);
 
-        if (!json.name || validator.isEmpty(json.name)) {
+        if (error != null) {
             return res.status(400).send({
-                errorMessage: "Field 'name' is missing or it's empty"
+                errorMessage: error.details[0].message
             });
         }
 
-        if (!json.email || !validator.isEmail(json.email)) {
-            return res.status(400).send({
-                errorMessage: "Field 'email' is missing or it's not a valid email address"
-            });
-        }
-
-
-        if (!json.badgeNumber || validator.isEmpty(json.badgeNumber)) {
-            return res.status(400).send({
-                errorMessage: "Field 'badgeNumber' is missing or it's empty"
-            });
-        }
-
-        UserService.registerUser(json)
+        UserService.registerUser(value)
             .then(user => res.status(201).send({
                 userId: user.id,
                 token : user.authToken
             }))
-            .catch(_ => res.status(409).send());
+            .catch(error => {
+                switch (error.message) {
+                    case UserService.errors.EMAIL_ALREADY_IN_USE:
+                        res.status(409).send({
+                            errorMessage: UserService.errors.EMAIL_ALREADY_IN_USE
+                        });
+                        break;
+
+                    case UserService.errors.PASSWORD_TOO_SHORT:
+                        res.status(400).send({
+                            errorMessage: "Field 'password' is missing or it's too short (at least 6 characters)"
+                        });
+                        break;
+
+                    default:
+                        res.status(500).send();
+                }
+            });
     },
 
     login: function (req, res) {
-        const json = req.body;
+        const {error, value} = Joi.validate(req.body, loginSchema);
 
-        if (!json.email) {
+        if (error != null) {
             return res.status(400).send({
-                errorMessage: "Field 'email' is missing"
+                errorMessage: error.details[0].message
             });
         }
 
-        if (!json.password) {
-            return res.status(400).send({
-                errorMessage: "Field 'password' is missing"
+        UserService.loginUser(value.email, value.password)
+            .then(user => res.status(200).send({
+                userId: user.id,
+                token : user.authToken
+            }))
+            .catch(error => {
+                if (error.message === UserService.errors.INVALID_CREDENTIALS) {
+                    return res.status(400).send({
+                        errorMessage: UserService.errors.INVALID_CREDENTIALS
+                    });
+                } else {
+                    return res.status(500).send();
+                }
             });
-        }
+    },
 
+    getAllUsers: async function (req, res) {
+        var users =await UserService.getAllUsers()
 
-        User.find({
-            where: {
-                email: json.email
-            }
-        }).then(user => {
-            if (user == null) {
-                return res.status(400).send({
-                    errorMessage: "Invalid credentials"
-                });
-            }
-
-            bcrypt.compare(json.password, user.password)
-                .then(equals => {
-                    if (!equals) {
-                        return res.status(400).send({
-                            errorMessage: "Invalid credentials"
-                        });
-                    }
-
-                    user.update({
-                        authToken: generateToken()
-                    }).then((user) => res.status(200).send({
-                        userId: user.id,
-                        token : user.authToken
-                    }))
-                });
-        });
+        res.status(200).send(users);
     }
 };

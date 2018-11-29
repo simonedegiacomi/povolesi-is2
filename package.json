@@ -22,6 +22,7 @@
     "bcrypt": "^3.0.2",
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "joi": "^14.3.0",
     "randomstring": "^1.1.5",
     "sequelize": "^4.41.2",
     "sqlite3": "^4.0.4",
@@ -34,6 +35,7 @@
   },
   "jest": {
     "verbose": true,
-    "collectCoverage": true
+    "collectCoverage": true,
+    "setupTestFrameworkScriptFile": "<rootDir>/tests/test_setup.js"
   }
 }
