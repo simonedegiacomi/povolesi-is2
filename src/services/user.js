@@ -19,55 +19,50 @@ module.exports = {
         MIN_PASSWORD_LENGTH: 6
     },
 
-    registerUser(user) {
+    async registerUser(user) {
         if (user.password.length < this.constants.MIN_PASSWORD_LENGTH) {
             throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
         }
 
-        return bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS)
-            .then(hash => {
-                user.password  = hash;
-                user.authToken = this._generateToken();
+        user.password  = await bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS);
+        user.authToken = this._generateToken();
 
-                return User.create(user)
-            })
-            .catch((error) => {
-                if (error instanceof sequelize.UniqueConstraintError) {
-                    const wrongField = error.errors[0].path;
-                    if (wrongField === 'badgeNumber') {
-                        throw new Error(this.errors.BADGE_NUMBER_ALREADY_IN_USE);
-                    } else if (wrongField === 'email') {
-                        throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
-                    }
+        try {
+            return await User.create(user);
+        } catch (ex) {
+            if (ex instanceof sequelize.UniqueConstraintError) {
+                const wrongField = ex.errors[0].path;
+                if (wrongField === 'badgeNumber') {
+                    throw new Error(this.errors.BADGE_NUMBER_ALREADY_IN_USE);
+                } else if (wrongField === 'email') {
+                    throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
                 }
+            }
 
-                throw error;
-            });
+            throw ex;
+        }
     },
 
-    loginUser(email, password) {
-        return User.find({
+    async loginUser(email, password) {
+        const user = await User.find({
             where: {
                 email
             }
-        }).then(user => {
-            if (user == null) {
-                throw new Error(this.errors.INVALID_CREDENTIALS);
-            }
-
-            return bcrypt.compare(password, user.password)
-                .then(equals => {
-                    if (!equals) {
-                        throw new Error(this.errors.INVALID_CREDENTIALS);
-                    }
-
-                    user.update({
-                        authToken: this._generateToken()
-                    });
-
-                    return user;
-                });
         });
+
+        if (user == null) {
+            throw new Error(this.errors.INVALID_CREDENTIALS);
+        }
+
+        const equals = await bcrypt.compare(password, user.password);
+        if (!equals) {
+            throw new Error(this.errors.INVALID_CREDENTIALS);
+        }
+
+        await user.update({
+            authToken: this._generateToken()
+        });
+        return user;
     },
 
     _generateToken() {

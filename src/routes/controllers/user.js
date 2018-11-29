@@ -15,12 +15,12 @@ const loginSchema = Joi.object().keys({
 });
 
 const updateEmailSchema = Joi.object().keys({
-    newEmail   : Joi.string().email()
+    newEmail: Joi.string().email()
 });
 
 module.exports = {
 
-    register: function (req, res) {
+    async register(req, res) {
         const {error, value} = Joi.validate(req.body, userSchema);
 
         if (error != null) {
@@ -29,24 +29,27 @@ module.exports = {
             });
         }
 
-        return UserService.registerUser(value)
-            .then(user => res.status(201).send({
+        try {
+            const user = await UserService.registerUser(value);
+            res.status(201).send({
                 userId: user.id,
                 token : user.authToken
-            }))
-            .catch(error => ErrorMapper.map(res, error, [{
-                error: UserService.errors.EMAIL_ALREADY_IN_USE,
-                status : 409
+            });
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserService.errors.EMAIL_ALREADY_IN_USE,
+                status: 409
             }, {
-                error: UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
-                status : 409
+                error : UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
+                status: 409
             }, {
-                error: UserService.errors.PASSWORD_TOO_SHORT,
-                status : 400
-            }]))
+                error : UserService.errors.PASSWORD_TOO_SHORT,
+                status: 400
+            }]);
+        }
     },
 
-    login: function (req, res) {
+    async login(req, res) {
         const {error, value} = Joi.validate(req.body, loginSchema);
 
         if (error != null) {
@@ -55,15 +58,18 @@ module.exports = {
             });
         }
 
-        UserService.loginUser(value.email, value.password)
-            .then(user => res.status(200).send({
+        try {
+            const user = await UserService.loginUser(value.email, value.password);
+            res.status(200).send({
                 userId: user.id,
                 token : user.authToken
-            }))
-            .catch(error => ErrorMapper.map(res, error, [{
-                error: UserService.errors.INVALID_CREDENTIALS,
-                status : 400
-            }]));
+            });
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserService.errors.INVALID_CREDENTIALS,
+                status: 400
+            }]);
+        }
     },
 
     getAllUsers: async function (req, res) {
@@ -72,7 +78,7 @@ module.exports = {
         res.status(200).send(users);
     },
 
-    updateEmail (req, res) {
+    updateEmail(req, res) {
         const {error, value} = Joi.validate(req.body, updateEmailSchema);
 
         if (error != null) {
@@ -85,8 +91,8 @@ module.exports = {
         return UserService.updateUserEmail(req.user, value.newEmail)
             .then(user => res.status(200).send())
             .catch(error => ErrorMapper.map(res, error, [{
-                error: UserService.errors.EMAIL_ALREADY_IN_USE,
-                status : 409
+                error : UserService.errors.EMAIL_ALREADY_IN_USE,
+                status: 409
             }]))
     }
 };
