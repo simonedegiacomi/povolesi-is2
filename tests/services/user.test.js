@@ -2,31 +2,51 @@ const UserService = require('../../src/services/user');
 const {User}      = require('../../src/models');
 
 
-test('Should return zero users if no users are registered', async (done) => {
-    await User.destroy({where: {}});
-
-    const users = await UserService.getAllUsers();
-
-    expect(users.length).toEqual(0);
-    done();
-});
-
 describe('Test the user registration', () => {
 
 
-    test('It should register the new user', (done) => {
-        UserService.registerUser({
+    test('It should register the new user', async () => {
+
+        const newUser = await UserService.registerUser({
             name       : 'Mario Blu',
             email      : 'mario@blu.it',
             badgeNumber: "AAAAAA",
             password   : 'password'
-        }).then(user => {
+        });
 
-            expect(user.id).toBeDefined();
-            done();
-        }).catch(console.log);
+        expect(newUser.id).toBeDefined();
     });
 
+    test('Should not register two users with the same email', async () => {
+        const existingUser = await User.findOne();
+
+        try {
+            await UserService.registerUser({
+                name       : 'Mario Blu',
+                email      : existingUser.email,
+                badgeNumber: "AAAAAA",
+                password   : 'password'
+            });
+
+            expect(true).toBe(false);
+        } catch (e) {
+            expect(e.message).toBe('email already in use');
+        }
+    });
+
+
+});
+
+
+describe('Test the listing of existing users', () =>{
+    test('Should return zero users if no users are registered', async (done) => {
+        await User.destroy({where: {}});
+
+        const users = await UserService.getAllUsers();
+
+        expect(users.length).toEqual(0);
+        done();
+    });
 
     test('Should return the registered users', (done) => {
         UserService.getAllUsers().then(users => {
@@ -39,8 +59,4 @@ describe('Test the user registration', () => {
             done();
         });
     });
-
-
 });
-
-

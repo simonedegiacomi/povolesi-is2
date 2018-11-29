@@ -22,21 +22,37 @@ describe('Test the user registration', () => {
             });
     });
 
-    test('Should not register two users with the same email', async (done) => {
+    test('Should not register two users with the same email', async () => {
         const existingUser = await User.findOne();
 
-        request(app)
+        const response = await request(app)
             .post('/api/v1/register')
             .send({
                 name       : 'Mario Rossi',
                 email      : existingUser.email,
                 badgeNumber: 'AAAAAA',
                 password   : 'password'
-            })
-            .expect(409)
-            .then(() => done());
+            });
+
+        expect(response.status).toBe(409);
+        expect(response.body.errorMessage).toBe('email already in use');
     });
 
+    test('Should not register two users with the same badge number', async () => {
+        const existingUser = await User.findOne();
+
+        const response = await request(app)
+            .post('/api/v1/register')
+            .send({
+                name       : 'Mario Rossi',
+                email      : 'mario@blu.it',
+                badgeNumber: existingUser.badgeNumber,
+                password   : 'password'
+            });
+
+        expect(response.status).toBe(409);
+        expect(response.body.errorMessage).toBe('badge number already in use');
+    })
 
 });
 

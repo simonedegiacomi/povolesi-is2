@@ -8,9 +8,9 @@ const BCRYPT_SALT_RAUNDS = 10;
 module.exports = {
 
     errors: {
-        EMAIL_ALREADY_IN_USE: "email already in use",
-        BADGE_NUMBER_ALREADY_IN_USE: "",
-        PASSWORD_TOO_SHORT  : "password too short",
+        EMAIL_ALREADY_IN_USE       : "email already in use",
+        BADGE_NUMBER_ALREADY_IN_USE: "badge number already in use",
+        PASSWORD_TOO_SHORT         : "password too short",
 
         INVALID_CREDENTIALS: "invalid credentials"
     },
@@ -33,10 +33,15 @@ module.exports = {
             })
             .catch((error) => {
                 if (error instanceof sequelize.UniqueConstraintError) {
-                    throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
-                } else {
-                    throw error;
+                    const wrongField = error.errors[0].path;
+                    if (wrongField === 'badgeNumber') {
+                        throw new Error(this.errors.BADGE_NUMBER_ALREADY_IN_USE);
+                    } else if (wrongField === 'email') {
+                        throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
+                    }
                 }
+
+                throw error;
             });
     },
 
@@ -65,14 +70,14 @@ module.exports = {
         });
     },
 
-    _generateToken(){
+    _generateToken() {
         return randomstring.generate({
             length: 40
         });
     },
 
     //don't need any control of error because there is no problem
-    getAllUsers(){
+    getAllUsers() {
         return User.findAll()
     }
 
