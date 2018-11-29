@@ -79,6 +79,12 @@ module.exports = {
     //don't need any control of error because there is no problem
     getAllUsers() {
         return User.findAll()
+    },
+
+    updateUserEmail (user, newEmail) {
+        return user.update({
+            email: newEmail
+        });
     }
 
 };

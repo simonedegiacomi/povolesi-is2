@@ -59,4 +59,19 @@ describe('Test the listing of existing users', () =>{
             done();
         });
     });
+
+});
+
+
+describe('Test user email update', () => {
+    // TODO: 1) Write some tests that call the 'updateUserEmail' method on the UserService
+
+    test('Should return the user with the email changed',  (done) => {
+        User.findOne()
+            .then(user => UserService.updateUserEmail(user, 'luca@bianchi.com'))
+            .then(user => {
+                expect(user.email).toEqual('luca@bianchi.com');
+                done();
+            }).catch(console.log);
+    });
 });
