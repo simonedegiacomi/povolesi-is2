@@ -44,7 +44,7 @@ module.exports = {
     },
 
     async loginUser(email, password) {
-        const user = await User.find({
+        const user = await User.findOne({
             where: {
                 email
             }
