@@ -2,8 +2,8 @@
 
 const express = require('express');
 
-const userController       = require('./controllers/user');
-const userGroupsController = require('./controllers/user_group');
+const userController       = require('./controllers/user_controller');
+const userGroupsController = require('./controllers/user_group_controller');
 
 const authenticationMiddleware = require('./middlewares/authentication');
 

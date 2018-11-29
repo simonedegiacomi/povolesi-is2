@@ -1,5 +1,5 @@
 const {sequelize} = require('../src/models');
-const UserService = require('../src/services/user');
+const UserService = require('../src/services/user_service');
 
 beforeEach(async (done) => {
     await dropAndCreateTables();

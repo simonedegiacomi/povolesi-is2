@@ -102,7 +102,7 @@ describe('Test the user login', () => {
 });
 
 describe('test the /users path', () => {
-    urlVer = "/api/v1"
+    urlVer = "/api/v1";
 
     test('app module should be defined', () => {
         expect(app).toBeDefined();

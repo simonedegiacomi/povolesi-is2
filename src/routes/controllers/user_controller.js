@@ -1,5 +1,5 @@
 const Joi         = require('joi');
-const UserService = require('../../services/user');
+const UserService = require('../../services/user_service');
 const ErrorMapper = require('./error_mapper');
 
 const userSchema = Joi.object().keys({
@@ -89,7 +89,7 @@ module.exports = {
 
 
         return UserService.updateUserEmail(req.user, value.newEmail)
-            .then(user => res.status(200).send())
+            .then(() => res.status(200).send())
             .catch(error => ErrorMapper.map(res, error, [{
                 error : UserService.errors.EMAIL_ALREADY_IN_USE,
                 status: 409

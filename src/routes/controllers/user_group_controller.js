@@ -1,5 +1,5 @@
 const Joi         = require('joi');
-const UserGroupService = require('../../services/user_group');
+const UserGroupService = require('../../services/user_group_service');
 
 const groupSchema = Joi.object().keys({
     name : Joi.string().min(3).max(200).required()
