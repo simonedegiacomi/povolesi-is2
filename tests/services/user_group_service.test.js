@@ -1,4 +1,4 @@
-const UserGroupService = require('../../src/services/user_group');
+const UserGroupService = require('../../src/services/user_group_service');
 const Models      = require('../../src/models/index');
 
 beforeEach((done) => {

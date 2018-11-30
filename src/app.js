@@ -6,7 +6,7 @@ const models = require('./models/index');
 const app = express();
 app.use(bodyParser.json());
 
-require('./routes/index')(app);
+require('./routes/routes_index')(app);
 
 models.sequelize.sync().then(() => {
     console.log('[APP] Database initialized');
