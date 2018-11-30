@@ -60,6 +60,38 @@ describe('Test the listing of existing users', () =>{
         });
     });
 
+    test('Should return array json of two user', async () => {
+        const user1 = await UserService.registerUser({
+            name       : 'Mario Rossi',
+            email      : 'mario2@rossi.it',
+            badgeNumber: "000000",
+            password   : 'password'
+        });
+
+        const user2 = await UserService.registerUser({
+            name       : 'Giorgio Segalla',
+            email      : 'giorgio@segalla.it',
+            badgeNumber: "000021",
+            password   : 'passwsard'
+        });
+
+        const users = await UserService.getAllUsers()
+        //farmi spiegare perchè
+        expect(users.map(u => u.toJSON())).toEqual([
+            {
+                name: user1.name,
+                email: user1.email,
+                badgeNumber: user1.badgeNumber
+            },
+            {
+                name: user2.name,
+                email: user2.email,
+                badgeNumber: user2.badgeNumber
+            }
+        ])
+
+    })
+
 });
 
 
