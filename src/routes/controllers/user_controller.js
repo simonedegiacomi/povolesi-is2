@@ -73,9 +73,18 @@ module.exports = {
     },
 
     getAllUsers: async function (req, res) {
+        
         const users = await UserService.getAllUsers();
-
-        res.status(200).send(users);
+        
+        let userFilter = []
+        
+        users.map(u => userFilter
+                            .push({name:u.name,
+                                    email:u.email,
+                                    badgeNumber:u.badgeNumber})
+                )
+        
+        res.status(200).send(userFilter)
     },
 
     updateEmail(req, res) {
