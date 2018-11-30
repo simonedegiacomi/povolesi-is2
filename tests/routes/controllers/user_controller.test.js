@@ -132,3 +132,63 @@ describe('Test user email update', () => {
 
     });
 });
+
+describe('Test get current user data', () => {
+    test('GET /users/me should return 200', (done) => {
+        User.findOne().then(user => {
+            return request(app)
+                .get('/api/v1/users/me')
+                .set('X-API-TOKEN', user.authToken)
+                .expect(200)
+                .then(response => {
+                    expect(response.body.id).toBe(user.id);
+                    expect(response.body.name).toBe('Mario Rossi');
+                    expect(response.body.badgeNumber).toBe('000001');
+                    expect(response.body.email).toBe('mario@rossi.it');
+                    done();
+                })
+        })
+    });
+});
+
+describe('Test user data update', () => {
+    test('PUT /users/me should return 204', (done) => {
+        User.findOne().then(user => {
+            return request(app)
+                .put('/api/v1/users/me')
+                .set('X-API-TOKEN', user.authToken)
+                .send({
+                    newName: 'Luca Bianchi',
+                    newBadgeNumber: '000002'
+                })
+                .expect(204)
+                .then(() => done());
+        })
+    });
+
+    test('PUT /users/me without valid token should return 401', (done) => {
+        User.findOne().then(() => {
+            return request(app)
+                .put('/api/v1/users/me')
+                .send({
+                    newName: 'Luca Bianchi',
+                    newBadgeNumber: '000002'
+                })
+                .expect(401)
+                .then(() => done());
+        })
+    });
+
+    test('PUT /users/me without some fields should return 400', (done) => {
+        User.findOne().then(user => {
+            return request(app)
+                .put('/api/v1/users/me')
+                .set('X-API-TOKEN', user.authToken)
+                .send({
+                    newBadgeNumber: '000002'
+                })
+                .expect(400)
+                .then(() => done());
+        })
+    });
+});

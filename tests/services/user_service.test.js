@@ -75,3 +75,15 @@ describe('Test user email update', () => {
             }).catch(console.log);
     });
 });
+
+describe('Test user data update', () => {
+   test('Should return the user with the data updated', (done) => {
+      User.findOne()
+          .then(user => UserService.updateUserData(user, 'Luca Bianchi', '000002'))
+          .then(user => {
+              expect(user.name).toEqual('Luca Bianchi');
+              expect(user.badgeNumber).toEqual('000002');
+              done();
+          }).catch(console.log);
+   });
+});

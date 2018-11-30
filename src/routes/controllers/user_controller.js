@@ -18,6 +18,11 @@ const updateEmailSchema = Joi.object().keys({
     newEmail: Joi.string().email()
 });
 
+const updateUserDataSchema = Joi.object().keys({
+    newName       : Joi.string().min(3).max(30).required(),
+    newBadgeNumber: Joi.string().min(1).max(45).required()
+});
+
 module.exports = {
 
     async register(req, res) {
@@ -87,12 +92,34 @@ module.exports = {
             });
         }
 
-
         return UserService.updateUserEmail(req.user, value.newEmail)
             .then(() => res.status(200).send())
             .catch(error => ErrorMapper.map(res, error, [{
                 error : UserService.errors.EMAIL_ALREADY_IN_USE,
                 status: 409
             }]))
+    },
+
+    getCurrentUserData: function (req, res) {
+        const json = req.user;
+        res.status(200).send({
+            id: json.id,
+            name: json.name,
+            badgeNumber: json.badgeNumber,
+            email: json.email
+        });
+    },
+
+    updateUserData: function (req, res) {
+        const {error, value} = Joi.validate(req.body, updateUserDataSchema);
+
+        if (error != null) {
+            return res.status(400).send({
+                errorMessage: error.details[0].message
+            });
+        }
+
+        return UserService.updateUserData(req.user, value.newName, value.newBadgeNumber)
+            .then(() => res.status(204).send());
     }
 };

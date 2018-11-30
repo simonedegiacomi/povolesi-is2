@@ -80,6 +80,13 @@ module.exports = {
         return user.update({
             email: newEmail
         });
+    },
+
+    updateUserData (user, newName, newBadgeNumber) {
+        return user.update({
+            name: newName,
+            badgeNumber: newBadgeNumber
+        })
     }
 
 };
