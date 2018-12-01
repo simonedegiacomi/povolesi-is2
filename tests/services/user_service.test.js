@@ -1,6 +1,6 @@
 const UserService = require('../../src/services/user_service');
 const {User}      = require('../../src/models');
-
+const dropCreateAndTables = require('../test_setup')
 
 describe('Test the user registration', () => {
 
@@ -40,6 +40,7 @@ describe('Test the user registration', () => {
 
 describe('Test the listing of existing users', () =>{
     test('Should return zero users if no users are registered', async (done) => {
+        //elimina dal database gli utenti
         await User.destroy({where: {}});
 
         const users = await UserService.getAllUsers();
@@ -61,6 +62,9 @@ describe('Test the listing of existing users', () =>{
     });
 
     test('Should return array json of two user', async () => {
+        //elimina gli utenti dal database
+        await User.destroy({where: {}});
+        
         const user1 = await UserService.registerUser({
             name       : 'Mario Rossi',
             email      : 'mario2@rossi.it',
@@ -76,18 +80,8 @@ describe('Test the listing of existing users', () =>{
         });
 
         const users = await UserService.getAllUsers()
-        //farmi spiegare perchè
         expect(users.map(u => u.toJSON())).toEqual([
-            {
-                name: user1.name,
-                email: user1.email,
-                badgeNumber: user1.badgeNumber
-            },
-            {
-                name: user2.name,
-                email: user2.email,
-                badgeNumber: user2.badgeNumber
-            }
+            user1.toJSON(),user2.toJSON()
         ])
 
     })
