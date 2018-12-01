@@ -1,4 +1,3 @@
-const User = require('./user');
 
 let UserGroup = function (sequelize, DataTypes) {
     let UserGroup = sequelize.define('UserGroup', {
@@ -14,8 +13,9 @@ let UserGroup = function (sequelize, DataTypes) {
         }
     });
 
-    let User_ = User(sequelize, DataTypes);
-    UserGroup.belongsTo(User_, {as: 'Creator'});
+    UserGroup.associate = (models) => {
+        UserGroup.belongsTo(models.User, {as: 'CreatedBy'});
+    };
 
     return UserGroup;
 };

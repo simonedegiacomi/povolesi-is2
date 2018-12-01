@@ -42,6 +42,7 @@ function setupAuthenticatedRoutes (app) {
     router.put('/users/me/email', userController.updateEmail);
 
     // /user-groups
+    router.get('/user-groups', userGroupsController.getAllGroups);
     router.post('/user-groups', userGroupsController.createUserGroup);
 
     // /task-pools

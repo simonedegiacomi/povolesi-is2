@@ -8,9 +8,10 @@ const groupSchema = Joi.object().keys({
 
 
 module.exports = {
-    getAllGroups: function (req, res) {
-        UserGroupService.getAllGroups()
-            .then(groups => res.status(200).send(groups));
+    async getAllGroups (req, res) {
+        const groups = await UserGroupService.getAllGroups();
+
+        res.status(200).send(groups)
     },
 
     async createUserGroup(req, res) {
