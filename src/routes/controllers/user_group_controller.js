@@ -1,8 +1,9 @@
-const Joi         = require('joi');
+const Joi              = require('joi');
 const UserGroupService = require('../../services/user_group_service');
+const ErrorMapper = require('./error_mapper');
 
 const groupSchema = Joi.object().keys({
-    name : Joi.string().min(3).max(200).required()
+    name: Joi.string().min(3).max(200).required()
 });
 
 
@@ -12,7 +13,7 @@ module.exports = {
             .then(groups => res.status(200).send(groups));
     },
 
-    createUserGroup: function(req, res) {
+    async createUserGroup(req, res) {
         const {error, value} = Joi.validate(req.body, groupSchema);
 
         if (error != null) {
@@ -21,15 +22,13 @@ module.exports = {
             });
         }
 
-        //TODO: check if the user actually has the permission to do so
-        UserGroupService.createGroup(value)
-            .then(group => res.status(201).send({
-                groupId: group.id
-            }))
-            .catch(error => {
-                res.status(500).send({
-                    errorMessage: error.message
-                })
+        try {
+            const createdGroup = await UserGroupService.createGroup(value);
+            res.status(201).send({
+                userGroupId: createdGroup.id
             });
+        } catch (e) {
+            ErrorMapper.map(res, e, []);
+        }
     }
 };

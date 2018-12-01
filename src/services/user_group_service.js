@@ -1,12 +1,11 @@
-
 const {UserGroup} = require('../models/index');
 
 module.exports = {
-    getAllGroups: function(){
-        return UserGroup.findAll()
+    async getAllGroups() {
+        return await UserGroup.findAll()
     },
 
-    createGroup: function(group){
-        return UserGroup.create(group);
+    async createGroup(group) {
+        return await UserGroup.create(group);
     }
 };

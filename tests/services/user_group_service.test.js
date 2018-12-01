@@ -1,12 +1,6 @@
 const UserGroupService = require('../../src/services/user_group_service');
 const Models      = require('../../src/models/index');
 
-beforeEach((done) => {
-    Models.sequelize
-        .sync({force: true})
-        .then(() => done())
-});
-
 function createGroup(groupName = "Group name") {
     return UserGroupService.createGroup({
         'name': groupName

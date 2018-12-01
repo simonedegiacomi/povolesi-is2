@@ -36,15 +36,16 @@ function setupAuthenticatedRoutes (app) {
 
     router.use(authenticationMiddleware);
 
-    router.get('/secure', (req, res) => res.status(200).send(`Hi ${req.user.name}!`));
-
+    // /user
     router.get('/users/me', userController.getCurrentUserData);
     router.put('/users/me', userController.updateUserData);
-
     router.put('/users/me/email', userController.updateEmail);
 
+    // /user-groups
+    router.post('/user-groups', userGroupsController.createUserGroup);
+
     // /task-pools
-    router.get('/task-pools', taskPoolController.getTaskPool)
+    router.get('/task-pools', taskPoolController.getTaskPool);
 
     app.use('/api/v1', router);
 }
