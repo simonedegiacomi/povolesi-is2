@@ -1,26 +1,23 @@
+const {TaskPool} = require('../models/index');
 
-const {sequelize, TaskPool} = require('../models/index');
-
-var ERROR = "FAIL OF QUERY, the task pool is incorrect"
 
 module.exports = {
-    
-    async createTaskPool(taskPool){
-        try {
-            await TaskPool.create(taskPool)
-        } catch(e) {
-            return ERROR
+
+    errors: {
+        NO_CREATOR_SPECIFIED: "no creator specified"
+    },
+
+    async createTaskPool(taskPool) {
+        if (taskPool.createdBy == null) {
+            throw new Error(this.errors.NO_CREATOR_SPECIFIED);
         }
 
-        //cerco l'utente appena creato
-        const jsonArray = await TaskPool.findAll({
-            where: {
-                id: taskPool.id
-            }
-        })
-
-        return jsonArray[0]
-
+        const createdTaskPool = await TaskPool.create({
+            ...taskPool,
+            createdById: taskPool.createdBy.id
+        });
+        createdTaskPool.createdBy = taskPool.createdBy;
+        return createdTaskPool;
     },
 
 

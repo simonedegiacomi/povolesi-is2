@@ -1,6 +1,6 @@
 const UserService = require('../../src/services/user_service');
 const {User}      = require('../../src/models');
-const dropCreateAndTables = require('../test_setup')
+const UserHelper  = require('../helpers/user_helper');
 
 describe('Test the user registration', () => {
 
@@ -18,7 +18,7 @@ describe('Test the user registration', () => {
     });
 
     test('Should not register two users with the same email', async () => {
-        const existingUser = await User.findOne();
+        const existingUser = await UserHelper.insertMario();
 
         try {
             await UserService.registerUser({
@@ -38,7 +38,7 @@ describe('Test the user registration', () => {
 });
 
 
-describe('Test the listing of existing users', () =>{
+describe('Test the listing of existing users', () => {
     test('Should return zero users if no users are registered', async (done) => {
         //elimina dal database gli utenti
         await User.destroy({where: {}});
@@ -49,7 +49,8 @@ describe('Test the listing of existing users', () =>{
         done();
     });
 
-    test('Should return the registered users', (done) => {
+    test('Should return the registered users', async (done) => {
+        await UserHelper.insertMario();
         UserService.getAllUsers().then(users => {
             let firstUser = users[0];
 
@@ -64,7 +65,7 @@ describe('Test the listing of existing users', () =>{
     test('Should return array json of two user', async () => {
         //elimina gli utenti dal database
         await User.destroy({where: {}});
-        
+
         const user1 = await UserService.registerUser({
             name       : 'Mario Rossi',
             email      : 'mario2@rossi.it',
@@ -81,7 +82,7 @@ describe('Test the listing of existing users', () =>{
 
         const users = await UserService.getAllUsers()
         expect(users.map(u => u.toJSON())).toEqual([
-            user1.toJSON(),user2.toJSON()
+            user1.toJSON(), user2.toJSON()
         ])
 
     })
@@ -92,8 +93,8 @@ describe('Test the listing of existing users', () =>{
 describe('Test user email update', () => {
     // TODO: 1) Write some tests that call the 'updateUserEmail' method on the UserService
 
-    test('Should return the user with the email changed',  (done) => {
-        User.findOne()
+    test('Should return the user with the email changed', (done) => {
+        UserHelper.insertMario()
             .then(user => UserService.updateUserEmail(user, 'luca@bianchi.com'))
             .then(user => {
                 expect(user.email).toEqual('luca@bianchi.com');
@@ -103,13 +104,13 @@ describe('Test user email update', () => {
 });
 
 describe('Test user data update', () => {
-   test('Should return the user with the data updated', (done) => {
-      User.findOne()
-          .then(user => UserService.updateUserData(user, 'Luca Bianchi', '000002'))
-          .then(user => {
-              expect(user.name).toEqual('Luca Bianchi');
-              expect(user.badgeNumber).toEqual('000002');
-              done();
-          }).catch(console.log);
-   });
+    test('Should return the user with the data updated', (done) => {
+        UserHelper.insertMario()
+            .then(user => UserService.updateUserData(user, 'Luca Bianchi', '000002'))
+            .then(user => {
+                expect(user.name).toEqual('Luca Bianchi');
+                expect(user.badgeNumber).toEqual('000002');
+                done();
+            }).catch(console.log);
+    });
 });

@@ -1,40 +1,31 @@
 const TaskPoolService = require('../../src/services/task_pool_service');
-const {TaskPool}      = require('../../src/models');
-
-var taskPoolExample = {
-    id: 1,
-    name: 'esempio',
-    createdById: 1
-}
-
-var taskPoolError = {
-    id: 1,
-    name: 'esempio',
-    createdById: 2
-}
+const UserHelper      = require('../helpers/user_helper');
 
 
 describe('creation of taskPool', () => {
 
     test('insert taskPool', async () => {
-        const json = await TaskPoolService.createTaskPool(taskPoolExample)
+        const creator         = await UserHelper.insertMario();
+        const taskPoolExample = {
+            name     : 'esempio',
+            createdBy: creator
+        };
 
-        expect(json.id).toEqual(taskPoolExample.id)
-        expect(json.name).toEqual(taskPoolExample.name)
-        expect(json.createdById).toEqual(taskPoolExample.createdById)
+        const createdPool = await TaskPoolService.createTaskPool(taskPoolExample);
+
+        expect(createdPool.name).toEqual(taskPoolExample.name);
+        expect(createdPool.createdBy.toJSON()).toEqual(creator.toJSON());
     });
 
-    test('insert taskPool with inexistent creatorUser ', async () => {
-        const error = await TaskPoolService.createTaskPool(taskPoolError)
+    test('insert taskPool without specifying the user', async () => {
+        const taskPool = {
+            name: 'esempio',
+        };
 
-        expect(error).toEqual("FAIL OF QUERY, the task pool is incorrect")
-    })
-
-    test('insert two taskPool with the same id', async () => {
-        taskPoolError.id=1
-        await TaskPoolService.createTaskPool(taskPoolExample)
-        const error = await TaskPoolService.createTaskPool(taskPoolError)
-
-        expect(error).toEqual("FAIL OF QUERY, the task pool is incorrect")
-    })
-})
+        try {
+            await TaskPoolService.createTaskPool(taskPool);
+        } catch (e) {
+            expect(e.message).toBe(TaskPoolService.errors.NO_CREATOR_SPECIFIED);
+        }
+    });
+});
