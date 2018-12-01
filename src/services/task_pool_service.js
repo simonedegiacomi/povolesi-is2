@@ -4,11 +4,7 @@ const {sequelize, TaskPool} = require('../models/index');
 module.exports = {
     
     async createTaskPool(taskPool){
-        TaskPool.create(taskPool)
-    },
-
-    async insertTaskInTaskPool(task,taskPool){
-        taskPool
+        await TaskPool.create(taskPool)
     },
 
     async getAllTaskPool() {
@@ -17,6 +13,10 @@ module.exports = {
 
     //ritorna un array di task
     getTaskPool: async function (userMe) {
+        createTaskPool({
+            name
+        })
+
         //query SELECT * WHERE user=userMe
         return TaskPool.findAll({
             where: {

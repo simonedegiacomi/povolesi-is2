@@ -3,18 +3,18 @@ const Task = require('./task');
 
 let TaskPool = function (sequelize, DataTypes) {
     let TaskPool = sequelize.define('TaskPool', {
-        id       : {
-            type         : DataTypes.INTEGER(11),
-            allowNull    : false,
-            primaryKey   : true,
+        id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+            primaryKey: true,
             autoIncrement: true
         },
-        name     : {
-            type     : DataTypes.STRING(200),
+        name: {
+            type: DataTypes.STRING(200),
             allowNull: false
 
         }
-
+    });
 
     //il task pool viene creato da un solo utente
     let User_ = User(sequelize, DataTypes);
