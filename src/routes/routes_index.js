@@ -4,6 +4,7 @@ const express = require('express');
 
 const userController = require('./controllers/user_controller');
 const userGroupsController = require('./controllers/user_group_controller');
+const taskPoolController = require('./controllers/task_pools_controller');
 
 const authenticationMiddleware = require('./middlewares/authentication');
 
@@ -39,6 +40,9 @@ function setupAuthenticatedRoutes (app) {
     router.put('/users/me', userController.updateUserData);
 
     router.put('/users/me/email', userController.updateEmail);
+
+    // /task-pools
+    router.get('/task-pools', taskPoolController.getTaskPool)
 
     app.use('/api/v1', router);
 }

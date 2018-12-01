@@ -12,8 +12,9 @@ let TaskPool = function (sequelize, DataTypes) {
         name     : {
             type     : DataTypes.STRING(200),
             allowNull: false
+
         }
-    });
+
 
     //il task pool viene creato da un solo utente
     let User_ = User(sequelize, DataTypes);
