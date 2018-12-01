@@ -71,7 +71,6 @@ module.exports = {
         });
     },
 
-    //don't need any control of error because there is no problem
     getAllUsers() {
         return User.findAll()
     },

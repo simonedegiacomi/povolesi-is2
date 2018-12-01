@@ -113,6 +113,27 @@ describe('test the /users path', () => {
         expect(response.statusCode).toBe(200);
     });
 
+    test('return of the users without passwords', async () => {
+        
+        result = await request(app).get(urlVer+'/users')
+        
+        // i campi che devono essere inviati in output
+        fieldNeed= [ "name", "email" , "badgeNumber"]
+        
+        JSON.parse(result.text).map(u => {
+                i=0
+                for(var k in u){ 
+                    expect(fieldNeed).toContain(k)
+                    i++
+                }
+            expect(i).toEqual(fieldNeed.length)
+            }
+        )
+        
+        
+
+    });
+
 });
 
 
