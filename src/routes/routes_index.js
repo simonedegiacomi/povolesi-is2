@@ -26,6 +26,8 @@ function setupUnauthenticatedRoutes (app) {
     router.get ('/groups', userGroupsController.getAllGroups);
     router.post('/groups', userGroupsController.createUserGroup);
 
+
+
     app.use('/api/v1', router);
 }
 
