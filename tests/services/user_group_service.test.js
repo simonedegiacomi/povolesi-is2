@@ -35,5 +35,24 @@ describe('The user group collection', () => {
         const groups = await UserGroupService.getAllGroups();
 
         expect(groups.length).toBe(0);
-    })
+    });
+
+    test('It should return a specific user group given its id', async () => {
+        const createdGroup = await UserGroupHelper.createGroup("A");
+
+        const group = await UserGroupService.getGroupById(createdGroup.id);
+
+        expect(group).toBeDefined();
+        expect(group.toJSON()).toEqual(createdGroup.toJSON());
+    });
+
+    test("It should throw an excpetion if I request a group that doesn't exist", async () => {
+        try {
+            await UserGroupService.getGroupById(createdGroup.id);
+            expect(true).toBe(false);
+        } catch (e) {
+            expect(e.message).toBe(UserGroupService.errors.GROUP_NOT_FOUND);
+        }
+    });
+
 });
