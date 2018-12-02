@@ -5,9 +5,15 @@ const UserPermissionsService = require('../../src/services/user_permissions_serv
 module.exports = {
     async insertUserPermission() {
         const group     = await UserGroupsHelper.createGroup();
-        const creator    = await group.getCreatedBy();
+        const creator   = await group.getCreatedBy();
         const newMember = await UserHelper.insertMario();
 
-        return await UserPermissionsService.createPermission(creator, group, newMember);
+        return await UserPermissionsService.createPermission(creator, {
+            userGroup           : group,
+            user                : newMember,
+            canManageTasks      : false,
+            canManageUsers      : false,
+            canChangePermissions: false
+        });
     }
 };

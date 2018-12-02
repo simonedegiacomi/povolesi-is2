@@ -24,5 +24,24 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'user_permission'
     });
 
+
+    UserPermission.associate = (models) => {
+        UserPermission.belongsTo(models.User, {
+            foreignKey: {
+                unique: 'compositeIndex',
+                name: 'userId',
+                allowNull: false
+            }
+        });
+        UserPermission.belongsTo(models.UserGroup, {
+            foreignKey: {
+                unique: 'compositeIndex',
+                name: 'userGroupId',
+                allowNull: false
+            }
+        });
+    };
+
+
     return UserPermission;
 };
