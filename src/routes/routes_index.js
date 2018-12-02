@@ -45,6 +45,7 @@ function setupAuthenticatedRoutes (app) {
     router.get('/user-groups', userGroupsController.getAllGroups);
     router.post('/user-groups', userGroupsController.createUserGroup);
     router.get('/user-groups/:id', userGroupsController.getGroupById);
+    router.delete('/user-groups/:id', userGroupsController.deleteGroupById);
 
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);

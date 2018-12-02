@@ -42,9 +42,9 @@ module.exports = {
         return group;
     },
 
-    async deleteById(group) {
+    async deleteById(id) {
         const deletedRows = await UserGroup.destroy({
-            where: {id: group.id}
+            where: {id}
         });
 
         if (deletedRows < 1) {

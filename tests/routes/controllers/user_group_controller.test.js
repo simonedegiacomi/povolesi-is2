@@ -4,6 +4,7 @@ const app             = require('../../../src/app');
 const UserHelper      = require('../../helpers/user_helper');
 const UserGroupHelper = require('../../helpers/user_groups_helper');
 const ModelsMapper    = require('../../../src/routes/controllers/models_mapper');
+const {UserGroup}      = require('../../../src/models');
 
 describe('Test the user group creation', () => {
 

@@ -48,5 +48,25 @@ module.exports = {
                 status: 404
             }]);
         }
+    },
+
+    async deleteGroupById(req, res) {
+        const id = req.params.id;
+
+        try {
+            const group = await UserGroupService.getGroupById(id);
+
+            if(group.createdById !== req.user.id) {
+                return res.status(403).send();
+            }
+
+            await UserGroupService.deleteById(id);
+            res.status(200).send();
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserGroupService.errors.GROUP_NOT_FOUND,
+                status: 404
+            }]);
+        }
     }
 };
