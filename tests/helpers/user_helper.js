@@ -9,5 +9,14 @@ module.exports = {
             email      : 'mario@rossi.it',
             badgeNumber: '000001'
         });
+    },
+
+    async insertGiorgio () {
+        return await UserService.registerUser({
+            name       : 'Giorgio Segalla',
+            password   : '112hhiufsk1',
+            email      : 'giorgio@segalla.it',
+            badgeNumber: '187633'
+        });
     }
 };

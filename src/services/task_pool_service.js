@@ -21,17 +21,16 @@ module.exports = {
     },
 
 
-    //TODO: da fare
-    /*
-    async getAllTaskPool() {
-        return TaskPool.findAll({})
-    },
-
-    //ritorna un array di task
-    getMyTaskPool: async function (userMe) {
+    async getMyTaskPool(userMe) {
 
         //query SELECT * WHERE user=userMe
-        return await TaskPool.findAll({})
+        const jsonArray = await TaskPool.findAll({
+            where: {
+                createdById: userMe.id
+            }
+        })
+
+        return jsonArray
     }
-    */
+
 };
