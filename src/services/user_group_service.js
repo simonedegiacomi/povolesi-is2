@@ -5,7 +5,17 @@ module.exports = {
         return await UserGroup.findAll()
     },
 
-    async createGroup(group) {
-        return await UserGroup.create(group);
+    async createGroup(groupData) {
+        const group = UserGroup.build(groupData);
+
+        try {
+            group.setCreatedBy(groupData.owner);
+
+            await group.save();
+        } catch (e) {
+            console.error(e);
+            return null;
+        }
+        return group;
     }
 };

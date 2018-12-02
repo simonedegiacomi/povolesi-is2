@@ -15,13 +15,13 @@ let TaskPool = function (sequelize, DataTypes) {
         }
     });
 
-    TaskPool.associate = (models) => {
+    /*TaskPool.associate = (models) => {
         TaskPool.CreatedBy = TaskPool.belongsTo(models.User, {as: 'createdBy'});
 
         //questo aggiunge un fk in Task che segnala a quale task pool appartiene
         let Task_ = Task(sequelize, DataTypes);
         TaskPool.hasMany(Task_, {as: 'task-pool'})
-    };
+    };*/
 
     return TaskPool;
 };
