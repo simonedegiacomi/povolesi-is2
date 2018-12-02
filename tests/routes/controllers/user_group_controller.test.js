@@ -105,6 +105,7 @@ describe('The user group collection', () => {
 describe("Test the user group deletion", () => {
     test('It should delete an existing user group', async () => {
         const group = await UserGroupHelper.createGroup();
+        const user  = await group.getCreatedBy();
 
         const response = await request(app)
             .delete(`/api/v1/user-groups/${group.id}`)
@@ -120,11 +121,25 @@ describe("Test the user group deletion", () => {
     });
 
     test("It should return 404 if I try to delete a user group that doesn't exists", async () => {
+        const user = await UserHelper.insertMario();
+
         const response = await request(app)
             .delete('/api/v1/user-groups/123')
             .set('X-API-TOKEN', user.authToken)
             .send();
 
         expect(response.status).toBe(404);
+    });
+
+    test("It should return 403 when someone who didn't create the group tries to delete the group", async () => {
+        const group = await UserGroupHelper.createGroup();
+        const user  = await UserHelper.insertMario();
+
+        const response = await request(app)
+            .delete(`/api/v1/user-groups/${group.id}`)
+            .set('X-API-TOKEN', user.authToken)
+            .send();
+
+        expect(response.status).toBe(403);
     });
 });
