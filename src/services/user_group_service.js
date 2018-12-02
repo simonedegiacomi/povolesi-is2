@@ -1,11 +1,20 @@
-const {UserGroup} = require('../models/index');
+const Models      = require('../models/index');
+const {UserGroup} = Models;
 
 module.exports = {
     async getAllGroups() {
-        return await UserGroup.findAll()
+        return await UserGroup.findAll({
+            include: [{
+                model: Models.User,
+                as: 'createdBy'
+            }]
+        })
     },
 
-    async createGroup(group) {
-        return await UserGroup.create(group);
+    async createGroup(groupData) {
+        return await UserGroup.create({
+            ...groupData,
+            createdById: groupData.createdBy.id
+        });
     }
 };

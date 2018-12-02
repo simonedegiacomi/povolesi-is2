@@ -1,8 +1,7 @@
-const User = require('./user');
 
-let UserGroup = function (sequelize, DataTypes) {
-    let UserGroup = sequelize.define('UserGroup', {
-        id       : {
+module.exports = (sequelize, DataTypes) => {
+    const UserGroup = sequelize.define('UserGroup', {
+        id  : {
             type         : DataTypes.INTEGER(11),
             allowNull    : false,
             primaryKey   : true,
@@ -14,10 +13,13 @@ let UserGroup = function (sequelize, DataTypes) {
         }
     });
 
-    let User_ = User(sequelize, DataTypes);
-    UserGroup.belongsTo(User_, {as: 'Creator'});
+    UserGroup.associate = (models) => {
+
+        UserGroup.belongsTo(models.User, {
+            as: 'createdBy',
+            foreignKey: 'createdById'
+        });
+    };
 
     return UserGroup;
 };
-
-module.exports = UserGroup;

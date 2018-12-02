@@ -1,5 +1,4 @@
-const User      = require('./user');
-const UserGroup = require('./user_group');
+
 
 module.exports = function (sequelize, DataTypes) {
     let UserPermission = sequelize.define('UserPermission', {
@@ -24,16 +23,6 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         tableName: 'user_permission'
     });
-
-    //User
-    let User_ = User(sequelize, DataTypes);
-    UserPermission.belongsTo(User_, {as: 'User'});
-
-    User_.belongsToMany(UserPermission, {through: 'Permissions'});
-
-    //UserGroup
-    let UserGroup_ = UserGroup(sequelize, DataTypes);
-    UserGroup_.belongsToMany(UserPermission, {through: 'Permissions'});
 
     return UserPermission;
 };

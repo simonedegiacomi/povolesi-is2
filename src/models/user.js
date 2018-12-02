@@ -1,8 +1,8 @@
 const BCRYPT_HASH_LENGTH = 90;
 const AUTH_TOKEN_LENGTH  = 255;
 
-module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('User', {
+module.exports = (sequelize, DataTypes) => {
+    const User = sequelize.define('User', {
         id         : {
             type         : DataTypes.INTEGER(11),
             allowNull    : false,
@@ -27,11 +27,21 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             unique   : true
         },
-        authToken: {
+        authToken  : {
             type     : DataTypes.STRING(AUTH_TOKEN_LENGTH),
             allowNull: true
         }
     }, {
         tableName: 'user'
     });
+
+
+   /* User.associate = (models) => {
+        models.User.hasMany(models.UserGroup, {
+            as: 'owner',
+            foreignKey: 'ownerId'
+        });
+    };*/
+
+    return User;
 };

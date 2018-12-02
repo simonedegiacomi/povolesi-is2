@@ -12,12 +12,18 @@ module.exports = {
             throw new Error(this.errors.NO_CREATOR_SPECIFIED);
         }
 
-        const createdTaskPool = await TaskPool.create({
-            ...taskPool,
-            createdById: taskPool.createdBy.id
-        });
-        createdTaskPool.createdBy = taskPool.createdBy;
-        return createdTaskPool;
+        try {
+            const createdTaskPool     = await TaskPool.create({
+                ...taskPool,
+                createdById: taskPool.createdBy.id
+            });
+            createdTaskPool.createdBy = taskPool.createdBy;
+
+            return createdTaskPool;
+        } catch (e){
+            console.log(e);
+            return null;
+        }
     },
 
 

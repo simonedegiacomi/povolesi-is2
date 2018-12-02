@@ -2,7 +2,7 @@ const {sequelize} = require('../../src/models/index');
 const UserService = require('../../src/services/user_service');
 
 module.exports = {
-    async insertMario () {
+    async insertMario() {
         return await UserService.registerUser({
             name       : 'Mario Rossi',
             password   : 'password',
@@ -11,12 +11,23 @@ module.exports = {
         });
     },
 
-    async insertGiorgio () {
+
+    async insertGiorgio() {
         return await UserService.registerUser({
             name       : 'Giorgio Segalla',
             password   : '112hhiufsk1',
             email      : 'giorgio@segalla.it',
             badgeNumber: '187633'
+        });
+    },
+
+    async insertNewRandom() {
+        const number = Math.round(Math.random() * 1000000);
+        return await UserService.registerUser({
+            name       : `Random ${number}`,
+            password   : 'password',
+            email      : `mario${number}@rossi.it'`,
+            badgeNumber: `${number}`
         });
     }
 };
