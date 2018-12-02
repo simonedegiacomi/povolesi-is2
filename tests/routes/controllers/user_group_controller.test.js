@@ -1,8 +1,8 @@
 const request = require('supertest');
 
-const app = require('../../../src/app');
-const UserHelper = require('../../helpers/user_helper');
-const UserGroupHelper  = require('../../helpers/user_groups_helper');
+const app             = require('../../../src/app');
+const UserHelper      = require('../../helpers/user_helper');
+const UserGroupHelper = require('../../helpers/user_groups_helper');
 
 describe('Test the user group creation', () => {
 
@@ -34,7 +34,7 @@ describe('Test the user group creation', () => {
 
 describe('The user group collection', () => {
     test('It should return the list when of groups', async () => {
-        const user     = await UserHelper.insertMario();
+        const user = await UserHelper.insertMario();
 
         await UserGroupHelper.createGroup("A");
         await UserGroupHelper.createGroup("B");
@@ -56,7 +56,7 @@ describe('The user group collection', () => {
     });
 
     test('It should return an empty list when no groups are registerd', async () => {
-        const user     = await UserHelper.insertMario();
+        const user = await UserHelper.insertMario();
 
         const response = await request(app)
             .get('/api/v1/user-groups')
@@ -67,5 +67,31 @@ describe('The user group collection', () => {
 
         const groups = response.body;
         expect(groups.length).toBe(0);
-    })
+    });
+
+    test('It should return a specific user group given its id', async () => {
+        const user         = await UserHelper.insertMario();
+        const createdGroup = await UserGroupHelper.createGroup("A");
+
+        const response = await request(app)
+            .get(`/api/v1/user-groups/${createdGroup.id}`)
+            .set('X-API-TOKEN', user.authToken)
+            .send();
+
+        expect(response.status).toBe(200);
+
+        const group = response.body;
+        expect(group).toBeDefined();
+        expect(group).toEqual(createdGroup.toJSON());
+    });
+    *test("It should return 404 if I request a group that doesn't exist", async () => {
+        const user         = await UserHelper.insertMario();
+
+        const response = await request(app)
+            .get('/api/v1/user-groups/123')
+            .set('X-API-TOKEN', user.authToken)
+            .send();
+
+        expect(response.status).toBe(404);
+    });
 });
