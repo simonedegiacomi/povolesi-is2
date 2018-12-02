@@ -1,5 +1,5 @@
 module.exports = {
-    map(res, error, mappings) {
+    map(res, error, mappings = []) {
         const mapping = mappings.find(m => m.error === error.message);
 
         if (mapping != null) {

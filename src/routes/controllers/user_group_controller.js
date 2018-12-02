@@ -1,6 +1,6 @@
 const Joi              = require('joi');
 const UserGroupService = require('../../services/user_group_service');
-const ErrorMapper = require('./error_mapper');
+const ErrorMapper      = require('./error_mapper');
 
 const groupSchema = Joi.object().keys({
     name: Joi.string().min(3).max(200).required()
@@ -8,7 +8,7 @@ const groupSchema = Joi.object().keys({
 
 
 module.exports = {
-    async getAllGroups (req, res) {
+    async getAllGroups(req, res) {
         const groups = await UserGroupService.getAllGroups();
 
         res.status(200).send(groups)
@@ -24,12 +24,13 @@ module.exports = {
         }
 
         try {
+            value.createdBy    = req.user;
             const createdGroup = await UserGroupService.createGroup(value);
             res.status(201).send({
                 userGroupId: createdGroup.id
             });
         } catch (e) {
-            ErrorMapper.map(res, e, []);
+            ErrorMapper.map(res, e);
         }
     }
 };

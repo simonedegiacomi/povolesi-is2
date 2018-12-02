@@ -29,7 +29,6 @@ describe('The user group collection', () => {
 
         const names = groups.map(item => item.name);
         expect(['A', 'B', 'C'].every(name => names.indexOf(name) > -1)).toBe(true);
-
     });
 
     test('It should return an empty array when there are no groups', async () => {
