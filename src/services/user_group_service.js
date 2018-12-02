@@ -9,9 +9,11 @@ module.exports = {
         const group = UserGroup.build(groupData);
 
         try {
-            group.setCreatedBy(groupData.owner);
 
             await group.save();
+
+            await group.setCreatedBy(groupData.createdBy);
+
         } catch (e) {
             console.error(e);
             return null;

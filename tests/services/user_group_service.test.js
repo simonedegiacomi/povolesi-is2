@@ -1,11 +1,18 @@
 const UserGroupService = require('../../src/services/user_group_service');
 const UserGroupHelper  = require('../helpers/user_groups_helper');
+const UserHelper  = require('../helpers/user_helper');
 
 describe('The user group creation', () => {
     test('It should create new groups', async () => {
-        const group = await UserGroupHelper.createGroup();
+        const groupData = {
+            name     : "test group",
+            createdBy: await UserHelper.insertNewRandom()
+        };
+        const group     = await UserGroupService.createGroup(groupData);
 
         expect(group.id).toBeDefined();
+        const createdBy = await group.getCreatedBy();
+        expect(createdBy.toJSON()).toEqual(groupData.createdBy.toJSON());
     });
 });
 
