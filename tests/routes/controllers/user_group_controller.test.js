@@ -3,6 +3,7 @@ const request = require('supertest');
 const app             = require('../../../src/app');
 const UserHelper      = require('../../helpers/user_helper');
 const UserGroupHelper = require('../../helpers/user_groups_helper');
+const ModelsMapper    = require('../../../src/routes/controllers/models_mapper');
 
 describe('Test the user group creation', () => {
 
@@ -70,8 +71,9 @@ describe('The user group collection', () => {
     });
 
     test('It should return a specific user group given its id', async () => {
-        const user         = await UserHelper.insertMario();
-        const createdGroup = await UserGroupHelper.createGroup("A");
+        const user             = await UserHelper.insertMario();
+        const createdGroup     = await UserGroupHelper.createGroup("A");
+        createdGroup.createdBy = await createdGroup.getCreatedBy();
 
         const response = await request(app)
             .get(`/api/v1/user-groups/${createdGroup.id}`)
@@ -82,10 +84,13 @@ describe('The user group collection', () => {
 
         const group = response.body;
         expect(group).toBeDefined();
-        expect(group).toEqual(createdGroup.toJSON());
+
+        const expectedJson = await ModelsMapper.mapUserGroup(createdGroup);
+        expect(group).toEqual(expectedJson);
     });
-    *test("It should return 404 if I request a group that doesn't exist", async () => {
-        const user         = await UserHelper.insertMario();
+
+    test("It should return 404 if I request a group that doesn't exist", async () => {
+        const user = await UserHelper.insertMario();
 
         const response = await request(app)
             .get('/api/v1/user-groups/123')

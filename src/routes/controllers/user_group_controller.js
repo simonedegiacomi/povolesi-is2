@@ -1,6 +1,7 @@
 const Joi              = require('joi');
 const UserGroupService = require('../../services/user_group_service');
 const ErrorMapper      = require('./error_mapper');
+const ModelsMapper     = require('./models_mapper');
 
 const groupSchema = Joi.object().keys({
     name: Joi.string().min(3).max(200).required()
@@ -31,6 +32,21 @@ module.exports = {
             });
         } catch (e) {
             ErrorMapper.map(res, e);
+        }
+    },
+
+    async getGroupById(req, res) {
+        const id = req.params.id;
+
+        try {
+            const group = await UserGroupService.getGroupById(id);
+            const json  = await ModelsMapper.mapUserGroup(group)
+            res.send(json);
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserGroupService.errors.GROUP_NOT_FOUND,
+                status: 404
+            }]);
         }
     }
 };
