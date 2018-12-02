@@ -48,7 +48,7 @@ describe('The user group collection', () => {
 
     test("It should throw an excpetion if I request a group that doesn't exist", async () => {
         try {
-            await UserGroupService.getGroupById(createdGroup.id);
+            await UserGroupService.getGroupById(123);
             expect(true).toBe(false);
         } catch (e) {
             expect(e.message).toBe(UserGroupService.errors.GROUP_NOT_FOUND);
