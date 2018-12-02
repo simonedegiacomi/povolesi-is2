@@ -25,8 +25,8 @@ describe("Test the creation of a user permission", () => {
 
         try {
             await UserPermissionsService.createPermission(unauthorized, {
-                userGroup: group,
-                user                : newMember,
+                userGroupId         : group.id,
+                userId              : newMember.id,
                 canManageTasks      : false,
                 canManageUsers      : false,
                 canChangePermissions: false
@@ -43,8 +43,8 @@ describe("Test the creation of a user permission", () => {
 
         try {
             await UserPermissionsService.createPermission({
-                userGroup: group,
-                user: newMember
+                userGroupId: group.id,
+                userId     : newMember.id
             });
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.WRONG_ARGUMENTS);
@@ -60,7 +60,7 @@ describe("Test the creation of a user permission", () => {
 
         try {
             await UserPermissionsService.createPermission(creator, {
-                user: newMember
+                userId: newMember.id
             });
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.WRONG_ARGUMENTS);
@@ -73,7 +73,7 @@ describe("Test the creation of a user permission", () => {
 
         try {
             await UserPermissionsService.createPermission(creator, {
-                userGroup: group,
+                userGroupId: group.id,
             });
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.WRONG_ARGUMENTS);
@@ -90,8 +90,8 @@ describe("Test the creation of a user permission", () => {
 
         try {
             await UserPermissionsService.createPermission(creator, {
-                userGroup: group,
-                user     : member
+                userGroupId: group.id,
+                userId     : member.id
             });
             expect(false).toBe(true);
         } catch (e) {

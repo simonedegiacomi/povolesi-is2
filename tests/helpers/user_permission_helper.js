@@ -9,8 +9,8 @@ module.exports = {
         const newMember = await UserHelper.insertMario();
 
         return await UserPermissionsService.createPermission(creator, {
-            userGroup           : group,
-            user                : newMember,
+            userGroupId         : group.id,
+            userId              : newMember.id,
             canManageTasks      : false,
             canManageUsers      : false,
             canChangePermissions: false

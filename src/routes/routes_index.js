@@ -5,6 +5,7 @@ const express = require('express');
 const userController = require('./controllers/user_controller');
 const userGroupsController = require('./controllers/user_group_controller');
 const taskPoolController = require('./controllers/task_pools_controller');
+const userPermissionsController = require('./controllers/user_permissions_controller');
 
 const authenticationMiddleware = require('./middlewares/authentication');
 
@@ -46,6 +47,9 @@ function setupAuthenticatedRoutes (app) {
     router.post('/user-groups', userGroupsController.createUserGroup);
     router.get('/user-groups/:id', userGroupsController.getGroupById);
     router.delete('/user-groups/:id', userGroupsController.deleteGroupById);
+
+    // /user-permissions
+    router.post('/user-permissions', userPermissionsController.createPermission);
 
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);
