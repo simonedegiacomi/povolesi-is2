@@ -62,7 +62,7 @@ describe("Test the user group deletion", () => {
     test('It should delete an existing user group', async () => {
         const group = await UserGroupHelper.createGroup();
 
-        await UserGroupService.delete(group);
+        await UserGroupService.deleteById(group);
 
         const loadedFromDb = await UserGroup.findOne({
             where: {id: group.id}
@@ -72,7 +72,7 @@ describe("Test the user group deletion", () => {
 
     test("It should throw an exception if I try to delete a user group that doesn't exists", async () => {
         try {
-            await UserGroupService.delete({ id: 999 });
+            await UserGroupService.deleteById({ id: 999 });
             expect(true).toBe(false);
         } catch (e) {
             expect(e.message).toBe(UserGroupService.errors.GROUP_NOT_FOUND);

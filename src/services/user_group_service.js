@@ -40,5 +40,15 @@ module.exports = {
         }
 
         return group;
+    },
+
+    async deleteById(group) {
+        const deletedRows = await UserGroup.destroy({
+            where: {id: group.id}
+        });
+
+        if (deletedRows < 1) {
+            throw new Error(this.errors.GROUP_NOT_FOUND);
+        }
     }
 };
