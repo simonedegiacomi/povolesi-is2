@@ -100,3 +100,31 @@ describe('The user group collection', () => {
         expect(response.status).toBe(404);
     });
 });
+
+
+describe("Test the user group deletion", () => {
+    test('It should delete an existing user group', async () => {
+        const group = await UserGroupHelper.createGroup();
+
+        const response = await request(app)
+            .delete(`/api/v1/user-groups/${group.id}`)
+            .set('X-API-TOKEN', user.authToken)
+            .send();
+
+        expect(response.status).toBe(200);
+
+        const loadedFromDb = await UserGroup.findOne({
+            where: {id: group.id}
+        });
+        expect(loadedFromDb).toBeNull();
+    });
+
+    test("It should return 404 if I try to delete a user group that doesn't exists", async () => {
+        const response = await request(app)
+            .delete('/api/v1/user-groups/123')
+            .set('X-API-TOKEN', user.authToken)
+            .send();
+
+        expect(response.status).toBe(404);
+    });
+});
