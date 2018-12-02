@@ -1,6 +1,7 @@
 const UserGroupService = require('../../src/services/user_group_service');
 const UserGroupHelper  = require('../helpers/user_groups_helper');
-const UserHelper  = require('../helpers/user_helper');
+const UserHelper       = require('../helpers/user_helper');
+const {UserGroup}      = require('../../src/models');
 
 describe('The user group creation', () => {
     test('It should create new groups', async () => {
@@ -55,4 +56,26 @@ describe('The user group collection', () => {
         }
     });
 
+});
+
+describe("Test the user group deletion", () => {
+    test('It should delete an existing user group', async () => {
+        const group = await UserGroupHelper.createGroup();
+
+        await UserGroupService.delete(group);
+
+        const loadedFromDb = await UserGroup.findOne({
+            where: {id: group.id}
+        });
+        expect(loadedFromDb).toBeNull();
+    });
+
+    test("It should throw an exception if I try to delete a user group that doesn't exists", async () => {
+        try {
+            await UserGroupService.delete({ id: 999 });
+            expect(true).toBe(false);
+        } catch (e) {
+            expect(e.message).toBe(UserGroupService.errors.GROUP_NOT_FOUND);
+        }
+    });
 });
