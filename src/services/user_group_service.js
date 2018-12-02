@@ -4,7 +4,8 @@ const {UserGroup} = Models;
 module.exports = {
 
     errors: {
-        GROUP_NOT_FOUND: 'group not found'
+        GROUP_NOT_FOUND: 'group not found',
+        UNAUTHORIZED   : 'user not authorized'
     },
 
     async getAllGroups() {
@@ -42,13 +43,13 @@ module.exports = {
         return group;
     },
 
-    async deleteById(id) {
-        const deletedRows = await UserGroup.destroy({
-            where: {id}
-        });
+    async deleteById(user, id) {
+        const group = await this.getGroupById(id);
 
-        if (deletedRows < 1) {
-            throw new Error(this.errors.GROUP_NOT_FOUND);
+        if(group.createdById !== user.id) {
+            throw new Error(this.errors.UNAUTHORIZED);
         }
+
+        await group.destroy();
     }
 };

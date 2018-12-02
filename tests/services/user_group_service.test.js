@@ -60,9 +60,10 @@ describe('The user group collection', () => {
 
 describe("Test the user group deletion", () => {
     test('It should delete an existing user group', async () => {
-        const group = await UserGroupHelper.createGroup();
+        const group   = await UserGroupHelper.createGroup();
+        const creator = await group.getCreatedBy();
 
-        await UserGroupService.deleteById(group.id);
+        await UserGroupService.deleteById(creator, group.id);
 
         const loadedFromDb = await UserGroup.findOne({
             where: {id: group.id}
@@ -71,11 +72,25 @@ describe("Test the user group deletion", () => {
     });
 
     test("It should throw an exception if I try to delete a user group that doesn't exists", async () => {
+        const user = await UserHelper.insertNewRandom();
+
         try {
-            await UserGroupService.deleteById(999);
+            await UserGroupService.deleteById(user, 999);
             expect(true).toBe(false);
         } catch (e) {
             expect(e.message).toBe(UserGroupService.errors.GROUP_NOT_FOUND);
+        }
+    });
+
+    test("It should throw an exception when someone try to delete a group that he didn't create", async () => {
+        const group   = await UserGroupHelper.createGroup();
+        const aUser = await UserHelper.insertNewRandom();
+
+        try {
+            await UserGroupService.deleteById(aUser, group.id);
+            expect(true).toBe(false);
+        } catch (e) {
+            expect(e.message).toBe(UserGroupService.errors.UNAUTHORIZED);
         }
     });
 });

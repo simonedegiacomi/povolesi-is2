@@ -54,18 +54,15 @@ module.exports = {
         const id = req.params.id;
 
         try {
-            const group = await UserGroupService.getGroupById(id);
-
-            if(group.createdById !== req.user.id) {
-                return res.status(403).send();
-            }
-
-            await UserGroupService.deleteById(id);
+            await UserGroupService.deleteById(req.user, id);
             res.status(200).send();
         } catch (e) {
             ErrorMapper.map(res, e, [{
                 error : UserGroupService.errors.GROUP_NOT_FOUND,
                 status: 404
+            }, {
+                error : UserGroupService.errors.UNAUTHORIZED,
+                status: 403
             }]);
         }
     }
