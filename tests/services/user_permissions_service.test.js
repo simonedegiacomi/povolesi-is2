@@ -17,7 +17,7 @@ describe("Test the creation of a user permission", () => {
         expect(fromDb).toBeDefined();
     });
 
-    test("Should throw an exception if an unathorized user create a permission", async () => {
+    test("Should throw an exception if a user outside the group creates a permission", async () => {
         const group     = await UserGroupsHelper.createGroup();
         const newMember = await UserHelper.insertMario();
 
@@ -50,6 +50,8 @@ describe("Test the creation of a user permission", () => {
             expect(e.message).toBe(UserPermissionsService.errors.WRONG_ARGUMENTS);
         }
     });
+
+    // TODO: Add test when someone inside the group but without the permissions tries to add a user
 
     test("Should throw an exception when trying to insert a permission without specifying the group ", async () => {
         const group     = await UserGroupsHelper.createGroup();
