@@ -16,10 +16,12 @@ let TaskPool = function (sequelize, DataTypes) {
     });
 
     TaskPool.associate = (models) => {
-
         TaskPool.belongsTo(models.User, {
             as: 'createdBy',
-            foreignKey: 'createdById'
+            foreignKey: {
+                name: 'createdById',
+                allowNull: false
+            }
         });
     };
 

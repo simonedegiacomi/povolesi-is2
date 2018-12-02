@@ -16,7 +16,10 @@ module.exports = (sequelize, DataTypes) => {
     UserGroup.associate = (models) => {
         UserGroup.belongsTo(models.User, {
             as: 'createdBy',
-            foreignKey: 'createdById'
+            foreignKey: {
+                name: 'createdById',
+                allowNull: false
+            }
         });
     };
 
