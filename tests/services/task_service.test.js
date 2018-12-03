@@ -13,7 +13,7 @@ describe("Test the creation of a new task", () => {
         expect(fromDb).toBeDefined();
     });
 
-    test('should throw an exception when trying to create a open task without the name', async () => {
+    test('should throw an exception when trying to create a open task without the question', async () => {
         try {
             await TaskService.createTask({
                 type            : 'open',
