@@ -192,7 +192,7 @@ describe('Test user data update', () => {
 
     test('PUT /users/me without valid token should return 401', (done) => {
         UserHelper.insertMario()
-            .then(user => {
+            .then(() => {
                 return request(app)
                     .put('/api/v1/users/me')
                     .send({

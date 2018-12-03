@@ -81,7 +81,7 @@ module.exports = {
         
         const users = await UserService.getAllUsers();
         
-        let userFilter = []
+        let userFilter = [];
         
         users.map(u => userFilter
                             .push({name:u.name,
@@ -119,7 +119,7 @@ module.exports = {
         });
     },
 
-    updateUserData: function (req, res) {
+    async updateUserData(req, res) {
         const {error, value} = Joi.validate(req.body, updateUserDataSchema);
 
         if (error != null) {
@@ -128,7 +128,7 @@ module.exports = {
             });
         }
 
-        return UserService.updateUserData(req.user, value.newName, value.newBadgeNumber)
-            .then(() => res.status(204).send());
+        UserService.updateUserData(req.user, value.newName, value.newBadgeNumber);
+        res.status(204).send();
     }
 };
