@@ -110,9 +110,6 @@ module.exports = {
         })
 
         return jsonResult
-
-    },*/
-
-    async getTaskPool(userMe)
+*/
 
 };
