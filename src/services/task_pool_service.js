@@ -1,6 +1,6 @@
 const {TaskPool,User,Task} = require('../models/index');
 
-var existUser = function(u){
+var notExistUser = function(u){
     let jsonArray = User.findAll({
         where: {
             id: u.id
@@ -10,15 +10,45 @@ var existUser = function(u){
     return jsonArray.length
 }
 
+var notExistTask = function(t){
+    let jsonArray = Task.findAll({
+        where: {
+            id: t.id
+        }
+    })
+
+    return jsonArray.length
+}
+
+var addTaskToTaskPool = async function (tasks,taskPool){
+
+    tasks.forEach( (t) => {
+        if(notExistTask(t))
+            throw new Error(this.errors.TASK_NOT_EXIST);
+    })
+
+    try {
+        await taskPool.setTasks(tasks)
+    } catch (e){
+        console.log("non riuscito a inserire i task nel taskPool")
+        console.log(e);
+        return null;
+    }
+
+}
+
+
+
 module.exports = {
 
     errors: {
         NO_CREATOR_SPECIFIED: "no creator specified",
         NO_NAME: "task pool have no name",
-        USER_NOT_EXIST: "user not exist"
+        USER_NOT_EXIST: "user not exist",
+        TASK_NOT_EXIST: "task not exist"
     },
 
-    async createTaskPool(taskPool) {
+    async addTaskPool(taskPool,tasks) {
         if (taskPool.name == null) {
             throw new Error(this.errors.NO_NAME);
         }
@@ -33,7 +63,11 @@ module.exports = {
             });
             createdTaskPool.createdBy = taskPool.createdBy;
 
+            //aggiungo i task al taskPool creato
+            await addTaskToTaskPool(tasks,createdTaskPool)
+
             return createdTaskPool;
+
         } catch (e){
             console.log(e);
             return null;
@@ -43,7 +77,7 @@ module.exports = {
 
     async getMyTaskPool(userMe) {
 
-        if(existUser(userMe))
+        if(notExistUser(userMe))
             throw new Error(this.errors.USER_NOT_EXIST);
 
         //query SELECT * WHERE user=userMe
