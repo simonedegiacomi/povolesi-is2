@@ -30,6 +30,8 @@ function setupUnauthenticatedRoutes (app) {
 
 
 
+
+
     app.use('/api/v1', router);
 }
 
@@ -58,6 +60,7 @@ function setupAuthenticatedRoutes (app) {
 
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);
+    router.post('/task-pools', taskPoolController.postTaskPool)
 
     app.use('/api/v1', router);
 }
