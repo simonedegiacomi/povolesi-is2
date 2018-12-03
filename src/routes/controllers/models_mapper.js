@@ -18,13 +18,10 @@ module.exports = {
     },
 
     mapUserPermission(model) {
-        return {
-            id                  : model.id,
-            userId              : model.userId,
-            userGroupId         : model.userGroupId,
-            canManageTasks      : model.canManageTasks,
-            canManageUsers      : model.canManageUsers,
-            canChangePermissions: model.canChangePermissions
-        }
+        return model.toJSON()
+    },
+
+    mapTask(model) {
+        return model.toJSON();
     }
 };

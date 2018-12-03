@@ -23,6 +23,18 @@ describe('Test the user registration', () => {
             });
     });
 
+    test('POST /register without the name should return 400', async () => {
+        const response = await request(app)
+            .post('/api/v1/register')
+            .send({
+                email      : 'mario@blu.it',
+                badgeNumber: 'AAAAAA',
+                password   : 'password'
+            });
+
+        expect(response.status).toBe(400);
+    });
+
     test('Should not register two users with the same email', async () => {
         const existingUser = await UserHelper.insertMario();
 
@@ -73,6 +85,16 @@ describe('Test the user login', () => {
                 expect(response.body.userId).toBeDefined();
                 done();
             });
+    });
+
+    test('POST /login without the email should return 400', async () => {
+        const response = await request(app)
+            .post('/api/v1/login')
+            .send({
+                password: 'password'
+            });
+
+        expect(response.status).toBe(400);
     });
 
     test('It should not login a user with a wrong password', (done) => {

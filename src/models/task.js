@@ -25,7 +25,7 @@ module.exports = (sequelize, DataTypes) => {
             type     : DataTypes.BOOLEAN,
             allowNull: true
         },
-        openMaxLength         : {
+        maxLength         : {
             type        : DataTypes.INTEGER(11),
             allowNull   : true,
             defaultValue: '10000'

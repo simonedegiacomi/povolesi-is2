@@ -1,18 +1,15 @@
 const request = require('supertest');
 
 const app         = require('../../../src/app');
-const TaskHelper  = require('../../helpers/task_helper');
 const UserHelper  = require('../../helpers/user_helper');
 const {Task}      = require('../../../src/models');
-const TaskService = require('../../../src/services/task_service');
-const ModelMapper = require('../../../src/routes/controllers/models_mapper');
 
 describe("Test the creation of a new task", () => {
 
     test('POST /task with valid data should return 200', async () => {
         const user     = await UserHelper.insertNewRandom();
         const response = await request(app)
-            .post('/api/v1/task')
+            .post('/api/v1/tasks')
             .set('X-API-TOKEN', user.authToken)
             .send({
                 question        : 'What is the meaning of life?',
@@ -28,13 +25,12 @@ describe("Test the creation of a new task", () => {
             where: {id: response.body.taskId}
         });
         expect(fromDb).toBeDefined();
-        expect(ModelMapper.mapTask(fromDb), response.body);
     });
 
     test('POST /task without the question should return 400', async () => {
         const user     = await UserHelper.insertNewRandom();
         const response = await request(app)
-            .post('/api/v1/task')
+            .post('/api/v1/tasks')
             .set('X-API-TOKEN', user.authToken)
             .send({
                 type            : 'open',
@@ -48,7 +44,7 @@ describe("Test the creation of a new task", () => {
     test('POST /task without the type should return 400', async () => {
         const user     = await UserHelper.insertNewRandom();
         const response = await request(app)
-            .post('/api/v1/task')
+            .post('/api/v1/tasks')
             .set('X-API-TOKEN', user.authToken)
             .send({
                 question        : 'What is the meaning of life?',
@@ -62,7 +58,7 @@ describe("Test the creation of a new task", () => {
     test('POST /task with multiple choice type but without choices should return 400', async () => {
         const user     = await UserHelper.insertNewRandom();
         const response = await request(app)
-            .post('/api/v1/task')
+            .post('/api/v1/tasks')
             .set('X-API-TOKEN', user.authToken)
             .send({
                 question        : 'What is the meaning of life?',
@@ -76,7 +72,7 @@ describe("Test the creation of a new task", () => {
     test('should crate a new link question', async () => {
         const user     = await UserHelper.insertNewRandom();
         const response = await request(app)
-            .post('/api/v1/task')
+            .post('/api/v1/tasks')
             .set('X-API-TOKEN', user.authToken)
             .send({
                 question        : 'What is the meaning of life?',
@@ -92,13 +88,12 @@ describe("Test the creation of a new task", () => {
             where: {id: response.body.taskId}
         });
         expect(fromDb).toBeDefined();
-        expect(ModelMapper.mapTask(fromDb), response.body);
     });
 
     test('should crate a new open multiple choice question', async () => {
         const user     = await UserHelper.insertNewRandom();
         const response = await request(app)
-            .post('/api/v1/task')
+            .post('/api/v1/tasks')
             .set('X-API-TOKEN', user.authToken)
             .send({
                 question        : 'What is the meaning of life?',
@@ -114,7 +109,6 @@ describe("Test the creation of a new task", () => {
             where: {id: response.body.taskId}
         });
         expect(fromDb).toBeDefined();
-        expect(ModelMapper.mapTask(fromDb), response.body);
     });
 
 });
