@@ -38,6 +38,7 @@ var addTaskToTaskPool = async function (tasks,taskPool){
 }
 
 var existUser = function(u){
+
     let jsonArray = User.findAll({
         where: {
             id: u.id
@@ -47,12 +48,40 @@ var existUser = function(u){
     return jsonArray.length
 }
 
+var notExistTask = function(t){
+    let jsonArray = Task.findAll({
+        where: {
+            id: t.id
+        }
+    })
+
+    return jsonArray.length
+}
+
+var addTaskToTaskPool = async function (tasks,taskPool){
+
+    tasks.forEach( (t) => {
+        if(notExistTask(t))
+            throw new Error(this.errors.TASK_NOT_EXIST);
+    })
+
+    try {
+        await taskPool.setTasks(tasks)
+    } catch (e){
+        console.log("non riuscito a inserire i task nel taskPool")
+        console.log(e);
+        return null;
+    }
+
+}
+
+
+
 module.exports = {
 
     errors: {
         NO_CREATOR_SPECIFIED: "no creator specified",
         NO_NAME: "task pool have no name",
-
         USER_NOT_EXIST: "user not exist",
         TASK_NOT_EXIST: "task not exist"
     },
