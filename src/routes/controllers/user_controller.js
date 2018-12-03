@@ -1,6 +1,7 @@
 const Joi         = require('joi');
 const UserService = require('../../services/user_service');
 const ErrorMapper = require('./error_mapper');
+const ModelMapper = require('./models_mapper');
 
 const userSchema = Joi.object().keys({
     name       : Joi.string().min(3).max(30).required(),
@@ -78,18 +79,8 @@ module.exports = {
     },
 
     getAllUsers: async function (req, res) {
-
         const users = await UserService.getAllUsers();
-
-        let userFilter = []
-
-        users.map(u => userFilter
-            .push({name:u.name,
-                email:u.email,
-                badgeNumber:u.badgeNumber})
-        );
-
-        res.status(200).send(userFilter)
+        res.status(200).send(users.map(u => ModelMapper.mapUser(u)));
     },
 
     updateEmail(req, res) {
@@ -109,14 +100,8 @@ module.exports = {
             }]))
     },
 
-    getCurrentUserData: function (req, res) {
-        const json = req.user;
-        res.status(200).send({
-            id: json.id,
-            name: json.name,
-            badgeNumber: json.badgeNumber,
-            email: json.email
-        });
+    getCurrentUserData (req, res) {
+        res.status(200).send(ModelMapper.mapUser(req.user));
     },
 
     updateUserData: function (req, res) {

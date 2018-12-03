@@ -1,6 +1,7 @@
 module.exports = {
     mapUser(model) {
         return {
+            id         : model.id,
             name       : model.name,
             email      : model.email,
             badgeNumber: model.badgeNumber
