@@ -1,4 +1,7 @@
 module.exports = (sequelize, DataTypes) => {
+
+    const Types = ['multiple', 'open', 'link'];
+
     const Task = sequelize.define('Task', {
         id                    : {
             type         : DataTypes.INTEGER(11),
@@ -11,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         type                  : {
-            type     : DataTypes.ENUM('multiple', 'open', 'link'),
+            type     : DataTypes.ENUM(...Types),
             allowNull: false
         },
         canBePeerReviewd      : {
@@ -30,6 +33,7 @@ module.exports = (sequelize, DataTypes) => {
     }, {
         tableName: 'task'
     });
+    Task.Types = Types;
 
     Task.associate = (models) => {
         Task.belongsToMany(models.TaskPool, {

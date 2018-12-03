@@ -78,17 +78,17 @@ module.exports = {
     },
 
     getAllUsers: async function (req, res) {
-        
+
         const users = await UserService.getAllUsers();
-        
+
         let userFilter = []
-        
+
         users.map(u => userFilter
-                            .push({name:u.name,
-                                    email:u.email,
-                                    badgeNumber:u.badgeNumber})
-                )
-        
+            .push({name:u.name,
+                email:u.email,
+                badgeNumber:u.badgeNumber})
+        );
+
         res.status(200).send(userFilter)
     },
 
@@ -119,7 +119,7 @@ module.exports = {
         });
     },
 
-    async updateUserData: function (req, res) {
+    updateUserData: function (req, res) {
         const {error, value} = Joi.validate(req.body, updateUserDataSchema);
 
         if (error != null) {
@@ -128,9 +128,7 @@ module.exports = {
             });
         }
 
-        const user = await UserService.updateUserData(req.user, value.newName, value.newBadgeNumber);
-
-        req.status(200).send(ModelMapper.mapUser(user))
+        return UserService.updateUserData(req.user, value.newName, value.newBadgeNumber)
             .then(() => res.status(204).send());
     }
 };

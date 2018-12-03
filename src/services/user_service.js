@@ -1,134 +1,91 @@
-const Joi         = require('joi');
-const UserService = require('../../services/user_service');
-const ErrorMapper = require('./error_mapper');
+const bcrypt       = require('bcrypt');
+const randomstring = require("randomstring");
 
-const userSchema = Joi.object().keys({
-    name       : Joi.string().min(3).max(30).required(),
-    email      : Joi.string().email().required(),
-    badgeNumber: Joi.string().min(1).max(45).required(),
-    password   : Joi.string().required()
-});
+const {sequelize, User} = require('../models/index');
 
-const loginSchema = Joi.object().keys({
-    email   : Joi.string().email().required(),
-    password: Joi.string().required()
-});
-
-const updateEmailSchema = Joi.object().keys({
-    newEmail: Joi.string().email()
-});
-
-const updateUserDataSchema = Joi.object().keys({
-    newName       : Joi.string().min(3).max(30).required(),
-    newBadgeNumber: Joi.string().min(1).max(45).required()
-});
+const BCRYPT_SALT_RAUNDS = 10;
 
 module.exports = {
 
-    async register(req, res) {
-        const {error, value} = Joi.validate(req.body, userSchema);
+    errors: {
+        EMAIL_ALREADY_IN_USE       : "email already in use",
+        BADGE_NUMBER_ALREADY_IN_USE: "badge number already in use",
+        PASSWORD_TOO_SHORT         : "password too short",
 
-        if (error != null) {
-            return res.status(400).send({
-                errorMessage: error.details[0].message
-            });
+        INVALID_CREDENTIALS: "invalid credentials"
+    },
+
+    constants: {
+        MIN_PASSWORD_LENGTH: 6
+    },
+
+    async registerUser(user) {
+        if (user.password.length < this.constants.MIN_PASSWORD_LENGTH) {
+            throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
         }
+
+        user.password  = await bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS);
+        user.authToken = this._generateToken();
 
         try {
-            const user = await UserService.registerUser(value);
-            res.status(201).send({
-                userId: user.id,
-                token : user.authToken
-            });
-        } catch (e) {
-            ErrorMapper.map(res, e, [{
-                error : UserService.errors.EMAIL_ALREADY_IN_USE,
-                status: 409
-            }, {
-                error : UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
-                status: 409
-            }, {
-                error : UserService.errors.PASSWORD_TOO_SHORT,
-                status: 400
-            }]);
+            return await User.create(user);
+        } catch (ex) {
+            if (ex instanceof sequelize.UniqueConstraintError) {
+                const wrongField = ex.errors[0].path;
+                if (wrongField === 'badgeNumber') {
+                    throw new Error(this.errors.BADGE_NUMBER_ALREADY_IN_USE);
+                } else if (wrongField === 'email') {
+                    throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
+                }
+            }
+
+            throw ex;
         }
     },
 
-    async login(req, res) {
-        const {error, value} = Joi.validate(req.body, loginSchema);
+    async loginUser(email, password) {
+        const user = await User.findOne({
+            where: {
+                email
+            }
+        });
 
-        if (error != null) {
-            return res.status(400).send({
-                errorMessage: error.details[0].message
-            });
+        if (user == null) {
+            throw new Error(this.errors.INVALID_CREDENTIALS);
         }
 
-        try {
-            const user = await UserService.loginUser(value.email, value.password);
-            res.status(200).send({
-                userId: user.id,
-                token : user.authToken
-            });
-        } catch (e) {
-            ErrorMapper.map(res, e, [{
-                error : UserService.errors.INVALID_CREDENTIALS,
-                status: 400
-            }]);
-        }
-    },
-
-    getAllUsers: async function (req, res) {
-
-        const users = await UserService.getAllUsers();
-
-        let userFilter = []
-
-        users.map(u => userFilter
-            .push({name:u.name,
-                email:u.email,
-                badgeNumber:u.badgeNumber})
-        )
-
-        res.status(200).send(userFilter)
-    },
-
-    updateEmail(req, res) {
-        const {error, value} = Joi.validate(req.body, updateEmailSchema);
-
-        if (error != null) {
-            return res.status(400).send({
-                errorMessage: error.details[0].message
-            });
+        const equals = await bcrypt.compare(password, user.password);
+        if (!equals) {
+            throw new Error(this.errors.INVALID_CREDENTIALS);
         }
 
-        return UserService.updateUserEmail(req.user, value.newEmail)
-            .then(() => res.status(200).send())
-            .catch(error => ErrorMapper.map(res, error, [{
-                error : UserService.errors.EMAIL_ALREADY_IN_USE,
-                status: 409
-            }]))
+        await user.update({
+            authToken: this._generateToken()
+        });
+        return user;
     },
 
-    getCurrentUserData: function (req, res) {
-        const json = req.user;
-        res.status(200).send({
-            id: json.id,
-            name: json.name,
-            badgeNumber: json.badgeNumber,
-            email: json.email
+    _generateToken() {
+        return randomstring.generate({
+            length: 40
         });
     },
 
-    updateUserData: function (req, res) {
-        const {error, value} = Joi.validate(req.body, updateUserDataSchema);
+    getAllUsers() {
+        return User.findAll()
+    },
 
-        if (error != null) {
-            return res.status(400).send({
-                errorMessage: error.details[0].message
-            });
-        }
+    updateUserEmail (user, newEmail) {
+        return user.update({
+            email: newEmail
+        });
+    },
 
-        return UserService.updateUserData(req.user, value.newName, value.newBadgeNumber)
-            .then(() => res.status(204).send());
+    updateUserData (user, newName, newBadgeNumber) {
+        return user.update({
+            name: newName,
+            badgeNumber: newBadgeNumber
+        })
     }
+
 };
