@@ -1,92 +1,16 @@
-const {TaskPool,User,Task} = require('../models/index');
-
-var notExistUser = function(u){
-    let jsonArray = User.findAll({
-        where: {
-            id: u.id
-        }
-    })
-
-    return jsonArray.length
-}
-
-var notExistTask = function(t){
-    let jsonArray = Task.findAll({
-        where: {
-            id: t.id
-        }
-    })
-
-    return jsonArray.length
-}
-
-var addTaskToTaskPool = async function (tasks,taskPool){
-
-    tasks.forEach( (t) => {
-        if(notExistTask(t))
-            throw new Error(this.errors.TASK_NOT_EXIST);
-    })
-
-    try {
-        await taskPool.setTasks(tasks)
-    } catch (e){
-        console.log("non riuscito a inserire i task nel taskPool")
-        console.log(e);
-        return null;
-    }
-
-}
-
-var existUser = function(u){
-
-    let jsonArray = User.findAll({
-        where: {
-            id: u.id
-        }
-    })
-
-    return jsonArray.length
-}
-
-var notExistTask = function(t){
-    let jsonArray = Task.findAll({
-        where: {
-            id: t.id
-        }
-    })
-
-    return jsonArray.length
-}
-
-var addTaskToTaskPool = async function (tasks,taskPool){
-
-    tasks.forEach( (t) => {
-        if(notExistTask(t))
-            throw new Error(this.errors.TASK_NOT_EXIST);
-    })
-
-    try {
-        await taskPool.setTasks(tasks)
-    } catch (e){
-        console.log("non riuscito a inserire i task nel taskPool")
-        console.log(e);
-        return null;
-    }
-
-}
-
+const {TaskPool, User, Task} = require('../models/index');
 
 
 module.exports = {
 
     errors: {
         NO_CREATOR_SPECIFIED: "no creator specified",
-        NO_NAME: "task pool have no name",
-        USER_NOT_EXIST: "user not exist",
-        TASK_NOT_EXIST: "task not exist"
+        NO_NAME             : "task pool have no name",
+        USER_NOT_EXIST      : "user not exist",
+        TASK_NOT_EXIST      : "task not exist"
     },
 
-    async addTaskPool(taskPool,tasks) {
+    async createTaskPool(taskPool, tasks = []) {
 
         if (taskPool.name == null) {
             throw new Error(this.errors.NO_NAME);
@@ -103,28 +27,28 @@ module.exports = {
             createdTaskPool.createdBy = taskPool.createdBy;
 
             //aggiungo i task al taskPool creato
-            await addTaskToTaskPool(tasks,createdTaskPool)
+            await createdTaskPool.setTasks(tasks);
 
             return createdTaskPool;
 
-        } catch (e){
+        } catch (e) {
             console.log(e);
-            return null;
+            throw e;
         }
     },
 
 
     async getMyTaskPool(userMe) {
-
-        if(notExistUser(userMe))
+        if(!(userMe instanceof User)){ // TODO: Check in the db
             throw new Error(this.errors.USER_NOT_EXIST);
+        }
 
         //query SELECT * WHERE user=userMe
         const jsonArray = await TaskPool.findAll({
-           where: {
+            where: {
                 createdById: userMe.id
-           }
-        })
+            }
+        });
 
         return jsonArray
     },

@@ -1,10 +1,11 @@
 const TaskPoolService = require('../../src/services/task_pool_service');
+const TaskHelper      = require('../helpers/task_helper');
 const UserHelper      = require('../helpers/user_helper');
 
-function insertArrayTaskPool(taskPools){
-    taskPools.forEach( async (t) =>
-        await TaskPoolService.createTaskPool(t) )
-
+async function insertArrayTaskPool(taskPools) {
+    taskPools.forEach(async (t) => {
+        await TaskPoolService.createTaskPool(t);
+    });
 }
 
 
@@ -23,6 +24,20 @@ describe('creation of taskPool', () => {
         expect(createdPool.createdBy.toJSON()).toEqual(creator.toJSON());
     });
 
+    test('insert taskPool with a task', async () => {
+        const creator         = await UserHelper.insertMario();
+        const taskPoolExample = {
+            name     : 'esempio',
+            createdBy: creator
+        };
+        const task            = await TaskHelper.createOpenQuestionTask();
+
+        const createdPool = await TaskPoolService.createTaskPool(taskPoolExample, [task]);
+
+        expect(createdPool.name).toEqual(taskPoolExample.name);
+        expect(createdPool.createdBy.toJSON()).toEqual(creator.toJSON());
+    });
+
     test('insert taskPool without specifying the user', async () => {
         const taskPool = {
             name: 'esempio',
@@ -36,7 +51,7 @@ describe('creation of taskPool', () => {
     });
 
     test('insert taskPool without specifying the name', async () => {
-        const noTaskPool = {}
+        const noTaskPool = {};
 
         try {
             await TaskPoolService.createTaskPool(noTaskPool);
@@ -50,45 +65,38 @@ describe('creation of taskPool', () => {
 
 describe('get my taskPool', () => {
     test('get my taskPools', async () => {
-        const mario = await UserHelper.insertMario();
+        const mario   = await UserHelper.insertMario();
         const giorgio = await UserHelper.insertGiorgio();
 
         const taskPool1 = {
             name     : 'esempio1',
             createdBy: giorgio
-        }
-
+        };
         const taskPool2 = {
             name     : 'esempio2',
             createdBy: giorgio
-        }
-
+        };
         const taskPool3 = {
             name     : 'esempio3',
             createdBy: mario
-        }
+        };
 
-        var array = [taskPool1, taskPool2, taskPool3]
-        insertArrayTaskPool(array)
+        var array = [taskPool1, taskPool2, taskPool3];
+        await insertArrayTaskPool(array);
 
-        const result = await TaskPoolService.getMyTaskPool(giorgio)
+        const result = await TaskPoolService.getMyTaskPool(giorgio);
 
         // control for any element of array that the creator is giorgio
-        result.forEach( (t) =>
-            expect(t.createdById).toEqual(giorgio.id) )
+        result.forEach((t) => expect(t.createdById).toEqual(giorgio.id));
     });
 
-    test('get taskPools of user that no exist', () => {
-        const giorgio = {
-            name       : 'Giorgio Segalla',
-            password   : '112hhiufsk1',
-            email      : 'giorgio@segalla.it',
-            badgeNumber: '187633'
-        }
+    test('get taskPools of user that no exist', async () => {
+        const giorgio = {name: 'giorgio'};
 
         try {
-            TaskPoolService.getMyTaskPool(giorgio)
-        } catch(e){
+            await TaskPoolService.getMyTaskPool(giorgio);
+            expect(true).toBe(false);
+        } catch (e) {
             expect(e.message).toBe(TaskPoolService.errors.USER_NOT_EXIST)
         }
     });
@@ -96,10 +104,7 @@ describe('get my taskPool', () => {
     test('user with no taskPool is an array empty', async () => {
         const giorgio = await UserHelper.insertGiorgio();
 
-        const jsonArray = await TaskPoolService.getMyTaskPool(giorgio)
-        expect(jsonArray.length).toEqual(0)
-
+        const jsonArray = await TaskPoolService.getMyTaskPool(giorgio);
+        expect(jsonArray.length).toEqual(0);
     });
-
-
 });

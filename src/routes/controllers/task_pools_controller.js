@@ -15,7 +15,7 @@ module.exports = {
         const tasks = req.body.tasks
 
         //creo il task Pool
-        let taskPoolCreated = await TaskPoolService.addTaskPool({
+        let taskPoolCreated = await TaskPoolService.createTaskPool({
             name: value.name,
             createdBy: userMe
         },tasks)
