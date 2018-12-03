@@ -4,7 +4,7 @@ const UserGroupsHelper       = require('../helpers/user_groups_helper');
 const UserPermissionsService = require('../../src/services/user_permissions_service.js');
 const {UserPermission}       = require('../../src/models');
 
-describe("Test the creation of a user permission", () => {
+describe("Test the creation of a user permission (add user to a group)", () => {
 
     test("Should return the user permission instance just created", async () => {
         const permission = await UserPermissionHelper.insertUserPermission();
@@ -100,3 +100,81 @@ describe("Test the creation of a user permission", () => {
     });
 
 });
+
+describe("Test the deletion of a user permission (remove a user fro a group)", () => {
+
+    test("Should remove a user from a group", async () => {
+        const permission = await UserPermissionHelper.insertUserPermission();
+        const group      = await permission.getUserGroup();
+        const creator    = await group.getCreatedBy();
+
+        await UserPermissionsService.deletePermissionById(creator, permission.id);
+
+        const fromDb = await UserPermission.findOne({
+            where: {id: permission.id}
+        });
+        expect(fromDb).toBeNull();
+    });
+
+    test("Should throw an exception when someone outside a group tries remove a member", async () => {
+        const permission = await UserPermissionHelper.insertUserPermission();
+        const aUser      = await UserHelper.insertNewRandom();
+
+        try {
+            await UserPermissionsService.deletePermissionById(aUser, permission.id);
+            expect(false).toBe(true);
+        } catch (e) {
+            expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
+        }
+    });
+
+    test("Should throw an exception when someone outside a group tries remove a member", async () => {
+        const permission = await UserPermissionHelper.insertUserPermission();
+        const aUser      = await UserHelper.insertNewRandom();
+
+        try {
+            await UserPermissionsService.deletePermissionById(aUser, permission.id);
+            expect(false).toBe(true);
+        } catch (e) {
+            expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
+        }
+    });
+
+    test("Should throw an exception when a member without the 'manageUsers' permissio  tries remove a member", async () => {
+        const permission = await UserPermissionHelper.insertUserPermission();
+        const group      = await permission.getUserGroup();
+        const creator    = await group.getCreatedBy();
+
+        const memberWithoutPermission = await UserHelper.insertNewRandom();
+        await UserPermissionsService.createPermission(creator, {
+            userGroupId         : group.id,
+            userId              : memberWithoutPermission.id,
+            canManageTasks      : false,
+            canManageUsers      : false,
+            canChangePermissions: false
+        });
+
+        try {
+            await UserPermissionsService.deletePermissionById(memberWithoutPermission, permission.id);
+            expect(false).toBe(true);
+        } catch (e) {
+            expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
+        }
+    });
+
+    test("Should throw an exception when someone tries to remove a non-member from a group", async () => {
+        const permission = await UserGroupsHelper.insertUserPermission();
+        const group      = await permission.getUserGroup();
+        const creator    = await group.getCreatedBy();
+
+        try {
+            await UserPermissionsService.deletePermissionById(creator, 999);
+            expect(false).toBe(true);
+        } catch (e) {
+            expect(e.message).toBe(UserPermissionsService.errors.USER_PERMISSION_NOT_FOUND);
+        }
+    });
+
+});
+
+
