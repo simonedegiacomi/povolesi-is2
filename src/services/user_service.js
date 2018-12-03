@@ -1,91 +1,134 @@
-const bcrypt       = require('bcrypt');
-const randomstring = require("randomstring");
+const Joi         = require('joi');
+const UserService = require('../../services/user_service');
+const ErrorMapper = require('./error_mapper');
 
-const {sequelize, User} = require('../models/index');
+const userSchema = Joi.object().keys({
+    name       : Joi.string().min(3).max(30).required(),
+    email      : Joi.string().email().required(),
+    badgeNumber: Joi.string().min(1).max(45).required(),
+    password   : Joi.string().required()
+});
 
-const BCRYPT_SALT_RAUNDS = 10;
+const loginSchema = Joi.object().keys({
+    email   : Joi.string().email().required(),
+    password: Joi.string().required()
+});
+
+const updateEmailSchema = Joi.object().keys({
+    newEmail: Joi.string().email()
+});
+
+const updateUserDataSchema = Joi.object().keys({
+    newName       : Joi.string().min(3).max(30).required(),
+    newBadgeNumber: Joi.string().min(1).max(45).required()
+});
 
 module.exports = {
 
-    errors: {
-        EMAIL_ALREADY_IN_USE       : "email already in use",
-        BADGE_NUMBER_ALREADY_IN_USE: "badge number already in use",
-        PASSWORD_TOO_SHORT         : "password too short",
+    async register(req, res) {
+        const {error, value} = Joi.validate(req.body, userSchema);
 
-        INVALID_CREDENTIALS: "invalid credentials"
-    },
-
-    constants: {
-        MIN_PASSWORD_LENGTH: 6
-    },
-
-    async registerUser(user) {
-        if (user.password.length < this.constants.MIN_PASSWORD_LENGTH) {
-            throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
+        if (error != null) {
+            return res.status(400).send({
+                errorMessage: error.details[0].message
+            });
         }
-
-        user.password  = await bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS);
-        user.authToken = this._generateToken();
 
         try {
-            return await User.create(user);
-        } catch (ex) {
-            if (ex instanceof sequelize.UniqueConstraintError) {
-                const wrongField = ex.errors[0].path;
-                if (wrongField === 'badgeNumber') {
-                    throw new Error(this.errors.BADGE_NUMBER_ALREADY_IN_USE);
-                } else if (wrongField === 'email') {
-                    throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
-                }
-            }
-
-            throw ex;
+            const user = await UserService.registerUser(value);
+            res.status(201).send({
+                userId: user.id,
+                token : user.authToken
+            });
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserService.errors.EMAIL_ALREADY_IN_USE,
+                status: 409
+            }, {
+                error : UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
+                status: 409
+            }, {
+                error : UserService.errors.PASSWORD_TOO_SHORT,
+                status: 400
+            }]);
         }
     },
 
-    async loginUser(email, password) {
-        const user = await User.findOne({
-            where: {
-                email
-            }
-        });
+    async login(req, res) {
+        const {error, value} = Joi.validate(req.body, loginSchema);
 
-        if (user == null) {
-            throw new Error(this.errors.INVALID_CREDENTIALS);
+        if (error != null) {
+            return res.status(400).send({
+                errorMessage: error.details[0].message
+            });
         }
 
-        const equals = await bcrypt.compare(password, user.password);
-        if (!equals) {
-            throw new Error(this.errors.INVALID_CREDENTIALS);
+        try {
+            const user = await UserService.loginUser(value.email, value.password);
+            res.status(200).send({
+                userId: user.id,
+                token : user.authToken
+            });
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserService.errors.INVALID_CREDENTIALS,
+                status: 400
+            }]);
+        }
+    },
+
+    getAllUsers: async function (req, res) {
+
+        const users = await UserService.getAllUsers();
+
+        let userFilter = []
+
+        users.map(u => userFilter
+            .push({name:u.name,
+                email:u.email,
+                badgeNumber:u.badgeNumber})
+        )
+
+        res.status(200).send(userFilter)
+    },
+
+    updateEmail(req, res) {
+        const {error, value} = Joi.validate(req.body, updateEmailSchema);
+
+        if (error != null) {
+            return res.status(400).send({
+                errorMessage: error.details[0].message
+            });
         }
 
-        await user.update({
-            authToken: this._generateToken()
-        });
-        return user;
+        return UserService.updateUserEmail(req.user, value.newEmail)
+            .then(() => res.status(200).send())
+            .catch(error => ErrorMapper.map(res, error, [{
+                error : UserService.errors.EMAIL_ALREADY_IN_USE,
+                status: 409
+            }]))
     },
 
-    _generateToken() {
-        return randomstring.generate({
-            length: 40
-        });
-    },
-
-    getAllUsers() {
-        return User.findAll()
-    },
-
-    updateUserEmail (user, newEmail) {
-        return user.update({
-            email: newEmail
+    getCurrentUserData: function (req, res) {
+        const json = req.user;
+        res.status(200).send({
+            id: json.id,
+            name: json.name,
+            badgeNumber: json.badgeNumber,
+            email: json.email
         });
     },
 
-    updateUserData (user, newName, newBadgeNumber) {
-        return user.update({
-            name: newName,
-            badgeNumber: newBadgeNumber
-        })
+    updateUserData: function (req, res) {
+        const {error, value} = Joi.validate(req.body, updateUserDataSchema);
+
+        if (error != null) {
+            return res.status(400).send({
+                errorMessage: error.details[0].message
+            });
+        }
+
+        return UserService.updateUserData(req.user, value.newName, value.newBadgeNumber)
+            .then(() => res.status(204).send());
     }
-
 };

@@ -119,7 +119,7 @@ module.exports = {
         });
     },
 
-    updateUserData: function (req, res) {
+    async updateUserData: function (req, res) {
         const {error, value} = Joi.validate(req.body, updateUserDataSchema);
 
         if (error != null) {
@@ -128,7 +128,9 @@ module.exports = {
             });
         }
 
-        return UserService.updateUserData(req.user, value.newName, value.newBadgeNumber)
+        const user = await UserService.updateUserData(req.user, value.newName, value.newBadgeNumber);
+
+        req.status(200).send(ModelMapper.mapUser(user))
             .then(() => res.status(204).send());
     }
 };
