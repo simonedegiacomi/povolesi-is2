@@ -37,18 +37,28 @@ var addTaskToTaskPool = async function (tasks,taskPool){
 
 }
 
+var existUser = function(u){
+    let jsonArray = User.findAll({
+        where: {
+            id: u.id
+        }
+    })
 
+    return jsonArray.length
+}
 
 module.exports = {
 
     errors: {
         NO_CREATOR_SPECIFIED: "no creator specified",
         NO_NAME: "task pool have no name",
+
         USER_NOT_EXIST: "user not exist",
         TASK_NOT_EXIST: "task not exist"
     },
 
     async addTaskPool(taskPool,tasks) {
+
         if (taskPool.name == null) {
             throw new Error(this.errors.NO_NAME);
         }
@@ -102,5 +112,7 @@ module.exports = {
         return jsonResult
 
     },*/
+
+    async getTaskPool(userMe)
 
 };
