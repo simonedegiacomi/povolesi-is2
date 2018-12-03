@@ -128,19 +128,8 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
         }
     });
 
-    test("Should throw an exception when someone outside a group tries remove a member", async () => {
-        const permission = await UserPermissionHelper.insertUserPermission();
-        const aUser      = await UserHelper.insertNewRandom();
 
-        try {
-            await UserPermissionsService.deletePermissionById(aUser, permission.id);
-            expect(false).toBe(true);
-        } catch (e) {
-            expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
-        }
-    });
-
-    test("Should throw an exception when a member without the 'manageUsers' permissio  tries remove a member", async () => {
+    test("Should throw an exception when a member without the 'manageUsers' permission tries remove a member", async () => {
         const permission = await UserPermissionHelper.insertUserPermission();
         const group      = await permission.getUserGroup();
         const creator    = await group.getCreatedBy();
