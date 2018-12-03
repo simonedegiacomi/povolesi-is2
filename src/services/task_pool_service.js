@@ -1,4 +1,4 @@
-const {TaskPool,User} = require('../models/index');
+const {TaskPool,User,Task} = require('../models/index');
 
 var existUser = function(u){
     let jsonArray = User.findAll({
@@ -54,8 +54,19 @@ module.exports = {
         })
 
         return jsonArray
-    }
+    },
 
-    async getTaskPool(userMe)
+    /*
+    async getTasksOf(taskPool){
+
+        const jsonResult = Task.findAll({
+            where: {
+                TaskPool_Task: taskPool.id
+            }
+        })
+
+        return jsonResult
+
+    },*/
 
 };
