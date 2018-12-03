@@ -34,10 +34,22 @@ describe('creation of taskPool', () => {
             expect(e.message).toBe(TaskPoolService.errors.NO_CREATOR_SPECIFIED);
         }
     });
+
+    test('insert taskPool without specifying the name', async () => {
+        const noTaskPool = {}
+
+        try {
+            await TaskPoolService.createTaskPool(noTaskPool);
+        } catch (e) {
+            expect(e.message).toBe(TaskPoolService.errors.NO_NAME);
+        }
+    });
+
+
 });
 
-describe('get task of my taskPool', () => {
-    test('insert taskPool', async () => {
+describe('get my taskPool', () => {
+    test('get my taskPools', async () => {
         const mario = await UserHelper.insertMario();
         const giorgio = await UserHelper.insertGiorgio();
 
@@ -65,4 +77,29 @@ describe('get task of my taskPool', () => {
         result.forEach( (t) =>
             expect(t.createdById).toEqual(giorgio.id) )
     });
+
+    test('get taskPools of user that no exist', () => {
+        const giorgio = {
+            name       : 'Giorgio Segalla',
+            password   : '112hhiufsk1',
+            email      : 'giorgio@segalla.it',
+            badgeNumber: '187633'
+        }
+
+        try {
+            TaskPoolService.getMyTaskPool(giorgio)
+        } catch(e){
+            expect(e.message).toBe(TaskPoolService.errors.USER_NOT_EXIST)
+        }
+    });
+
+    test('user with no taskPool is an array empty', async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+
+        const jsonArray = await TaskPoolService.getMyTaskPool(giorgio)
+        expect(jsonArray.length).toEqual(0)
+
+    });
+
+
 });
