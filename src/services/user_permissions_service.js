@@ -3,14 +3,15 @@ const {sequelize, User, UserPermission, UserGroup} = require('../models');
 module.exports = {
 
     errors: {
-        UNAUTHORIZED       : 'user is not authorized',
-        USER_ALREADY_MEMBER: 'the user that you want to add is already a member of the specified group',
-        WRONG_ARGUMENTS    : 'wrong argument number or type',
-        GROUP_NOT_FOUND    : 'group not found'
+        UNAUTHORIZED             : 'user is not authorized',
+        USER_ALREADY_MEMBER      : 'the user that you want to add is already a member of the specified group',
+        WRONG_ARGUMENTS          : 'wrong argument number or type',
+        GROUP_NOT_FOUND          : 'group not found',
+        USER_PERMISSION_NOT_FOUND: 'user permission not found'
     },
 
-    async createPermission(inviter, permission) {
-        if (!inviter instanceof User) {
+    async createPermission(actionPerformer, permission) {
+        if (!actionPerformer instanceof User) {
             throw new Error(this.errors.WRONG_ARGUMENTS);
         }
         if (!permission || !permission.userId || !permission.userGroupId) {
@@ -24,7 +25,7 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND);
         }
 
-        const hasPermission = await this._canUserManageGroupUsers(inviter, group);
+        const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
         if (!hasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
@@ -74,5 +75,34 @@ module.exports = {
         }
 
         return false;
+    },
+
+    async deletePermissionById(actionPerformer, id) {
+        if (!actionPerformer instanceof User || !id) {
+            throw new Error(this.errors.WRONG_ARGUMENTS);
+        }
+
+        const permission = await this.getPermissionById(actionPerformer, id);
+        await permission.destroy();
+
+    },
+
+    async getPermissionById(actionPerformer, id) {
+        const permission = await UserPermission.findOne({
+            where: {id}
+        });
+
+        if (permission == null) {
+            throw new Error(this.errors.USER_PERMISSION_NOT_FOUND);
+        }
+
+        const group = await permission.getUserGroup();
+
+        const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        if (!performerHasPermission) {
+            throw new Error(this.errors.UNAUTHORIZED);
+        }
+
+        return permission;
     }
 };

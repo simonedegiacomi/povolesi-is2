@@ -163,7 +163,7 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
     });
 
     test("Should throw an exception when someone tries to remove a non-member from a group", async () => {
-        const permission = await UserGroupsHelper.insertUserPermission();
+        const permission = await UserPermissionHelper.insertUserPermission();
         const group      = await permission.getUserGroup();
         const creator    = await group.getCreatedBy();
 
