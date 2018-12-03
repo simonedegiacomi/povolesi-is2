@@ -5,6 +5,7 @@ const UserHelper             = require('../../helpers/user_helper');
 const UserGroupHelper        = require('../../helpers/user_groups_helper');
 const UserPermissionHelper   = require('../../helpers/user_permission_helper');
 const UserPermissionsService = require('../../../src/services/user_permissions_service');
+const {UserPermission}       = require('../../../src/models');
 
 describe("Test the creation of a user permission", () => {
 

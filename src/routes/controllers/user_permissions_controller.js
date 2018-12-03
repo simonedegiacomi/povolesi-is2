@@ -36,6 +36,24 @@ module.exports = {
                 status: 403
             }]);
         }
+    },
+
+
+    async deletePermissionById (req, res) {
+        const id = req.params.id;
+
+        try {
+            await UserPermissionsService.deletePermissionById(req.user, id);
+            res.status(200).send();
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserPermissionsService.errors.USER_PERMISSION_NOT_FOUND,
+                status: 404
+            }, {
+                error : UserPermissionsService.errors.UNAUTHORIZED,
+                status: 403
+            }]);
+        }
     }
 
 };

@@ -50,6 +50,7 @@ function setupAuthenticatedRoutes (app) {
 
     // /user-permissions
     router.post('/user-permissions', userPermissionsController.createPermission);
+    router.delete('/user-permissions/:id', userPermissionsController.deletePermissionById);
 
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);
