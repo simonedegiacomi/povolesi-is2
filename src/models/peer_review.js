@@ -1,26 +1,10 @@
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('PeerReview', {
+    const PeerReview = sequelize.define('PeerReview', {
         id          : {
             type         : DataTypes.INTEGER(11),
             allowNull    : false,
             primaryKey   : true,
             autoIncrement: true
-        },
-        taskAnswerId: {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'answer',
-                key  : 'id'
-            }
-        },
-        userId      : {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'user',
-                key  : 'id'
-            }
         },
         mark        : {
             type     : DataTypes.INTEGER(4),
@@ -33,4 +17,24 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         tableName: 'peer_review'
     });
+
+    PeerReview.associate = (models) => {
+        PeerReview.belongsTo(models.User, {
+            as: 'user',
+            foreignKey: {
+                name: 'userId',
+                allowNull: false
+            }
+        });
+
+        PeerReview.belongsTo(models.Answer, {
+            as: 'answer',
+            foreignKey: {
+                name: 'answerId',
+                allowNull: false
+            }
+        });
+    };
+
+    return PeerReview;
 };

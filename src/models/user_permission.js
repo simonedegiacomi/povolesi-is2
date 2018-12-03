@@ -33,6 +33,7 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false
             }
         });
+
         UserPermission.belongsTo(models.UserGroup, {
             foreignKey: {
                 unique: 'compositeIndex',

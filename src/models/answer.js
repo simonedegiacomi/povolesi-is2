@@ -1,35 +1,11 @@
 
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('Answer', {
+    const Answer = sequelize.define('Answer', {
         id            : {
             type         : DataTypes.INTEGER(11),
             allowNull    : false,
             primaryKey   : true,
             autoIncrement: true
-        },
-        userId        : {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'user',
-                key  : 'id'
-            }
-        },
-        taskId        : {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'task',
-                key  : 'id'
-            }
-        },
-        assignmentId  : {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'assignment',
-                key  : 'id'
-            }
         },
         submittedOn   : {
             type        : DataTypes.DATE,
@@ -51,4 +27,32 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         tableName: 'answer'
     });
+
+    Answer.associate = (models) => {
+        Answer.belongsTo(models.User, {
+            as        : 'user',
+            foreignKey: {
+                name     : 'userId',
+                allowNull: false
+            }
+        });
+
+        Answer.belongsTo(models.Task, {
+            as: 'task',
+            foreignKey: {
+                name: 'taskId',
+                allowNull: false
+            }
+        });
+
+        Answer.belongsTo(models.Assignment, {
+            as: 'assignment',
+            foreignKey: {
+                name: 'assignmentId',
+                allowNull: false
+            }
+        });
+    };
+
+    return Answer;
 };

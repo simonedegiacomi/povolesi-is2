@@ -1,5 +1,5 @@
-module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('Task', {
+module.exports = (sequelize, DataTypes) => {
+    const Task = sequelize.define('Task', {
         id                    : {
             type         : DataTypes.INTEGER(11),
             allowNull    : false,
@@ -30,4 +30,12 @@ module.exports = function (sequelize, DataTypes) {
     }, {
         tableName: 'task'
     });
+
+    Task.associate = (models) => {
+        Task.belongsToMany(models.TaskPool, {
+            through: 'TaskPool_Task'
+        });
+    };
+
+    return Task;
 };

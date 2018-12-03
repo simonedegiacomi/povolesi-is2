@@ -1,6 +1,5 @@
-
 module.exports = function (sequelize, DataTypes) {
-    return sequelize.define('Assignment', {
+    const Assignment = sequelize.define('Assignment', {
         id                 : {
             type         : DataTypes.INTEGER(11),
             allowNull    : false,
@@ -25,24 +24,28 @@ module.exports = function (sequelize, DataTypes) {
             type        : DataTypes.DATE,
             allowNull   : false,
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
-        },
-        createdBy          : {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'user',
-                key  : 'id'
-            }
-        },
-        assignedGroupId    : {
-            type      : DataTypes.INTEGER(11),
-            allowNull : false,
-            references: {
-                model: 'user_group',
-                key  : 'id'
-            }
         }
     }, {
         tableName: 'assignment'
     });
+
+    Assignment.associate = (models) => {
+        Assignment.belongsTo(models.User, {
+            as: 'createdBy',
+            foreignKey: {
+                name: 'createdById',
+                allowNull: false
+            }
+        });
+
+        Assignment.belongsTo(models.UserGroup, {
+            as: 'assignedUserGroup',
+            foreignKey: {
+                name: 'assignedUserGroupId',
+                allowNull: false
+            }
+        });
+    };
+
+    return Assignment;
 };
