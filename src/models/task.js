@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
             type     : DataTypes.ENUM(...Types),
             allowNull: false
         },
-        canBePeerReviewd      : {
+        canBePeerReviewed      : {
             type     : DataTypes.BOOLEAN,
             allowNull: false
         },

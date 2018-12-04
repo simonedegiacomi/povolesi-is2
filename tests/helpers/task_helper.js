@@ -7,7 +7,7 @@ module.exports = {
             question        : 'What is the meaning of life?',
             type            : 'open',
             maxLength       : 255,
-            canBePeerReviewd: true
+            canBePeerReviewed: true
         });
     },
 
@@ -16,7 +16,7 @@ module.exports = {
             question        : 'What is the meaning of life?',
             type            : 'link',
             maxLength       : 255,
-            canBePeerReviewd: true
+            canBePeerReviewed: true
         });
     },
 
@@ -25,7 +25,7 @@ module.exports = {
             question        : 'What is the meaning of life?',
             type            : 'multiple',
             maxLength       : 255,
-            canBePeerReviewd: true,
+            canBePeerReviewed: true,
             choices         : ["Happiness", "Balance", 42]
         });
     }

@@ -6,7 +6,7 @@ const ModelMapper = require('./models_mapper');
 const taskSchema = Joi.object().keys({
     question              : Joi.string().required(),
     type                  : Joi.string().required(),
-    canBePeerReviewd      : Joi.boolean().required(),
+    canBePeerReviewed      : Joi.boolean().required(),
     maxLength             : Joi.number().integer().min(0),
     multipleChoicesAllowed: Joi.boolean(),
     choices               : Joi.array().min(2)

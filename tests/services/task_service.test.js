@@ -18,7 +18,7 @@ describe("Test the creation of a new task", () => {
             await TaskService.createTask({
                 type            : 'open',
                 maxLength       : 255,
-                canBePeerReviewd: true
+                canBePeerReviewed: true
             });
             expect(true).toBe(false);
         } catch (e) {
@@ -31,7 +31,7 @@ describe("Test the creation of a new task", () => {
             await TaskService.createTask({
                 name            : 'a',
                 maxLength       : 255,
-                canBePeerReviewd: true
+                canBePeerReviewed: true
             });
             expect(true).toBe(false);
         } catch (e) {
@@ -44,7 +44,7 @@ describe("Test the creation of a new task", () => {
             await TaskService.createTask({
                 type            : 'multiple',
                 name            : 'a',
-                canBePeerReviewd: true
+                canBePeerReviewed: true
             });
             expect(true).toBe(false);
         } catch (e) {

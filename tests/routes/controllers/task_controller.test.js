@@ -42,7 +42,7 @@ describe("Test the creation of a new task", () => {
             question: 'What is the meaning of life?',
             type: 'open',
             maxLength: 255,
-            canBePeerReviewd: true
+            canBePeerReviewed: true
         }, 201);
     });
 
@@ -50,7 +50,7 @@ describe("Test the creation of a new task", () => {
         await postTaskWithAuthenticatedUserAndExpectCode({
             type            : 'open',
             maxLength       : 255,
-            canBePeerReviewd: true
+            canBePeerReviewed: true
         }, 400);
     });
 
@@ -58,14 +58,14 @@ describe("Test the creation of a new task", () => {
         await postTaskWithAuthenticatedUserAndExpectCode({
             question: 'What is the meaning of life?',
             maxLength: 255,
-            canBePeerReviewd: true
+            canBePeerReviewed: true
         }, 400);
     });
 
     test('POST /task with multiple choice type but without choices should return 400', async () => {
         await postTaskWithAuthenticatedUserAndExpectCode({
             question        : 'What is the meaning of life?',
-            canBePeerReviewd: true,
+            canBePeerReviewed: true,
             type            : 'multiple'
         }, 400);
     });
@@ -75,7 +75,7 @@ describe("Test the creation of a new task", () => {
             question        : 'What is the meaning of life?',
             type            : 'link',
             maxLength       : 255,
-            canBePeerReviewd: true
+            canBePeerReviewed: true
         }, 201);
     });
 
@@ -83,7 +83,7 @@ describe("Test the creation of a new task", () => {
         await postTaskWithAuthenticatedUserHavingCodeAndExpectToBeDefined({
             question        : 'What is the meaning of life?',
             type            : 'multiple',
-            canBePeerReviewd: true,
+            canBePeerReviewed: true,
             choices         : ["Happiness", "Balance", 42]
         }, 201);
     });
