@@ -253,7 +253,7 @@ definitions:
     - createdByUserId
     - assignedToUserGroupId
 
-  AssignmentWithTasks:
+  AssignmentWithTasksAndPeerReviews:
     title: Assignment with tasks
     type: object
     description: An object containg the assignment assigned to a user and the user-specific tasks
@@ -264,6 +264,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Task'
+      peerReviews:
+        type: array
+        items:
+          $ref: '#/definitions/PeerReview'
 
   TaskAnswer:
     title: Task Answer
@@ -574,7 +578,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Assignment'
+              $ref: '#/definitions/AssignmentWithTasksAndPeerReviews'
         401:
           $ref: "#/responses/Unauthenticated"
 
@@ -594,7 +598,7 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/AssignmentWithTasks'
+            $ref: '#/definitions/AssignmentWithTasksAndPeerReviews'
 
         401:
           $ref: "#/responses/Unauthenticated"
@@ -603,6 +607,7 @@ paths:
           description: The assignement is not found
           schema:
             $ref: '#/definitions/Error'
+
 
   /users:
     get:
@@ -1231,24 +1236,6 @@ paths:
       responses:
         204:
           description: OK
-
-        401:
-          $ref: "#/responses/Unauthenticated"
-
-  ###########################
-  # ASSIGNED ASSIGNMENTS
-  ###########################
-  /assigned-assignments:
-    get:
-      summary: Returns the assignments assigned to a group in which you are in.
-      tags: [Assigned Assignment]
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/Assignment'
 
         401:
           $ref: "#/responses/Unauthenticated"
