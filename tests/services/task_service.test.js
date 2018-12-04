@@ -138,22 +138,29 @@ describe("Test the retrieval of a task with a specific ID", () => {
         let user = await UserHelper.insertNewRandom();
         let task = await TaskHelper.createValidTaskWithQuestion(user.id, "A");
 
-        let foundTask = await TaskService.getTask(task.id);
+        let foundTask = await TaskService.getTask(task.id, user.id);
         expect(foundTask).toBeDefined()
     });
 
     test('Should fail to retrieve a non-existing task', async() => {
-        let foundTask = await TaskService.getTask(10000);
-        expect(foundTask).toBe(null)
+        try {
+            await TaskService.getTask(10000, 0);
+            expect(false).toBe(true)
+        } catch(e){ }
+
     });
 
     test('Should fail to retrieve a task of other users that do not share a group with him', async() => {
         let mario   = await UserHelper.insertMario();
         let giorgio = await UserHelper.insertGiorgio();
 
-        let taskCreatedByMario = TaskHelper.createValidTaskWithQuestion(mario.id, "A");
+        let taskCreatedByMario = await TaskHelper.createValidTaskWithQuestion(mario.id, "A");
 
-        let taskFoundByGiorgio = await TaskService.getTask(taskCreatedByMario.id, giorgio.id);
-        expect(taskFoundByGiorgio).toBe(null);
+        try {
+            await TaskService.getTask(taskCreatedByMario.id, giorgio.id);
+            expect(false);
+        } catch(e){
+            expect(true);
+        }
     });
 });

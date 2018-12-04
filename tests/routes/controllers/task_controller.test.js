@@ -104,9 +104,11 @@ function createValidTaskWithQuestion(question){
 }
 
 async function createValidTaskWithQuestionAndUser(user, question) {
-    let taskA = createValidTaskWithQuestion(question);
-    await postTaskWithUser(user, taskA);
-    return taskA;
+    let task = createValidTaskWithQuestion(question);
+    let response = await postTaskWithUser(user, task);
+
+    task.id = response.body.taskId;
+    return task;
 }
 
 describe("Test the retrieval of all the tasks", () => {

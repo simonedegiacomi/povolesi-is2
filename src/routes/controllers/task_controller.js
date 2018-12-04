@@ -14,14 +14,14 @@ const taskSchema = Joi.object().keys({
 module.exports = {
 
     async getTask(req, res) {
-        const id = req.params.id;
+        const id = parseInt(req.params.id);
 
         try {
-            await TaskService.getTask(id, req.user.id);
-            res.send(json);
+            let task = await TaskService.getTask(id, req.user.id);
+            res.status(200).send(task);
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : this.errors.TASK_NOT_FOUND,
+                error : TaskService.errors.TASK_NOT_FOUND,
                 status: 404
             }]);
         }

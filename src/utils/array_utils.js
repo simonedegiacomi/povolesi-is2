@@ -18,6 +18,10 @@ module.exports = {
         // Otherwise, does it have any properties of its own?
         // Note that this doesn't handle
         // toString and valueOf enumeration bugs in IE < 9
+        for (const key in obj) {
+            if (obj.hasOwnProperty(key)) return false;
+        }
+
         return true
     }
 };
