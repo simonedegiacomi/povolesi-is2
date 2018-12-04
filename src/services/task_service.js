@@ -7,6 +7,12 @@ module.exports = {
         WRONG_ARGUMENTS: 'wrong arguments'
     },
 
+    async getTasks(authenticatedUserId){
+        return await Task.findAll({
+            where: { userId: authenticatedUserId }
+        });
+    },
+
     async createTask(taskData) {
         if (!taskData) {
             throw new Error(this.errors.WRONG_ARGUMENTS);

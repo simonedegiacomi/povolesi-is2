@@ -1,7 +1,6 @@
 const Joi         = require('joi');
 const TaskService = require('../../services/task_service');
 const ErrorMapper = require('./error_mapper');
-const ModelMapper = require('./models_mapper');
 
 const taskSchema = Joi.object().keys({
     question              : Joi.string().required(),
@@ -13,6 +12,20 @@ const taskSchema = Joi.object().keys({
 });
 
 module.exports = {
+
+    async getTasks(req, res) {
+        try {
+            const tasks = await TaskService.getTasks(req.user.id);
+
+            res.status(200).send(tasks);
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : TaskService.errors.WRONG_ARGUMENTS,
+                status: 400
+            }]);
+        }
+    },
+
     async createTask(req, res) {
         const {error, value} = Joi.validate(req.body, taskSchema);
 
