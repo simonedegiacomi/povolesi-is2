@@ -138,20 +138,58 @@ describe('test the /users path', () => {
 
 
 describe('Test user email update', () => {
-    // TODO: 3) Write some tests that send the PUT to '/users/me/email'
-    test('CHANGE', (done) => {
-        UserHelper.insertMario()
-            .then(user => {
-                return request(app)
-                    .put('/api/v1/users/me/email')
-                    .set('X-API-TOKEN', user.authToken)
-                    .send({
-                        newEmail: 'luca@bianchi.com'
-                    })
-                    .expect(200)
-                    .then(() => done());
-            })
+    test('Should change the email of the given user', async () => {
+        const existingUser = await UserHelper.insertMario();
 
+        const response = await request(app)
+            .put('/api/v1/users/me/email')
+            .set('X-API-TOKEN', existingUser.authToken)
+            .send({
+                newEmail: 'luca@bianchi.com'
+            });
+
+        expect(response.status).toBe(200);
+    })
+
+    test('Should not change the email to an existing one', async () => {
+        const existingUser1 = await UserHelper.insertMario();
+        const existingUser2 = await UserHelper.insertGiorgio();
+
+        const response = await request(app)
+            .put('/api/v1/users/me/email')
+            .set('X-API-TOKEN', existingUser1.authToken)
+            .send({
+                newEmail: existingUser2.email
+            });
+
+        expect(response.status).toBe(409);
+        expect(response.body.errorMessage).toBe('email already in use');
+    });
+
+    test('Should not change the email if the string is not an email address', async () => {
+        const existingUser = await UserHelper.insertMario();
+
+        const response = await request(app)
+            .put('/api/v1/users/me/email')
+            .set('X-API-TOKEN', existingUser.authToken)
+            .send({
+                newEmail: 'Not an email!'
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body.errorMessage).toBe('\"value\" must be a valid email');
+    });
+
+    test('Should give an error if email is missing from the request body', async () => {
+        const existingUser = await UserHelper.insertMario();
+
+        const response = await request(app)
+            .put('/api/v1/users/me/email')
+            .set('X-API-TOKEN', existingUser.authToken)
+            .send({});
+
+        expect(response.status).toBe(400);
+        expect(response.body.errorMessage).toBe('email missing');
     });
 });
 

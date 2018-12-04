@@ -1,7 +1,9 @@
 const bcrypt       = require('bcrypt');
 const randomstring = require("randomstring");
+const Joi          = require('joi');
 
 const {sequelize, User} = require('../models/index');
+const ArgumentError = require('./argument_error');
 
 const BCRYPT_SALT_RAUNDS = 10;
 
@@ -12,7 +14,9 @@ module.exports = {
         BADGE_NUMBER_ALREADY_IN_USE: "badge number already in use",
         PASSWORD_TOO_SHORT         : "password too short",
 
-        INVALID_CREDENTIALS: "invalid credentials"
+        INVALID_USER: "invalid user",
+        INVALID_CREDENTIALS: "invalid credentials",
+        INVALID_EMAIL: "\"value\" must be a valid email"
     },
 
     constants: {
@@ -75,10 +79,31 @@ module.exports = {
         return User.findAll()
     },
 
-    updateUserEmail (user, newEmail) {
-        return user.update({
-            email: newEmail
-        });
+    async updateUserEmail (user, newEmail) {
+        if (!(user instanceof User)) {
+            throw new ArgumentError(this.errors.INVALID_USER);
+        }
+
+        const {error, value} = Joi.validate(newEmail, Joi.string().email().required());
+
+        if (error != null) {
+            throw new ArgumentError(error.details[0].message);
+        }
+
+        try {
+            return await user.update({
+                email: newEmail
+            });
+        } catch (ex) {
+            if (ex instanceof sequelize.UniqueConstraintError) {
+                const wrongField = ex.errors[0].path;
+                if (wrongField === 'email') {
+                    throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
+                }
+            }
+
+            throw ex;
+        }
     },
 
     updateUserData (user, newName, newBadgeNumber) {
