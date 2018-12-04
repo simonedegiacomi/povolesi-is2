@@ -5,6 +5,7 @@ module.exports = {
 
     errors: {
         NO_CREATOR_SPECIFIED: "no creator specified",
+
         NO_NAME             : "task pool have no name",
         USER_NOT_EXIST      : "user not exist",
         TASK_NOT_EXIST      : "task not exist"
@@ -45,7 +46,7 @@ module.exports = {
 
         //query SELECT * WHERE user=userMe
         const jsonArray = await TaskPool.findAll({
-            where: {
+           where: {
                 createdById: userMe.id
             }
         });
@@ -63,6 +64,7 @@ module.exports = {
         })
 
         return jsonResult
+
 */
 
 };

@@ -36,6 +36,9 @@ describe('creation of taskPool', () => {
 
         expect(createdPool.name).toEqual(taskPoolExample.name);
         expect(createdPool.createdBy.toJSON()).toEqual(creator.toJSON());
+
+        const tasksFromPool = await createdPool.getTasks();
+        expect(tasksFromPool[0].id).toEqual(task.id);
     });
 
     test('insert taskPool without specifying the user', async () => {
@@ -107,4 +110,10 @@ describe('get my taskPool', () => {
         const jsonArray = await TaskPoolService.getMyTaskPool(giorgio);
         expect(jsonArray.length).toEqual(0);
     });
+
+
 });
+
+/*describe('get task of task pool',() => {
+
+})*/
