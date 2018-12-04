@@ -103,16 +103,19 @@ function createValidTaskWithQuestion(question){
     };
 }
 
+async function createValidTaskWithQuestionAndUser(user, question) {
+    let taskA = createValidTaskWithQuestion(question);
+    await postTaskWithUser(user, taskA);
+    return taskA;
+}
+
 describe("Test the retrieval of all the tasks", () => {
 
     test('should return all tasks that the user created', async () => {
         let user = await UserHelper.insertNewRandom();
 
-        let taskA = createValidTaskWithQuestion("A");
-        await postTaskWithUser(user, taskA);
-
-        let taskB = createValidTaskWithQuestion("B");
-        await postTaskWithUser(user, taskB);
+        let taskA = await createValidTaskWithQuestionAndUser(user, "A");
+        let taskB = await createValidTaskWithQuestionAndUser(user, "B");
 
         let response = await request(app)
             .get('/api/v1/tasks')
@@ -120,13 +123,8 @@ describe("Test the retrieval of all the tasks", () => {
             .send();
 
         let answersArray = response.body.map((task) => task.question);
-
         expect(answersArray).toContain(taskA.question);
         expect(answersArray).toContain(taskB.question);
     });
-
-    test('should not be able to see tasks of other users that do not share a group with him', async () => {});
-
-    test('should be able to see tasks of other users that do share a group with him', async () => {});
 
 });
