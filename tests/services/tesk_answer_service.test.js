@@ -4,7 +4,7 @@ const {Answer}          = require('../../src/models');
 
 describe("Test the update of a submitted answer", () => {
     test('Should edit a task answer', async () => {
-        const answer = await TaskAnswerHelper.insertAnswrOfAOpenTask();
+        const answer = await TaskAnswerHelper.insertAnswerOfAOpenTask();
 
         const update = {openAnswer: 'Mmmm, forse era quarantadue?'};
         await TaskAnswerService.updateAnswer(answer.id, update);

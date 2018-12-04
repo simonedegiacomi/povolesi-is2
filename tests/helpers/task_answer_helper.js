@@ -3,14 +3,15 @@ const AssignmentHelper = require('./assignment_helper');
 const {Answer}         = require('../../src/models');
 
 module.exports = {
-    async insertAnswrOfAOpenTask() {
+    async insertAnswerOfAOpenTask() {
         const assignemnt = await AssignmentHelper.insertSimpleAssignment();
-        const users      = await assignemnt.getUsers();
+        const group      = await assignemnt.getGroup();
+        const users      = await group.getUsers();
 
         return await Answer.create({
             taskId      : task.id,
             assignmentId: assignment.id,
-            userId      : user[0].id,
+            userId      : users[0].id,
             openAnswer  : "Secondo me 42"
         });
     }
