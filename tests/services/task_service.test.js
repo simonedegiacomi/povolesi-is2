@@ -114,7 +114,8 @@ describe("Test the retrieval of all the tasks", () => {
         expect(tasksB[0].question).toBe(anotherUserQuestion.question);
     });
 
-    //TODO:
+    //TODO: implement this once the task draws are finished
+    //
     // test('User should be able to see tasks of other users that do share a group with him', async () => {
     //     let anotherUser         = await UserHelper.insertNewRandom();
     //     let anotherUserQuestion = await TaskHelper.createValidTaskWithQuestion(anotherUser.id, "A");
@@ -129,4 +130,30 @@ describe("Test the retrieval of all the tasks", () => {
     //     expect(tasksB[0].question).toBe(anotherUserQuestion.question);
     // });
 
+});
+
+describe("Test the retrieval of a task with a specific ID", () => {
+
+    test('Should be able to retrieve a task with a specific ID', async() => {
+        let user = await UserHelper.insertNewRandom();
+        let task = await TaskHelper.createValidTaskWithQuestion(user.id, "A");
+
+        let foundTask = await TaskService.getTask(task.id);
+        expect(foundTask).toBeDefined()
+    });
+
+    test('Should fail to retrieve a non-existing task', async() => {
+        let foundTask = await TaskService.getTask(10000);
+        expect(foundTask).toBe(null)
+    });
+
+    test('Should fail to retrieve a task of other users that do not share a group with him', async() => {
+        let mario   = await UserHelper.insertMario();
+        let giorgio = await UserHelper.insertGiorgio();
+
+        let taskCreatedByMario = TaskHelper.createValidTaskWithQuestion(mario.id, "A");
+
+        let taskFoundByGiorgio = await TaskService.getTask(taskCreatedByMario.id, giorgio.id);
+        expect(taskFoundByGiorgio).toBe(null);
+    });
 });

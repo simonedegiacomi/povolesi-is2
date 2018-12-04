@@ -13,6 +13,20 @@ const taskSchema = Joi.object().keys({
 
 module.exports = {
 
+    async getTask(req, res) {
+        const id = req.params.id;
+
+        try {
+            await TaskService.getTask(id, req.user.id);
+            res.send(json);
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : this.errors.TASK_NOT_FOUND,
+                status: 404
+            }]);
+        }
+    },
+
     async getTasks(req, res) {
         try {
             const tasks = await TaskService.getTasks(req.user.id);
