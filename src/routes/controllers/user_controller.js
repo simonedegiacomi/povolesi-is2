@@ -1,6 +1,7 @@
-const Joi         = require('joi');
-const UserService = require('../../services/user_service');
-const ErrorMapper = require('./error_mapper');
+const Joi          = require('joi');
+const UserService  = require('../../services/user_service');
+const ErrorMapper  = require('./error_mapper');
+const ModelsMapper = require('./models_mapper');
 
 const userSchema = Joi.object().keys({
     name       : Joi.string().min(3).max(30).required(),
@@ -130,5 +131,20 @@ module.exports = {
 
         UserService.updateUserData(req.user, value.newName, value.newBadgeNumber);
         res.status(204).send();
+    },
+
+    async getUserById(req, res) {
+        const id = req.params.id;
+
+        try {
+            const user = await UserService.getUserById(id);
+            const json  = await ModelsMapper.mapUser(user);
+            res.send(json);
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserService.errors.USER_NOT_FOUND,
+                status: 404
+            }]);
+        }
     }
 };

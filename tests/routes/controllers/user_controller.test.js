@@ -3,6 +3,7 @@ const request = require('supertest');
 const {User}     = require('../../../src/models');
 const UserHelper = require('../../helpers/user_helper');
 const app        = require('../../../src/app');
+const ModelsMapper    = require('../../../src/routes/controllers/models_mapper');
 
 describe('Test the user registration', () => {
 
@@ -217,4 +218,21 @@ describe('Test user data update', () => {
                     .then(() => done());
             })
     });
+});
+
+describe('Test get user data given its id',  () => {
+    test('GET /users/:id', async () => {
+        const newUSer = await UserHelper.insertMario();
+        const response = await request(app)
+            .get(`/api/v1/users/${newUSer.id}`)
+            .set('X-API-TOKEN', newUSer.authToken);
+
+        expect(response.status).toBe(200);
+
+        const user = response.body;
+        expect(user).toBeDefined();
+
+        const expectedJson = await ModelsMapper.mapUser(newUSer);
+        expect(user).toEqual(expectedJson);
+    })
 });

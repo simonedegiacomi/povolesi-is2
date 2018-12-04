@@ -80,7 +80,7 @@ describe('Test the listing of existing users', () => {
             password   : 'passwsard'
         });
 
-        const users = await UserService.getAllUsers()
+        const users = await UserService.getAllUsers();
         expect(users.map(u => u.toJSON())).toEqual([
             user1.toJSON(), user2.toJSON()
         ])
@@ -113,4 +113,13 @@ describe('Test user data update', () => {
                 done();
             }).catch(console.log);
     });
+});
+
+describe('Test get user given its id', () => {
+    test('Should return the user given its id', async () => {
+        const newUser = await UserHelper.insertMario();
+        const user = await UserService.getUserById(newUser.id);
+
+        expect(user.toJSON()).toEqual(newUser.toJSON());
+    })
 });

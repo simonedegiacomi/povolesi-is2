@@ -40,7 +40,7 @@ module.exports = {
 
         try {
             const group = await UserGroupService.getGroupById(id);
-            const json  = await ModelsMapper.mapUserGroup(group)
+            const json  = await ModelsMapper.mapUserGroup(group);
             res.send(json);
         } catch (e) {
             ErrorMapper.map(res, e, [{

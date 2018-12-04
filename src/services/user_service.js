@@ -11,7 +11,7 @@ module.exports = {
         EMAIL_ALREADY_IN_USE       : "email already in use",
         BADGE_NUMBER_ALREADY_IN_USE: "badge number already in use",
         PASSWORD_TOO_SHORT         : "password too short",
-
+        USER_NOT_FOUND             : "the specified user doesn't exists" ,
         INVALID_CREDENTIALS: "invalid credentials"
     },
 
@@ -79,6 +79,12 @@ module.exports = {
         return user.update({
             email: newEmail
         });
+    },
+
+    getUserById(userId) {
+        return User.findOne({
+            where: {id: userId}
+        })
     },
 
     updateUserData (user, newName, newBadgeNumber) {
