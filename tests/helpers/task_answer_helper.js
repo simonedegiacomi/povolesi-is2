@@ -4,8 +4,8 @@ const {Answer}         = require('../../src/models');
 
 module.exports = {
     async insertAnswerOfAOpenTask() {
-        const assignemnt = await AssignmentHelper.insertSimpleAssignment();
-        const group      = await assignemnt.getGroup();
+        const assignment = await AssignmentHelper.insertSimpleAssignment();
+        const group      = await assignment.getGroup();
         const users      = await group.getUsers();
 
         return await Answer.create({

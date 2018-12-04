@@ -30,7 +30,7 @@ describe('creation of taskPool', () => {
             name     : 'esempio',
             createdBy: creator
         };
-        const task            = await TaskHelper.createOpenQuestionTask();
+        const task            = await TaskHelper.insertOpenQuestionTask();
 
         const createdPool = await TaskPoolService.createTaskPool(taskPoolExample, [task]);
 
