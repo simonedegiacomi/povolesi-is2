@@ -104,5 +104,26 @@ module.exports = {
         }
 
         return permission;
+    },
+
+    async getPermissionListByGroup(actionPerformer, group) {
+
+        if (group == null) {
+            throw new Error(this.errors.GROUP_NOT_FOUND)
+        }
+
+        const permissionList =  await UserPermission.findAll({
+            where: { userGroupId: group.id }
+        });
+        if (permissionList == null) {
+            throw new Error(this.errors.GROUP_NOT_FOUND)
+        }
+
+        /*const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        if (!performerHasPermission) {
+            throw new Error(this.errors.UNAUTHORIZED);
+        }*/
+
+        return permissionList;
     }
 };

@@ -124,3 +124,21 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
         expect(response.status).toBe(404);
     });
 });
+
+describe('Test the get of a user group list', () => {
+    test('GET /user-permission should return 200 and the list of users', async () => {
+
+        const group = await UserGroupHelper.createGroup();
+        const creator = await group.getCreatedBy();
+
+        const response = await request(app)
+            .get('/api/v1/user-permissions')
+            .set('X-API-TOKEN', creator.authToken);
+
+        const userGroupList = await UserPermissionHelper.getGroupUserList();
+        console.log(userGroupList);
+        expect(response.status).toBe(200);
+        expect(response.body).toEqual(userGroupList);
+
+    })
+});

@@ -75,6 +75,12 @@ module.exports = {
         return User.findAll()
     },
 
+    getUserById(userId) {
+        return User.findOne({
+            where: {id: userId}
+        })
+    },
+
     updateUserEmail (user, newEmail) {
         return user.update({
             email: newEmail

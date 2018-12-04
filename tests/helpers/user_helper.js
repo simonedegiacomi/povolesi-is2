@@ -26,7 +26,7 @@ module.exports = {
         return await UserService.registerUser({
             name       : `Random ${number}`,
             password   : 'password',
-            email      : `mario${number}@rossi.it'`,
+            email      : `mario${number}@rossi.it`,
             badgeNumber: `${number}`
         });
     }

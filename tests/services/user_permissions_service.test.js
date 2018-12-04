@@ -4,10 +4,26 @@ const UserGroupsHelper       = require('../helpers/user_groups_helper');
 const UserPermissionsService = require('../../src/services/user_permissions_service.js');
 const {UserPermission}       = require('../../src/models');
 
+describe("Test the listing of user permissions in a group", () => {
+    test("Should return the user permission list given a groupId", async () => {
+        const group = await UserGroupsHelper.createGroup();
+        const permissionList = await UserPermissionHelper.insertMultipleUserPermission(group);
+        const permissionListFromDb = await UserPermissionHelper.getUserPermissionList(group);
+
+        expect(permissionList).toBeDefined();
+        expect(permissionListFromDb).toBeDefined();
+
+        expect(permissionListFromDb).toEqual(
+            expect.arrayContaining(permissionList)
+        );
+    })
+});
+
 describe("Test the creation of a user permission (add user to a group)", () => {
 
     test("Should return the user permission instance just created", async () => {
-        const permission = await UserPermissionHelper.insertUserPermission();
+        const group = await UserGroupsHelper.createGroup();
+        const permission = await UserPermissionHelper.insertUserPermission(group);
 
         expect(permission).toBeDefined();
 

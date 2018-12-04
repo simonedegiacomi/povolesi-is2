@@ -15,6 +15,24 @@ const permissionSchema = Joi.object().keys({
 
 module.exports = {
 
+    async getPermissionListByGroup(req, res) {
+        if (req.query.groupId == null) {
+            return res.status(400).send({
+                errorMessage: error.details[0].message
+            });
+        }
+
+        try {
+            const permissionList = await UserPermissionsService.getPermissionListByGroup(req.user, req.query.groupId);
+            res.status(200).send(permissionList)
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error: UserPermissionsService.errors.UNAUTHORIZED,
+                status: 403
+            }])
+        }
+    },
+
     async createPermission(req, res) {
         const {error, value} = Joi.validate(req.body, permissionSchema);
 
