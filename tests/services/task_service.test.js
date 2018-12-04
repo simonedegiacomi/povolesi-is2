@@ -1,11 +1,13 @@
 const TaskHelper  = require('../helpers/task_helper');
+const UserHelper  = require('../helpers/user_helper');
 const {Task}      = require('../../src/models');
 const TaskService = require('../../src/services/task_service');
 
 describe("Test the creation of a new task", () => {
 
     test('should crate a new open question task', async () => {
-        const task = await TaskHelper.createOpenQuestionTask();
+        let user = await UserHelper.insertNewRandom();
+        const task = await TaskHelper.createOpenQuestionTask(user.id);
 
         const fromDb = await Task.findOne({
             where: {id: task.id}
@@ -53,7 +55,8 @@ describe("Test the creation of a new task", () => {
     });
 
     test('should crate a new link question', async () => {
-        const task = await TaskHelper.createLinkTask();
+        let user = await UserHelper.insertNewRandom();
+        const task = await TaskHelper.createLinkTask(user.id);
 
         const fromDb = await Task.findOne({
             where: {id: task.id}
@@ -62,7 +65,8 @@ describe("Test the creation of a new task", () => {
     });
 
     test('should crate a new open multiple choice question', async () => {
-        const task = await TaskHelper.createMultipleChoiceTask();
+        let user = await UserHelper.insertNewRandom();
+        const task = await TaskHelper.createMultipleChoiceTask(user.id);
 
         const fromDb = await Task.findOne({
             where: {id: task.id}

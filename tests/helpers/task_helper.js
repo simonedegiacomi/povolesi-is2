@@ -2,31 +2,34 @@ const TaskService = require('../../src/services/task_service');
 
 module.exports = {
 
-    async createOpenQuestionTask() {
+    async createOpenQuestionTask(userId) {
         return await TaskService.createTask({
             question        : 'What is the meaning of life?',
             type            : 'open',
             maxLength       : 255,
-            canBePeerReviewed: true
+            canBePeerReviewed: true,
+            userId          : userId
         });
     },
 
-    async createLinkTask() {
+    async createLinkTask(userId) {
         return await TaskService.createTask({
             question        : 'What is the meaning of life?',
             type            : 'link',
             maxLength       : 255,
-            canBePeerReviewed: true
+            canBePeerReviewed: true,
+            userId          : userId
         });
     },
 
-    async createMultipleChoiceTask() {
+    async createMultipleChoiceTask(userId) {
         return await TaskService.createTask({
             question        : 'What is the meaning of life?',
             type            : 'multiple',
             maxLength       : 255,
             canBePeerReviewed: true,
-            choices         : ["Happiness", "Balance", 42]
+            choices         : ["Happiness", "Balance", 42],
+            userId          : userId
         });
     }
 

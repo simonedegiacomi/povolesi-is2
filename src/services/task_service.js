@@ -14,7 +14,9 @@ module.exports = {
         if (typeof taskData.question !== 'string') {
             throw new Error(this.errors.WRONG_ARGUMENTS);
         }
-
+        if (typeof taskData.userId !== 'number') {
+            throw new Error(this.errors.WRONG_ARGUMENTS);
+        }
         if (typeof taskData.type !== 'string' || Task.Types.every(t => taskData.type !== t)) {
             throw new Error(this.errors.WRONG_ARGUMENTS);
         }

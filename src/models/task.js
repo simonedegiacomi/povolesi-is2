@@ -36,6 +36,8 @@ module.exports = (sequelize, DataTypes) => {
     Task.Types = Types;
 
     Task.associate = (models) => {
+        Task.belongsTo(models.User, {as: 'user'});
+
         Task.belongsToMany(models.TaskPool, {
             through: 'TaskPool_Task'
         });
