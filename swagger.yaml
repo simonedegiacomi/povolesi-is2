@@ -1236,100 +1236,19 @@ paths:
           $ref: "#/responses/Unauthenticated"
 
   ###########################
-  # DRAWS
+  # ASSIGNED ASSIGNMENTS
   ###########################
-
-  /draws:
+  /assigned-assignments:
     get:
-      summary: Returns the draws associated to the assignment with a given id.
-      tags: [Draws]
-      parameters:
-      - in: query
-        name: assignmentId
-        required: true
-        type: integer
-
+      summary: Returns the assignments assigned to a group in which you are in.
+      tags: [Assigned Assignment]
       responses:
         200:
           description: OK
           schema:
             type: array
             items:
-              $ref: '#/definitions/TaskDraw'
-
-        401:
-          $ref: "#/responses/Unauthenticated"
-
-    post:
-      summary: Adds a new draw
-      description: >
-        Adds a new draw to a specified assignment having specified instructions on the number of tasks to draw.
-
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
-
-      tags: [Draws]
-      parameters:
-      - in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/TaskDraw'
-      responses:
-        201:
-          description: OK
-          schema:
-            type: object
-            properties:
-              drawId:
-                type: integer
-
-        401:
-          $ref: "#/responses/Unauthenticated"
-
-        403:
-          $ref: '#/responses/Unauthorized'
-
-  /draws/{drawId}:
-    parameters:
-    - in: path
-      name: drawId
-      required: true
-      type: integer
-
-    get:
-      summary: Returns the draw having the given id
-      tags: [Draws]
-      responses:
-        200:
-          description: OK
-          schema:
-            $ref: '#/definitions/TaskDraw'
-
-    put:
-      summary: Updates the draw
-      tags: [Draws]
-      parameters:
-      - in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/TaskDraw'
-
-      responses:
-        200:
-          description: OK
-
-        401:
-          $ref: "#/responses/Unauthenticated"
-
-    delete:
-      summary: Deletes the draw having a given id
-      tags: [Draws]
-      responses:
-        204:
-          description: OK
-          schema:
-            $ref: '#/definitions/TaskDraw'
+              $ref: '#/definitions/Assignment'
 
         401:
           $ref: "#/responses/Unauthenticated"
