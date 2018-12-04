@@ -20,9 +20,9 @@ describe('The user group creation', () => {
 describe('The user group collection', () => {
     test('It should show created groups', async () => {
 
-        await UserGroupHelper.createGroup("A");
-        await UserGroupHelper.createGroup("B");
-        await UserGroupHelper.createGroup("C");
+        await UserGroupHelper.insertGroup("A");
+        await UserGroupHelper.insertGroup("B");
+        await UserGroupHelper.insertGroup("C");
 
         const groups = await UserGroupService.getAllGroups();
 
@@ -39,7 +39,7 @@ describe('The user group collection', () => {
     });
 
     test('It should return a specific user group given its id', async () => {
-        const createdGroup = await UserGroupHelper.createGroup("A");
+        const createdGroup = await UserGroupHelper.insertGroup("A");
 
         const group = await UserGroupService.getGroupById(createdGroup.id);
 
@@ -60,7 +60,7 @@ describe('The user group collection', () => {
 
 describe("Test the user group deletion", () => {
     test('It should delete an existing user group', async () => {
-        const group   = await UserGroupHelper.createGroup();
+        const group   = await UserGroupHelper.insertGroup();
         const creator = await group.getCreatedBy();
 
         await UserGroupService.deleteById(creator, group.id);
@@ -83,7 +83,7 @@ describe("Test the user group deletion", () => {
     });
 
     test("It should throw an exception when someone try to delete a group that he didn't create", async () => {
-        const group   = await UserGroupHelper.createGroup();
+        const group   = await UserGroupHelper.insertGroup();
         const aUser = await UserHelper.insertNewRandom();
 
         try {

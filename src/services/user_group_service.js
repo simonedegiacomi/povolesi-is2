@@ -17,7 +17,7 @@ module.exports = {
         });
     },
 
-    async createGroup(groupData) {
+    async insertGroup(groupData) {
         return await UserGroup.create({
             ...groupData,
             createdById: groupData.createdBy.id

@@ -10,7 +10,7 @@ const {UserPermission}       = require('../../../src/models');
 describe("Test the creation of a user permission", () => {
 
     test("POST /user-permissions with valid data should return 201 and the permission", async () => {
-        const group     = await UserGroupHelper.createGroup();
+        const group     = await UserGroupHelper.insertGroup();
         const creator   = await group.getCreatedBy();
         const newMember = await UserHelper.insertMario();
 
@@ -34,7 +34,7 @@ describe("Test the creation of a user permission", () => {
     });
 
     test("POST /user-permissions from a user outside the group should return 403", async () => {
-        const group = await UserGroupHelper.createGroup();
+        const group = await UserGroupHelper.insertGroup();
         const user  = await UserHelper.insertMario();
 
         const aUser = await UserHelper.insertNewRandom();

@@ -38,9 +38,9 @@ describe('The user group collection', () => {
     test('It should return the list when of groups', async () => {
         const user = await UserHelper.insertMario();
 
-        await UserGroupHelper.createGroup("A");
-        await UserGroupHelper.createGroup("B");
-        await UserGroupHelper.createGroup("C");
+        await UserGroupHelper.insertGroup("A");
+        await UserGroupHelper.insertGroup("B");
+        await UserGroupHelper.insertGroup("C");
 
         const response = await request(app)
             .get('/api/v1/user-groups')
@@ -73,7 +73,7 @@ describe('The user group collection', () => {
 
     test('It should return a specific user group given its id', async () => {
         const user             = await UserHelper.insertMario();
-        const createdGroup     = await UserGroupHelper.createGroup("A");
+        const createdGroup     = await UserGroupHelper.insertGroup("A");
         createdGroup.createdBy = await createdGroup.getCreatedBy();
 
         const response = await request(app)
@@ -105,7 +105,7 @@ describe('The user group collection', () => {
 
 describe("Test the user group deletion", () => {
     test('It should delete an existing user group', async () => {
-        const group = await UserGroupHelper.createGroup();
+        const group = await UserGroupHelper.insertGroup();
         const user  = await group.getCreatedBy();
 
         const response = await request(app)
@@ -133,7 +133,7 @@ describe("Test the user group deletion", () => {
     });
 
     test("It should return 403 when someone who didn't create the group tries to delete the group", async () => {
-        const group = await UserGroupHelper.createGroup();
+        const group = await UserGroupHelper.insertGroup();
         const user  = await UserHelper.insertMario();
 
         const response = await request(app)

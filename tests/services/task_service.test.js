@@ -5,7 +5,7 @@ const TaskService = require('../../src/services/task_service');
 describe("Test the creation of a new task", () => {
 
     test('should crate a new open question task', async () => {
-        const task = await TaskHelper.createOpenQuestionTask();
+        const task = await TaskHelper.insertOpenQuestionTask();
 
         const fromDb = await Task.findOne({
             where: {id: task.id}
@@ -53,7 +53,7 @@ describe("Test the creation of a new task", () => {
     });
 
     test('should crate a new link question', async () => {
-        const task = await TaskHelper.createLinkTask();
+        const task = await TaskHelper.insertLinkTask();
 
         const fromDb = await Task.findOne({
             where: {id: task.id}
@@ -62,7 +62,7 @@ describe("Test the creation of a new task", () => {
     });
 
     test('should crate a new open multiple choice question', async () => {
-        const task = await TaskHelper.createMultipleChoiceTask();
+        const task = await TaskHelper.insertMultipleChoiceTask();
 
         const fromDb = await Task.findOne({
             where: {id: task.id}

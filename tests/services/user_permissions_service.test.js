@@ -18,7 +18,7 @@ describe("Test the creation of a user permission (add user to a group)", () => {
     });
 
     test("Should throw an exception if a user outside the group creates a permission", async () => {
-        const group     = await UserGroupsHelper.createGroup();
+        const group     = await UserGroupsHelper.insertGroup();
         const newMember = await UserHelper.insertMario();
 
         const unauthorized = await UserHelper.insertNewRandom();
@@ -38,7 +38,7 @@ describe("Test the creation of a user permission (add user to a group)", () => {
     });
 
     test("Should throw an exception when trying to insert a permission without specifying who wants to do it ", async () => {
-        const group     = await UserGroupsHelper.createGroup();
+        const group     = await UserGroupsHelper.insertGroup();
         const newMember = await UserHelper.insertMario();
 
         try {
@@ -54,7 +54,7 @@ describe("Test the creation of a user permission (add user to a group)", () => {
     // TODO: Add test when someone inside the group but without the permissions tries to add a user
 
     test("Should throw an exception when trying to insert a permission without specifying the group ", async () => {
-        const group     = await UserGroupsHelper.createGroup();
+        const group     = await UserGroupsHelper.insertGroup();
         const creator   = await group.getCreatedBy();
         const newMember = await UserHelper.insertMario();
 
@@ -68,7 +68,7 @@ describe("Test the creation of a user permission (add user to a group)", () => {
     });
 
     test("Should throw an exception when trying to insert a permission without specifying the new group member", async () => {
-        const group   = await UserGroupsHelper.createGroup();
+        const group   = await UserGroupsHelper.insertGroup();
         const creator = await group.getCreatedBy();
 
         try {

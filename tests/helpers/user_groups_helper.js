@@ -3,7 +3,7 @@ const UserHelper = require('./user_helper');
 
 module.exports = {
 
-    async createGroup(groupName = "Group name") {
+    async insertGroup(groupName = "Group name") {
         return await UserGroupService.createGroup({
             name: groupName,
             createdBy: await UserHelper.insertNewRandom()

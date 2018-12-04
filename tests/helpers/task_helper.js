@@ -2,7 +2,7 @@ const TaskService = require('../../src/services/task_service');
 
 module.exports = {
 
-    async createOpenQuestionTask() {
+    async insertOpenQuestionTask() {
         return await TaskService.createTask({
             question        : 'What is the meaning of life?',
             type            : 'open',
@@ -11,7 +11,7 @@ module.exports = {
         });
     },
 
-    async createLinkTask() {
+    async insertLinkTask() {
         return await TaskService.createTask({
             question        : 'What is the meaning of life?',
             type            : 'link',
@@ -20,7 +20,7 @@ module.exports = {
         });
     },
 
-    async createMultipleChoiceTask() {
+    async insertMultipleChoiceTask() {
         return await TaskService.createTask({
             question        : 'What is the meaning of life?',
             type            : 'multiple',
