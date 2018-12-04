@@ -6,6 +6,7 @@ const userController = require('./controllers/user_controller');
 const userGroupsController = require('./controllers/user_group_controller');
 const taskPoolController = require('./controllers/task_pools_controller');
 const userPermissionsController = require('./controllers/user_permissions_controller');
+const taskController = require('./controllers/task_controller');
 
 const authenticationMiddleware = require('./middlewares/authentication');
 
@@ -51,6 +52,9 @@ function setupAuthenticatedRoutes (app) {
     // /user-permissions
     router.post('/user-permissions', userPermissionsController.createPermission);
     router.delete('/user-permissions/:id', userPermissionsController.deletePermissionById);
+
+    // /tasks
+    router.post('/tasks', taskController.createTask);
 
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);

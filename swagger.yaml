@@ -495,7 +495,7 @@ paths:
               type: string
 
       responses:
-        204:
+        200:
           description: OK
         401:
           $ref: "#/responses/Unauthenticated"
@@ -1078,8 +1078,13 @@ paths:
                 type: integer
                 example: 12
 
+
         401:
           $ref: "#/responses/Unauthenticated"
+
+        400:
+          description: Task  in the param is not exist
+
 
 
   /task-pools/{poolId}:

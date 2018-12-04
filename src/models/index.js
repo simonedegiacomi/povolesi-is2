@@ -7,7 +7,10 @@ const db       = {};
 
 const sequelize = new Sequelize('database', 'username', 'password', {
     dialect: 'sqlite',
-    logging: false
+    logging: false,
+    define: {
+        timestamps: false
+    }
 });
 
 fs
