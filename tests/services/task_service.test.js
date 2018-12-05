@@ -74,9 +74,9 @@ describe("Test the retrieval of all the tasks", () => {
     });
 
     test('Should return an empty array if there are no tasks', async () => {
-        let tasks = TaskService.getTasks(user.id);
+        let tasks = await TaskService.getTasks(user.id);
 
-        expect(tasks).toMatchObject({});
+        expect(tasks).toMatchObject([]);
     });
 
 
