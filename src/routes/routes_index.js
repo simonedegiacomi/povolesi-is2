@@ -56,6 +56,7 @@ function setupAuthenticatedRoutes (app) {
     // /tasks
     router.get ('/tasks',   taskController.getTasks);
     router.get ('/tasks/:id',taskController.getTask);
+    router.delete ('/tasks/:id',taskController.deleteTask);
     router.post('/tasks',   taskController.createTask);
 
     // /task-pools

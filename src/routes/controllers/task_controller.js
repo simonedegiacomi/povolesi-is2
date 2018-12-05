@@ -27,6 +27,20 @@ module.exports = {
         }
     },
 
+    async deleteTask(req, res) {
+        const id = parseInt(req.params.id);
+
+        try {
+            let task = await TaskService.deleteTask(id, req.user.id);
+            res.status(204).send(task);
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : TaskService.errors.TASK_NOT_FOUND,
+                status: 404
+            }]);
+        }
+    },
+
     async getTasks(req, res) {
         try {
             const tasks = await TaskService.getTasks(req.user.id);

@@ -1,14 +1,8 @@
 const TaskHelper  = require('../helpers/task_helper');
 const UserHelper  = require('../helpers/user_helper');
-const {Task}      = require('../../src/models');
 const TaskService = require('../../src/services/task_service');
+const expectToFail = require("../test_utils").expectToFail;
 
-async function expectTaskToExistInDb(task) {
-    const fromDb = await Task.findOne({
-        where: {id: task.id}
-    });
-    expect(fromDb).toBeDefined();
-}
 
 describe("Test the creation of a new task", () => {
 
@@ -16,7 +10,7 @@ describe("Test the creation of a new task", () => {
         let user   = await UserHelper.insertNewRandom();
         const task = await TaskHelper.createOpenQuestionTask(user.id);
 
-        await expectTaskToExistInDb(task);
+        await TaskHelper.expectTaskToExistInDb(task.id);
     });
 
     test('should throw an exception when trying to create a open task without the question', async () => {
@@ -62,14 +56,14 @@ describe("Test the creation of a new task", () => {
         let user   = await UserHelper.insertNewRandom();
         const task = await TaskHelper.createLinkTask(user.id);
 
-        await expectTaskToExistInDb(task);
+        await TaskHelper.expectTaskToExistInDb(task.id);
     });
 
     test('should crate a new open multiple choice question', async () => {
         let user   = await UserHelper.insertNewRandom();
         const task = await TaskHelper.createMultipleChoiceTask(user.id);
 
-        await expectTaskToExistInDb(task);
+        await TaskHelper.expectTaskToExistInDb(task.id);
     });
 });
 
@@ -145,7 +139,7 @@ describe("Test the retrieval of a task with a specific ID", () => {
     test('Should fail to retrieve a non-existing task', async() => {
         try {
             await TaskService.getTask(10000, 0);
-            expect(false).toBe(true)
+            expectToFail();
         } catch(e){ }
 
     });
@@ -158,9 +152,44 @@ describe("Test the retrieval of a task with a specific ID", () => {
 
         try {
             await TaskService.getTask(taskCreatedByMario.id, giorgio.id);
-            expect(false);
+            expectToFail();
         } catch(e){
-            expect(true);
         }
     });
+});
+
+
+
+describe("Test the deletion of a task with a specific ID", () => {
+
+    test('Should delete a task', async() => {
+        let user = await UserHelper.insertNewRandom();
+        let task = await TaskHelper.createValidTask(user.id);
+
+        await TaskHelper.expectTaskToExistInDb(task.id);
+        await TaskService.deleteTask(task.id, user.id);
+        await TaskHelper.expectTaskToNotExistInDb(task.id);
+    });
+
+    test('Should throw an error when a task does not exists', async() => {
+        let user = await UserHelper.insertNewRandom();
+        try {
+            await TaskService.deleteTask(1, user.id);
+            expectToFail();
+        } catch(e){}
+    });
+
+    test('Should not allow to delete a task that is not manageable by the user', async() => {
+        let giorgio = await UserHelper.insertGiorgio();
+        let mario   = await UserHelper.insertMario();
+
+        let taskCreatedByGiorgio = await TaskHelper.createValidTask(giorgio.id);
+
+        try {
+            await TaskService.deleteTask(taskCreatedByGiorgio.id, mario.id);
+            expectToFail();
+        } catch(e) {}
+
+    });
+
 });

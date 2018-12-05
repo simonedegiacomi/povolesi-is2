@@ -2,6 +2,7 @@ const request = require('supertest');
 
 const app         = require('../../../src/app');
 const UserHelper  = require('../../helpers/user_helper');
+const TaskHelper  = require('../../helpers/task_helper');
 const {Task}      = require('../../../src/models');
 
 async function postTaskWithUser(user, taskBody) {
@@ -133,7 +134,7 @@ describe("Test the retrieval of all the tasks", () => {
 
 describe("Test the retrieval of a single task", () => {
 
-    test('should return an existing task with the given id', async () => {
+    test('Should return an existing task with the given id', async () => {
         let user = await UserHelper.insertNewRandom();
         let task = await createValidTaskWithQuestionAndUser(user, "A");
 
@@ -147,10 +148,37 @@ describe("Test the retrieval of a single task", () => {
 
     });
 
-    test('should return 404 error for not existing tasks', async () => {
+    test('Should return 404 error for not existing tasks', async () => {
         let user = await UserHelper.insertNewRandom();
         let response = await request(app)
             .get('/api/v1/tasks/123456')
+            .set('X-API-TOKEN', user.authToken)
+            .send();
+
+        expect(response.status).toBe(404);
+    });
+
+});
+
+describe("Test the deletion of a single task", () => {
+
+    test('Should delete tasks', async () => {
+        let user = await UserHelper.insertNewRandom();
+        let task = await TaskHelper.createValidTask(user.id);
+
+        await request(app)
+            .delete('/api/v1/tasks/'+task.id)
+            .set('X-API-TOKEN', user.authToken)
+            .send();
+
+        TaskHelper.expectTaskToNotExistInDb(task.id)
+    });
+
+    test('Should not delete tasks that do not exist', async () => {
+        let user = await UserHelper.insertNewRandom();
+
+        let response = await request(app)
+            .delete('/api/v1/tasks/123456')
             .set('X-API-TOKEN', user.authToken)
             .send();
 

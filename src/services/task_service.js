@@ -36,6 +36,17 @@ module.exports = {
         });
     },
 
+    async deleteTask(taskId, authenticatedUserId){
+        let taskWithId = await this.getTask(taskId, authenticatedUserId);
+
+        //No need to check whenever the user can delete tasks. It's always possible for a user that can retrieve a task
+        //to delete it
+
+        //TODO: the deletion of a task will become extremely messy once we will implement assignment, peer review, etc..
+        //We'll have to think about how to manage that situation
+        await taskWithId.destroy();
+    },
+
     async createTask(taskData) {
         assertIsDefined(taskData,         this.errors.WRONG_ARGUMENTS);
         assertIsString(taskData.question, this.errors.WRONG_ARGUMENTS);

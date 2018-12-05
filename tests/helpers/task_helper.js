@@ -1,4 +1,5 @@
 const TaskService = require('../../src/services/task_service');
+const {Task}      = require('../../src/models');
 
 module.exports = {
 
@@ -10,6 +11,10 @@ module.exports = {
             canBePeerReviewed: true,
             userId          : userId
         });
+    },
+
+    async createValidTask(userId) {
+        return this.createOpenQuestionTask(userId);
     },
 
     async createOpenQuestionTask(userId) {
@@ -41,6 +46,22 @@ module.exports = {
             choices         : ["Happiness", "Balance", 42],
             userId          : userId
         });
+    },
+
+    async findTaskInDb(taskId) {
+        return await Task.findOne({
+            where: {id: taskId}
+        });
+    },
+
+    async expectTaskToExistInDb(taskId) {
+        let taskInDb = await this.findTaskInDb(taskId);
+        expect(taskInDb).not.toBe(null);
+    },
+
+    async expectTaskToNotExistInDb(taskId) {
+        let taskInDb = await this.findTaskInDb(taskId);
+        expect(taskInDb).toBe(null);
     }
 
 };
