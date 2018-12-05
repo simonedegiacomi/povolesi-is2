@@ -119,10 +119,10 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND)
         }
 
-        /*const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
         if (!performerHasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
-        }*/
+        }
 
         return permissionList;
     },
@@ -142,10 +142,10 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND);
         }
 
-        /*const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
         if (!hasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
-        }*/
+        }
 
         try {
             return await permission.update({

@@ -28,14 +28,14 @@ module.exports = {
     },
 
     async getUserPermissionList(group) {
-        const creator = group.getCreatedBy();
+        const creator = await group.getCreatedBy();
         return await UserPermissionsService.getPermissionListByGroup(creator, group);
     },
 
     async updateUserPermission(permission, canManageTasks, canManageUsers, canChangePermissions) {
         const groupId = await permission.userGroupId;
         const group = await UserGroupService.getGroupById(groupId);
-        const creator = group.getCreatedBy();
+        const creator = await group.getCreatedBy();
         return await UserPermissionsService.updateUserPermission(creator, permission, {
             userGroupId: group.id,
             userId: permission.id,
