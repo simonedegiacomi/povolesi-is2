@@ -24,9 +24,9 @@ module.exports = {
     async insertNewRandom() {
         const number = Math.round(Math.random() * 1000000);
         return await UserService.registerUser({
-            name: `Random ${number}`,
-            password: 'password',
-            email: `mario${number}@rossi.it'`,
+            name       : `Random ${number}`,
+            password   : 'password',
+            email      : `mario${number}@rossi.it`,
             badgeNumber: `${number}`
         });
     },

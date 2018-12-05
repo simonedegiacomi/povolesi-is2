@@ -80,7 +80,7 @@ describe('Test the listing of existing users', () => {
             password: 'passwsard'
         });
 
-        const users = await UserService.getAllUsers()
+        const users = await UserService.getAllUsers();
         expect(users.map(u => u.toJSON())).toEqual([
             user1.toJSON(), user2.toJSON()
         ])
