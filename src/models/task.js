@@ -17,7 +17,7 @@ module.exports = (sequelize, DataTypes) => {
             type     : DataTypes.ENUM(...Types),
             allowNull: false
         },
-        canBePeerReviewd      : {
+        canBePeerReviewed      : {
             type     : DataTypes.BOOLEAN,
             allowNull: false
         },
@@ -36,6 +36,8 @@ module.exports = (sequelize, DataTypes) => {
     Task.Types = Types;
 
     Task.associate = (models) => {
+        Task.belongsTo(models.User, {as: 'user'});
+
         Task.belongsToMany(models.TaskPool, {
             through: 'TaskPool_Task'
         });
