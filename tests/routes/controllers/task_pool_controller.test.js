@@ -9,7 +9,7 @@ describe('creation of taskPool', () => {
 
     test('insert taskPool with a task', async () => {
         const creator = await UserHelper.insertMario();
-        const task    = await TaskHelper.createOpenQuestionTask();
+        const task    = await TaskHelper.createOpenQuestionTask(creator.id);
 
         const response = await request(app)
             .post('/api/v1/task-pools')
