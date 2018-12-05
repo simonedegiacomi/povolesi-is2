@@ -41,6 +41,7 @@ function setupAuthenticatedRoutes(app) {
     router.get('/users/me', userController.getCurrentUserData);
     router.put('/users/me', userController.updateUserData);
     router.put('/users/me/email', userController.updateEmail);
+    router.get('/users/:id', userController.getUserById);
 
     // /user-groups
     router.get('/user-groups', userGroupsController.getAllGroups);
@@ -49,7 +50,9 @@ function setupAuthenticatedRoutes(app) {
     router.delete('/user-groups/:id', userGroupsController.deleteGroupById);
 
     // /user-permissions
+    router.get('/user-permissions', userPermissionsController.getPermissionListByGroup);
     router.post('/user-permissions', userPermissionsController.createPermission);
+    router.put('/user-permissions/:id', userPermissionsController.updatePermission);
     router.delete('/user-permissions/:id', userPermissionsController.deletePermissionById);
 
     // /tasks

@@ -1,4 +1,4 @@
-const bcrypt = require('bcrypt');
+const bcrypt       = require('bcrypt');
 const randomstring = require("randomstring");
 const Joi = require('joi');
 
@@ -115,7 +115,13 @@ module.exports = {
         }
     },
 
-    updateUserData(user, newName, newBadgeNumber) {
+    getUserById(userId) {
+        return User.findOne({
+            where: {id: userId}
+        })
+    },
+
+    updateUserData (user, newName, newBadgeNumber) {
         return user.update({
             name: newName,
             badgeNumber: newBadgeNumber

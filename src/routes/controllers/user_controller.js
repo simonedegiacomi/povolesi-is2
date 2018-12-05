@@ -1,14 +1,15 @@
-const Joi = require('joi');
-const UserService = require('../../services/user_service');
-const ErrorMapper = require('./error_mapper');
-const ModelMapper = require('./models_mapper');
+const Joi          = require('joi');
+const UserService  = require('../../services/user_service');
+const ErrorMapper  = require('./error_mapper');
+const ModelsMapper = require('./models_mapper');
+
 
 const updateEmailSchema = Joi.object().keys({
-    newEmail: Joi.string().email().required()
+    newEmail: Joi.string().email()
 });
 
 const updateUserDataSchema = Joi.object().keys({
-    newName: Joi.string().min(3).max(30).required(),
+    newName       : Joi.string().min(3).max(30).required(),
     newBadgeNumber: Joi.string().min(1).max(45).required()
 });
 
@@ -88,7 +89,7 @@ module.exports = {
         res.status(200).send(ModelMapper.mapUser(req.user));
     },
 
-    updateUserData: function (req, res) {
+    async updateUserData(req, res) {
         const {error, value} = Joi.validate(req.body, updateUserDataSchema);
 
         if (error != null) {
@@ -97,7 +98,22 @@ module.exports = {
             });
         }
 
-        return UserService.updateUserData(req.user, value.newName, value.newBadgeNumber)
-            .then(() => res.status(204).send());
+        UserService.updateUserData(req.user, value.newName, value.newBadgeNumber);
+        res.status(204).send();
+    },
+
+    async getUserById(req, res) {
+        const id = req.params.id;
+
+        try {
+            const user = await UserService.getUserById(id);
+            const json  = await ModelsMapper.mapUser(user);
+            res.send(json);
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserService.errors.USER_NOT_FOUND,
+                status: 404
+            }]);
+        }
     }
 };

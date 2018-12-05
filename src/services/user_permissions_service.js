@@ -104,5 +104,62 @@ module.exports = {
         }
 
         return permission;
+    },
+
+    async getPermissionListByGroup(actionPerformer, group) {
+        if (group == null) {
+            throw new Error(this.errors.GROUP_NOT_FOUND)
+        }
+
+        const permissionList =  await UserPermission.findAll({
+            where: { userGroupId: group.id }
+        });
+        if (permissionList == null) {
+            throw new Error(this.errors.GROUP_NOT_FOUND)
+        }
+
+        const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        if (!performerHasPermission && permissionList != null) {
+            throw new Error(this.errors.UNAUTHORIZED);
+        }
+
+        return permissionList;
+    },
+
+    async updateUserPermission(actionPerformer, permission, updatedPermission) {
+        if (!actionPerformer instanceof User) {
+            throw new Error(this.errors.WRONG_ARGUMENTS);
+        }
+        if (!permission || !permission.userId || !permission.userGroupId) {
+            throw new Error(this.errors.WRONG_ARGUMENTS);
+        }
+
+        const group = await UserGroup.findOne({
+            where: {id: permission.userGroupId}
+        });
+        if (group == null) {
+            throw new Error(this.errors.GROUP_NOT_FOUND);
+        }
+        console.log(group);
+
+        const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        if (!hasPermission) {
+            throw new Error(this.errors.UNAUTHORIZED);
+        }
+
+        try {
+            return await permission.update({
+                userId              : updatedPermission.userId,
+                userGroupId         : updatedPermission.userGroupId,
+                canManageTasks      : updatedPermission.canManageTasks,
+                canManageUsers      : updatedPermission.canManageUsers,
+                canChangePermissions: updatedPermission.canChangePermissions
+            });
+        } catch (e) {
+            if (this._isDuplicateMemberError(e)) {
+                throw new Error(this.errors.USER_ALREADY_MEMBER);
+            }
+            throw e;
+        }
     }
 };

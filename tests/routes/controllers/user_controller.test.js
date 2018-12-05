@@ -1,7 +1,8 @@
 const request = require('supertest');
 
 const UserHelper = require('../../helpers/user_helper');
-const app = require('../../../src/app');
+const app        = require('../../../src/app');
+const ModelsMapper    = require('../../../src/routes/controllers/models_mapper');
 
 function postUser(user) {
     return request(app)
@@ -213,6 +214,7 @@ describe('Test user data update', () => {
 
     });
 
+
     test('PUT /users/me without valid token should return 401', async () => {
         const response = await request(app)
             .put('/api/v1/users/me')
@@ -222,6 +224,7 @@ describe('Test user data update', () => {
             });
 
         expect(response.status).toBe(401);
+
     });
 
     test('PUT /users/me without some fields should return 400', async () => {
@@ -236,4 +239,21 @@ describe('Test user data update', () => {
 
         expect(response.status).toBe(400);
     });
+});
+
+describe('Test get user data given its id',  () => {
+    test('GET /users/:id', async () => {
+        const newUSer = await UserHelper.insertMario();
+        const response = await request(app)
+            .get(`/api/v1/users/${newUSer.id}`)
+            .set('X-API-TOKEN', newUSer.authToken);
+
+        expect(response.status).toBe(200);
+
+        const user = response.body;
+        expect(user).toBeDefined();
+
+        const expectedJson = await ModelsMapper.mapUser(newUSer);
+        expect(user).toEqual(expectedJson);
+    })
 });
