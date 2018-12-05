@@ -26,11 +26,12 @@ describe('creation of taskPool', () => {
 
     test('insert taskPool with a task', async () => {
         const creator         = await UserHelper.insertMario();
+
         const taskPoolExample = {
             name     : 'esempio',
             createdBy: creator
         };
-        const task            = await TaskHelper.createOpenQuestionTask();
+        const task = await TaskHelper.createOpenQuestionTask();
 
         const createdPool = await TaskPoolService.createTaskPool(taskPoolExample, [task]);
 
