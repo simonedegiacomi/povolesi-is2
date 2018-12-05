@@ -126,7 +126,7 @@ describe('test the /users path', () => {
     });
 
     test('return of the users without passwords', async () => {
-        UserHelper.insertNewRandom();
+        await UserHelper.insertNewRandom();
 
         const response = await request(app).get('/api/v1/users');
 
@@ -136,8 +136,8 @@ describe('test the /users path', () => {
             expect(u.email).toBeDefined();
             expect(u.badgeNumber).toBeDefined();
 
-            expect(u.password).toBeNull();
-            expect(u.authCode).toBeNull();
+            expect(u.password).not.toBeDefined();
+            expect(u.authCode).not.toBeDefined();
         });
     });
 
