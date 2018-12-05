@@ -3,8 +3,10 @@ const TaskHelper = require('../helpers/task_helper');
 const UserHelper = require('../helpers/user_helper');
 
 async function insertArrayTaskPool(taskPools) {
-    for (let i = 0; i < taskPools.length; i++) {
-        await TaskPoolService.createTaskPool(taskPools[i]);
+
+    for (const pool of taskPools) {
+        await TaskPoolService.createTaskPool(pool);
+
     }
 }
 
