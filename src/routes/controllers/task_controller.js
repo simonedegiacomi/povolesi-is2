@@ -1,14 +1,14 @@
-const Joi         = require('joi');
+const Joi = require('joi');
 const TaskService = require('../../services/task_service');
 const ErrorMapper = require('./error_mapper');
 
 const taskSchema = Joi.object().keys({
-    question              : Joi.string().required(),
-    type                  : Joi.string().required(),
-    canBePeerReviewed     : Joi.boolean().required(),
-    maxLength             : Joi.number().integer().min(0),
+    question: Joi.string().required(),
+    type: Joi.string().required(),
+    canBePeerReviewed: Joi.boolean().required(),
+    maxLength: Joi.number().integer().min(0),
     multipleChoicesAllowed: Joi.boolean(),
-    choices               : Joi.array().min(2)
+    choices: Joi.array().min(2)
 });
 
 module.exports = {
@@ -21,7 +21,7 @@ module.exports = {
             res.status(200).send(task);
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : TaskService.errors.TASK_NOT_FOUND,
+                error: TaskService.errors.TASK_NOT_FOUND,
                 status: 404
             }]);
         }
@@ -35,7 +35,7 @@ module.exports = {
             res.status(204).send(task);
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : TaskService.errors.TASK_NOT_FOUND,
+                error: TaskService.errors.TASK_NOT_FOUND,
                 status: 404
             }]);
         }
@@ -48,7 +48,7 @@ module.exports = {
             res.status(200).send(tasks);
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : TaskService.errors.WRONG_ARGUMENTS,
+                error: TaskService.errors.WRONG_ARGUMENTS,
                 status: 400
             }]);
         }
@@ -72,7 +72,7 @@ module.exports = {
             });
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : TaskService.errors.WRONG_ARGUMENTS,
+                error: TaskService.errors.WRONG_ARGUMENTS,
                 status: 400
             }]);
         }

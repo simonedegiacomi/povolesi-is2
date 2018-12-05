@@ -1,27 +1,26 @@
-
 module.exports = function (sequelize, DataTypes) {
     const Answer = sequelize.define('Answer', {
-        id            : {
-            type         : DataTypes.INTEGER(11),
-            allowNull    : false,
-            primaryKey   : true,
+        id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+            primaryKey: true,
             autoIncrement: true
         },
-        submittedOn   : {
-            type        : DataTypes.DATE,
-            allowNull   : false,
+        submittedOn: {
+            type: DataTypes.DATE,
+            allowNull: false,
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
         },
-        openAnswer    : {
-            type     : DataTypes.TEXT,
+        openAnswer: {
+            type: DataTypes.TEXT,
             allowNull: true
         },
-        teacherMark   : {
-            type     : DataTypes.INTEGER(4),
+        teacherMark: {
+            type: DataTypes.INTEGER(4),
             allowNull: true
         },
         teacherComment: {
-            type     : DataTypes.TEXT,
+            type: DataTypes.TEXT,
             allowNull: true
         }
     }, {
@@ -30,9 +29,9 @@ module.exports = function (sequelize, DataTypes) {
 
     Answer.associate = (models) => {
         Answer.belongsTo(models.User, {
-            as        : 'user',
+            as: 'user',
             foreignKey: {
-                name     : 'userId',
+                name: 'userId',
                 allowNull: false
             }
         });

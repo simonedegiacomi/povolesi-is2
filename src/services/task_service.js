@@ -11,7 +11,7 @@ module.exports = {
         WRONG_ARGUMENTS: 'wrong arguments'
     },
 
-    async getTask(taskId, authenticatedUserId){
+    async getTask(taskId, authenticatedUserId) {
         assertIsNumber(taskId, this.errors.WRONG_ARGUMENTS);
         assertIsNumber(authenticatedUserId, this.errors.WRONG_ARGUMENTS);
 
@@ -19,7 +19,7 @@ module.exports = {
         let foundTask = await Task.findOne({
             where: {
                 userId: authenticatedUserId,
-                id:     taskId
+                id: taskId
             }
         });
 
@@ -30,13 +30,13 @@ module.exports = {
         }
     },
 
-    async getTasks(authenticatedUserId){
+    async getTasks(authenticatedUserId) {
         return await Task.findAll({
-            where: { userId: authenticatedUserId }
+            where: {userId: authenticatedUserId}
         });
     },
 
-    async deleteTask(taskId, authenticatedUserId){
+    async deleteTask(taskId, authenticatedUserId) {
         let taskWithId = await this.getTask(taskId, authenticatedUserId);
 
         //No need to check whenever the user can delete tasks. It's always possible for a user that can retrieve a task
@@ -48,9 +48,9 @@ module.exports = {
     },
 
     async createTask(taskData) {
-        assertIsDefined(taskData,         this.errors.WRONG_ARGUMENTS);
+        assertIsDefined(taskData, this.errors.WRONG_ARGUMENTS);
         assertIsString(taskData.question, this.errors.WRONG_ARGUMENTS);
-        assertIsNumber(taskData.userId,   this.errors.WRONG_ARGUMENTS);
+        assertIsNumber(taskData.userId, this.errors.WRONG_ARGUMENTS);
 
         if (typeof taskData.type !== 'string' || Task.Types.every(t => taskData.type !== t)) {
             throw new Error(this.errors.WRONG_ARGUMENTS);

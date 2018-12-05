@@ -1,5 +1,5 @@
 module.exports = class ArgumentError extends Error {
-    constructor (message) {
+    constructor(message) {
         super(message);
     }
 }

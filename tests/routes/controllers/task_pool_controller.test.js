@@ -1,6 +1,6 @@
 const request = require('supertest');
 
-const app        = require('../../../src/app');
+const app = require('../../../src/app');
 const UserHelper = require('../../helpers/user_helper');
 const TaskHelper = require('../../helpers/task_helper');
 const {TaskPool} = require('../../../src/models');
@@ -9,13 +9,13 @@ describe('creation of taskPool', () => {
 
     test('insert taskPool with a task', async () => {
         const creator = await UserHelper.insertMario();
-        const task    = await TaskHelper.createOpenQuestionTask(creator.id);
+        const task = await TaskHelper.createOpenQuestionTask(creator.id);
 
         const response = await request(app)
             .post('/api/v1/task-pools')
             .set('X-API-TOKEN', creator.authToken)
             .send({
-                "name" : "Test task pool",
+                "name": "Test task pool",
                 "tasks": [task.id]
             });
 

@@ -1,17 +1,17 @@
-const Joi         = require('joi');
+const Joi = require('joi');
 const UserService = require('../../services/user_service');
 const ErrorMapper = require('./error_mapper');
 const ModelMapper = require('./models_mapper');
 
 const userSchema = Joi.object().keys({
-    name       : Joi.string().min(3).max(30).required(),
-    email      : Joi.string().email().required(),
+    name: Joi.string().min(3).max(30).required(),
+    email: Joi.string().email().required(),
     badgeNumber: Joi.string().min(1).max(45).required(),
-    password   : Joi.string().required()
+    password: Joi.string().required()
 });
 
 const loginSchema = Joi.object().keys({
-    email   : Joi.string().email().required(),
+    email: Joi.string().email().required(),
     password: Joi.string().required()
 });
 
@@ -20,7 +20,7 @@ const updateEmailSchema = Joi.object().keys({
 });
 
 const updateUserDataSchema = Joi.object().keys({
-    newName       : Joi.string().min(3).max(30).required(),
+    newName: Joi.string().min(3).max(30).required(),
     newBadgeNumber: Joi.string().min(1).max(45).required()
 });
 
@@ -39,17 +39,17 @@ module.exports = {
             const user = await UserService.registerUser(value);
             res.status(201).send({
                 userId: user.id,
-                token : user.authToken
+                token: user.authToken
             });
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : UserService.errors.EMAIL_ALREADY_IN_USE,
+                error: UserService.errors.EMAIL_ALREADY_IN_USE,
                 status: 409
             }, {
-                error : UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
+                error: UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
                 status: 409
             }, {
-                error : UserService.errors.PASSWORD_TOO_SHORT,
+                error: UserService.errors.PASSWORD_TOO_SHORT,
                 status: 400
             }]);
         }
@@ -68,11 +68,11 @@ module.exports = {
             const user = await UserService.loginUser(value.email, value.password);
             res.status(200).send({
                 userId: user.id,
-                token : user.authToken
+                token: user.authToken
             });
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : UserService.errors.INVALID_CREDENTIALS,
+                error: UserService.errors.INVALID_CREDENTIALS,
                 status: 400
             }]);
         }
@@ -89,22 +89,22 @@ module.exports = {
                 errorMessage: 'email missing'
             });
         }
-        
+
         try {
             await UserService.updateUserEmail(req.user, req.body.newEmail);
             res.status(200).send();
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : UserService.errors.EMAIL_ALREADY_IN_USE,
+                error: UserService.errors.EMAIL_ALREADY_IN_USE,
                 status: 409
             }, {
-                error : UserService.errors.INVALID_EMAIL,
+                error: UserService.errors.INVALID_EMAIL,
                 status: 400
             }])
         }
     },
 
-    getCurrentUserData (req, res) {
+    getCurrentUserData(req, res) {
         res.status(200).send(ModelMapper.mapUser(req.user));
     },
 

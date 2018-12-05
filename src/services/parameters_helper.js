@@ -1,5 +1,3 @@
-
-
 module.exports = {
     assertIsNumber(a, errorToThrow) {
         if (typeof a !== 'number') {

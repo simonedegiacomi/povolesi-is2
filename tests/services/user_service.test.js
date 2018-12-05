@@ -1,6 +1,6 @@
 const UserService = require('../../src/services/user_service');
-const {User}      = require('../../src/models');
-const UserHelper  = require('../helpers/user_helper');
+const {User} = require('../../src/models');
+const UserHelper = require('../helpers/user_helper');
 
 describe('Test the user registration', () => {
 
@@ -8,10 +8,10 @@ describe('Test the user registration', () => {
     test('It should register the new user', async () => {
 
         const newUser = await UserService.registerUser({
-            name       : 'Mario Blu',
-            email      : 'mario@blu.it',
+            name: 'Mario Blu',
+            email: 'mario@blu.it',
             badgeNumber: "AAAAAA",
-            password   : 'password'
+            password: 'password'
         });
 
         expect(newUser.id).toBeDefined();
@@ -22,10 +22,10 @@ describe('Test the user registration', () => {
 
         try {
             await UserService.registerUser({
-                name       : 'Mario Blu',
-                email      : existingUser.email,
+                name: 'Mario Blu',
+                email: existingUser.email,
                 badgeNumber: "AAAAAA",
-                password   : 'password'
+                password: 'password'
             });
 
             expect(true).toBe(false);
@@ -67,17 +67,17 @@ describe('Test the listing of existing users', () => {
         await User.destroy({where: {}});
 
         const user1 = await UserService.registerUser({
-            name       : 'Mario Rossi',
-            email      : 'mario2@rossi.it',
+            name: 'Mario Rossi',
+            email: 'mario2@rossi.it',
             badgeNumber: "000000",
-            password   : 'password'
+            password: 'password'
         });
 
         const user2 = await UserService.registerUser({
-            name       : 'Giorgio Segalla',
-            email      : 'giorgio@segalla.it',
+            name: 'Giorgio Segalla',
+            email: 'giorgio@segalla.it',
             badgeNumber: "000021",
-            password   : 'passwsard'
+            password: 'passwsard'
         });
 
         const users = await UserService.getAllUsers()
@@ -94,7 +94,7 @@ describe('Test user email update', () => {
     test('Should return the user with the email updated', async () => {
         const existingUser = await UserHelper.insertMario()
         const existingUserWithNewEmail = await UserService.updateUserEmail(existingUser, 'luca@bianchi.com');
-        
+
         expect(existingUserWithNewEmail.email).toEqual('luca@bianchi.com');
     });
 

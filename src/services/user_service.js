@@ -1,6 +1,6 @@
-const bcrypt       = require('bcrypt');
+const bcrypt = require('bcrypt');
 const randomstring = require("randomstring");
-const Joi          = require('joi');
+const Joi = require('joi');
 
 const {sequelize, User} = require('../models/index');
 const ArgumentError = require('./argument_error');
@@ -10,9 +10,9 @@ const BCRYPT_SALT_RAUNDS = 10;
 module.exports = {
 
     errors: {
-        EMAIL_ALREADY_IN_USE       : "email already in use",
+        EMAIL_ALREADY_IN_USE: "email already in use",
         BADGE_NUMBER_ALREADY_IN_USE: "badge number already in use",
-        PASSWORD_TOO_SHORT         : "password too short",
+        PASSWORD_TOO_SHORT: "password too short",
 
         INVALID_USER: "invalid user",
         INVALID_CREDENTIALS: "invalid credentials",
@@ -28,7 +28,7 @@ module.exports = {
             throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
         }
 
-        user.password  = await bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS);
+        user.password = await bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS);
         user.authToken = this._generateToken();
 
         try {
@@ -79,7 +79,7 @@ module.exports = {
         return User.findAll()
     },
 
-    async updateUserEmail (user, newEmail) {
+    async updateUserEmail(user, newEmail) {
         if (!(user instanceof User)) {
             throw new ArgumentError(this.errors.INVALID_USER);
         }
@@ -106,7 +106,7 @@ module.exports = {
         }
     },
 
-    updateUserData (user, newName, newBadgeNumber) {
+    updateUserData(user, newName, newBadgeNumber) {
         return user.update({
             name: newName,
             badgeNumber: newBadgeNumber

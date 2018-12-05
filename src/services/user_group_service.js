@@ -1,18 +1,18 @@
-const Models      = require('../models/index');
+const Models = require('../models/index');
 const {UserGroup} = Models;
 
 module.exports = {
 
     errors: {
         GROUP_NOT_FOUND: 'group not found',
-        UNAUTHORIZED   : 'user not authorized'
+        UNAUTHORIZED: 'user not authorized'
     },
 
     async getAllGroups() {
         return await UserGroup.findAll({
             include: [{
                 model: Models.User,
-                as   : 'createdBy'
+                as: 'createdBy'
             }]
         });
     },
@@ -32,7 +32,7 @@ module.exports = {
         }, {
             include: [{
                 model: Models.User,
-                as   : 'createdBy'
+                as: 'createdBy'
             }]
         });
 
@@ -46,7 +46,7 @@ module.exports = {
     async deleteById(user, id) {
         const group = await this.getGroupById(id);
 
-        if(group.createdById !== user.id) {
+        if (group.createdById !== user.id) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
 

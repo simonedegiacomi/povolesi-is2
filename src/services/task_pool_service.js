@@ -6,9 +6,9 @@ module.exports = {
     errors: {
         NO_CREATOR_SPECIFIED: "no creator specified",
 
-        NO_NAME             : "task pool have no name",
-        USER_NOT_EXIST      : "user not exist",
-        TASK_NOT_EXIST      : "task not exist"
+        NO_NAME: "task pool have no name",
+        USER_NOT_EXIST: "user not exist",
+        TASK_NOT_EXIST: "task not exist"
     },
 
     async createTaskPool(taskPool, tasks = []) {
@@ -21,7 +21,7 @@ module.exports = {
         }
 
         try {
-            const createdTaskPool     = await TaskPool.create({
+            const createdTaskPool = await TaskPool.create({
                 ...taskPool,
                 createdById: taskPool.createdBy.id
             });
@@ -40,13 +40,13 @@ module.exports = {
 
 
     async getMyTaskPool(userMe) {
-        if(!(userMe instanceof User)){ // TODO: Check in the db
+        if (!(userMe instanceof User)) { // TODO: Check in the db
             throw new Error(this.errors.USER_NOT_EXIST);
         }
 
         //query SELECT * WHERE user=userMe
         const jsonArray = await TaskPool.findAll({
-           where: {
+            where: {
                 createdById: userMe.id
             }
         });

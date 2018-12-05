@@ -1,9 +1,9 @@
 const request = require('supertest');
 
-const app         = require('../../../src/app');
-const UserHelper  = require('../../helpers/user_helper');
-const TaskHelper  = require('../../helpers/task_helper');
-const {Task}      = require('../../../src/models');
+const app = require('../../../src/app');
+const UserHelper = require('../../helpers/user_helper');
+const TaskHelper = require('../../helpers/task_helper');
+const {Task} = require('../../../src/models');
 
 async function postTaskWithUser(user, taskBody) {
     return await request(app)
@@ -53,8 +53,8 @@ describe("Test the creation of a new task", () => {
 
     test('POST /task without the question should return 400', async () => {
         await postTaskWithAuthenticatedUserAndExpectCode({
-            type            : 'open',
-            maxLength       : 255,
+            type: 'open',
+            maxLength: 255,
             canBePeerReviewed: true
         }, 400);
     });
@@ -69,33 +69,33 @@ describe("Test the creation of a new task", () => {
 
     test('POST /task with multiple choice type but without choices should return 400', async () => {
         await postTaskWithAuthenticatedUserAndExpectCode({
-            question        : 'What is the meaning of life?',
+            question: 'What is the meaning of life?',
             canBePeerReviewed: true,
-            type            : 'multiple'
+            type: 'multiple'
         }, 400);
     });
 
     test('should crate a new link question', async () => {
         await postTaskWithAuthenticatedUserHavingCodeAndExpectToBeDefined({
-            question        : 'What is the meaning of life?',
-            type            : 'link',
-            maxLength       : 255,
+            question: 'What is the meaning of life?',
+            type: 'link',
+            maxLength: 255,
             canBePeerReviewed: true
         }, 201);
     });
 
     test('should crate a new open multiple choice question', async () => {
         await postTaskWithAuthenticatedUserHavingCodeAndExpectToBeDefined({
-            question        : 'What is the meaning of life?',
-            type            : 'multiple',
+            question: 'What is the meaning of life?',
+            type: 'multiple',
             canBePeerReviewed: true,
-            choices         : ["Happiness", "Balance", 42]
+            choices: ["Happiness", "Balance", 42]
         }, 201);
     });
 
 });
 
-function createValidTaskWithQuestion(question){
+function createValidTaskWithQuestion(question) {
     return {
         question: question,
         type: 'open',
@@ -139,7 +139,7 @@ describe("Test the retrieval of a single task", () => {
         let task = await createValidTaskWithQuestionAndUser(user, "A");
 
         let response = await request(app)
-            .get('/api/v1/tasks/'+task.id)
+            .get('/api/v1/tasks/' + task.id)
             .set('X-API-TOKEN', user.authToken)
             .send();
 
@@ -167,7 +167,7 @@ describe("Test the deletion of a single task", () => {
         let task = await TaskHelper.createValidTask(user.id);
 
         await request(app)
-            .delete('/api/v1/tasks/'+task.id)
+            .delete('/api/v1/tasks/' + task.id)
             .set('X-API-TOKEN', user.authToken)
             .send();
 
