@@ -1,17 +1,17 @@
 module.exports = function (sequelize, DataTypes) {
     const PeerReview = sequelize.define('PeerReview', {
-        id          : {
-            type         : DataTypes.INTEGER(11),
-            allowNull    : false,
-            primaryKey   : true,
+        id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+            primaryKey: true,
             autoIncrement: true
         },
-        mark        : {
-            type     : DataTypes.INTEGER(4),
+        mark: {
+            type: DataTypes.INTEGER(4),
             allowNull: true
         },
-        comment     : {
-            type     : DataTypes.TEXT,
+        comment: {
+            type: DataTypes.TEXT,
             allowNull: true
         }
     }, {

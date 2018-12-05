@@ -1,13 +1,16 @@
-const fs        = require('fs');
-const path      = require('path');
+const fs = require('fs');
+const path = require('path');
 const Sequelize = require('sequelize');
 
 const basename = path.basename(__filename);
-const db       = {};
+const db = {};
 
 const sequelize = new Sequelize('database', 'username', 'password', {
     dialect: 'sqlite',
-    logging: false
+    logging: false,
+    define: {
+        timestamps: false
+    }
 });
 
 fs
@@ -16,7 +19,7 @@ fs
         return (file.indexOf('.') !== 0) && (file !== basename) && (file.slice(-3) === '.js');
     })
     .forEach(file => {
-        const model    = sequelize['import'](path.join(__dirname, file));
+        const model = sequelize['import'](path.join(__dirname, file));
         db[model.name] = model;
     });
 

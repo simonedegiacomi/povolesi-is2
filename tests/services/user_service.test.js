@@ -1,6 +1,6 @@
 const UserService = require('../../src/services/user_service');
-const {User}      = require('../../src/models');
-const UserHelper  = require('../helpers/user_helper');
+const {User} = require('../../src/models');
+const UserHelper = require('../helpers/user_helper');
 
 describe('Test the user registration', () => {
 
@@ -8,10 +8,10 @@ describe('Test the user registration', () => {
     test('It should register the new user', async () => {
 
         const newUser = await UserService.registerUser({
-            name       : 'Mario Blu',
-            email      : 'mario@blu.it',
+            name: 'Mario Blu',
+            email: 'mario@blu.it',
             badgeNumber: "AAAAAA",
-            password   : 'password'
+            password: 'password'
         });
 
         expect(newUser.id).toBeDefined();
@@ -22,10 +22,10 @@ describe('Test the user registration', () => {
 
         try {
             await UserService.registerUser({
-                name       : 'Mario Blu',
-                email      : existingUser.email,
+                name: 'Mario Blu',
+                email: existingUser.email,
                 badgeNumber: "AAAAAA",
-                password   : 'password'
+                password: 'password'
             });
 
             expect(true).toBe(false);
@@ -67,17 +67,17 @@ describe('Test the listing of existing users', () => {
         await User.destroy({where: {}});
 
         const user1 = await UserService.registerUser({
-            name       : 'Mario Rossi',
-            email      : 'mario2@rossi.it',
+            name: 'Mario Rossi',
+            email: 'mario2@rossi.it',
             badgeNumber: "000000",
-            password   : 'password'
+            password: 'password'
         });
 
         const user2 = await UserService.registerUser({
-            name       : 'Giorgio Segalla',
-            email      : 'giorgio@segalla.it',
+            name: 'Giorgio Segalla',
+            email: 'giorgio@segalla.it',
             badgeNumber: "000021",
-            password   : 'passwsard'
+            password: 'passwsard'
         });
 
         const users = await UserService.getAllUsers();
@@ -91,15 +91,48 @@ describe('Test the listing of existing users', () => {
 
 
 describe('Test user email update', () => {
-    // TODO: 1) Write some tests that call the 'updateUserEmail' method on the UserService
+    test('Should return the user with the email updated', async () => {
+        const existingUser = await UserHelper.insertMario()
+        const existingUserWithNewEmail = await UserService.updateUserEmail(existingUser, 'luca@bianchi.com');
 
-    test('Should return the user with the email changed', (done) => {
-        UserHelper.insertMario()
-            .then(user => UserService.updateUserEmail(user, 'luca@bianchi.com'))
-            .then(user => {
-                expect(user.email).toEqual('luca@bianchi.com');
-                done();
-            }).catch(console.log);
+        expect(existingUserWithNewEmail.email).toEqual('luca@bianchi.com');
+    });
+
+    test('Should not change the email to an existing one', async () => {
+        const existingUser1 = await UserHelper.insertMario();
+        const existingUser2 = await UserHelper.insertGiorgio();
+
+        try {
+            await UserService.updateUserEmail(existingUser1, existingUser2.email);
+
+            expect(true).toBe(false);
+        } catch (e) {
+            expect(e.message).toBe('email already in use');
+        }
+    });
+
+    test('Should not change the email if the string is not an email address', async () => {
+        const existingUser = await UserHelper.insertMario();
+
+        try {
+            await UserService.updateUserEmail(existingUser, 'Not an email!');
+
+            expect(true).toBe(false);
+        } catch (e) {
+            expect(e.message).toBe('\"value\" must be a valid email');
+        }
+    });
+
+    test('Should give an error if the user passed is not an user', async () => {
+        const existingUser = await UserHelper.insertMario();
+
+        try {
+            await UserService.updateUserEmail({field: "Not a user!"}, existingUser.email);
+
+            expect(true).toBe(false);
+        } catch (e) {
+            expect(e.message).toBe('invalid user');
+        }
     });
 });
 

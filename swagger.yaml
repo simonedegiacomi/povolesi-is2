@@ -253,7 +253,7 @@ definitions:
     - createdByUserId
     - assignedToUserGroupId
 
-  AssignmentWithTasks:
+  AssignmentWithTasksAndPeerReviews:
     title: Assignment with tasks
     type: object
     description: An object containg the assignment assigned to a user and the user-specific tasks
@@ -264,6 +264,10 @@ definitions:
         type: array
         items:
           $ref: '#/definitions/Task'
+      peerReviews:
+        type: array
+        items:
+          $ref: '#/definitions/PeerReview'
 
   TaskAnswer:
     title: Task Answer
@@ -495,7 +499,7 @@ paths:
               type: string
 
       responses:
-        204:
+        200:
           description: OK
         401:
           $ref: "#/responses/Unauthenticated"
@@ -574,7 +578,7 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Assignment'
+              $ref: '#/definitions/AssignmentWithTasksAndPeerReviews'
         401:
           $ref: "#/responses/Unauthenticated"
 
@@ -594,7 +598,7 @@ paths:
         200:
           description: OK
           schema:
-            $ref: '#/definitions/AssignmentWithTasks'
+            $ref: '#/definitions/AssignmentWithTasksAndPeerReviews'
 
         401:
           $ref: "#/responses/Unauthenticated"
@@ -603,6 +607,7 @@ paths:
           description: The assignement is not found
           schema:
             $ref: '#/definitions/Error'
+
 
   /users:
     get:
@@ -1078,8 +1083,13 @@ paths:
                 type: integer
                 example: 12
 
+
         401:
           $ref: "#/responses/Unauthenticated"
+
+        400:
+          description: Task  in the param is not exist
+
 
 
   /task-pools/{poolId}:
@@ -1226,105 +1236,6 @@ paths:
       responses:
         204:
           description: OK
-
-        401:
-          $ref: "#/responses/Unauthenticated"
-
-  ###########################
-  # DRAWS
-  ###########################
-
-  /draws:
-    get:
-      summary: Returns the draws associated to the assignment with a given id.
-      tags: [Draws]
-      parameters:
-      - in: query
-        name: assignmentId
-        required: true
-        type: integer
-
-      responses:
-        200:
-          description: OK
-          schema:
-            type: array
-            items:
-              $ref: '#/definitions/TaskDraw'
-
-        401:
-          $ref: "#/responses/Unauthenticated"
-
-    post:
-      summary: Adds a new draw
-      description: >
-        Adds a new draw to a specified assignment having specified instructions on the number of tasks to draw.
-
-        NOTE: The caller must have the `manageTasks` permission set, otherwise a 403 error will be issued
-
-      tags: [Draws]
-      parameters:
-      - in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/TaskDraw'
-      responses:
-        201:
-          description: OK
-          schema:
-            type: object
-            properties:
-              drawId:
-                type: integer
-
-        401:
-          $ref: "#/responses/Unauthenticated"
-
-        403:
-          $ref: '#/responses/Unauthorized'
-
-  /draws/{drawId}:
-    parameters:
-    - in: path
-      name: drawId
-      required: true
-      type: integer
-
-    get:
-      summary: Returns the draw having the given id
-      tags: [Draws]
-      responses:
-        200:
-          description: OK
-          schema:
-            $ref: '#/definitions/TaskDraw'
-
-    put:
-      summary: Updates the draw
-      tags: [Draws]
-      parameters:
-      - in: body
-        name: data
-        required: true
-        schema:
-          $ref: '#/definitions/TaskDraw'
-
-      responses:
-        200:
-          description: OK
-
-        401:
-          $ref: "#/responses/Unauthenticated"
-
-    delete:
-      summary: Deletes the draw having a given id
-      tags: [Draws]
-      responses:
-        204:
-          description: OK
-          schema:
-            $ref: '#/definitions/TaskDraw'
 
         401:
           $ref: "#/responses/Unauthenticated"

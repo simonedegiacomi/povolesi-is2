@@ -39,17 +39,17 @@ module.exports = {
             const user = await UserService.registerUser(value);
             res.status(201).send({
                 userId: user.id,
-                token : user.authToken
+                token: user.authToken
             });
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : UserService.errors.EMAIL_ALREADY_IN_USE,
+                error: UserService.errors.EMAIL_ALREADY_IN_USE,
                 status: 409
             }, {
-                error : UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
+                error: UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
                 status: 409
             }, {
-                error : UserService.errors.PASSWORD_TOO_SHORT,
+                error: UserService.errors.PASSWORD_TOO_SHORT,
                 status: 400
             }]);
         }
@@ -68,56 +68,44 @@ module.exports = {
             const user = await UserService.loginUser(value.email, value.password);
             res.status(200).send({
                 userId: user.id,
-                token : user.authToken
+                token: user.authToken
             });
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : UserService.errors.INVALID_CREDENTIALS,
+                error: UserService.errors.INVALID_CREDENTIALS,
                 status: 400
             }]);
         }
     },
 
     getAllUsers: async function (req, res) {
-        
         const users = await UserService.getAllUsers();
-        
-        let userFilter = [];
-        
-        users.map(u => userFilter
-                            .push({name:u.name,
-                                    email:u.email,
-                                    badgeNumber:u.badgeNumber})
-                )
-        
-        res.status(200).send(userFilter)
+        res.status(200).send(users.map(u => ModelMapper.mapUser(u)));
     },
 
-    updateEmail(req, res) {
-        const {error, value} = Joi.validate(req.body, updateEmailSchema);
-
-        if (error != null) {
+    async updateEmail(req, res) {
+        if (!req.body.newEmail) {
             return res.status(400).send({
-                errorMessage: error.details[0].message
+                errorMessage: 'email missing'
             });
         }
 
-        return UserService.updateUserEmail(req.user, value.newEmail)
-            .then(() => res.status(200).send())
-            .catch(error => ErrorMapper.map(res, error, [{
-                error : UserService.errors.EMAIL_ALREADY_IN_USE,
+        try {
+            await UserService.updateUserEmail(req.user, req.body.newEmail);
+            res.status(200).send();
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error: UserService.errors.EMAIL_ALREADY_IN_USE,
                 status: 409
-            }]))
+            }, {
+                error: UserService.errors.INVALID_EMAIL,
+                status: 400
+            }])
+        }
     },
 
-    getCurrentUserData: function (req, res) {
-        const json = req.user;
-        res.status(200).send({
-            id: json.id,
-            name: json.name,
-            badgeNumber: json.badgeNumber,
-            email: json.email
-        });
+    getCurrentUserData(req, res) {
+        res.status(200).send(ModelMapper.mapUser(req.user));
     },
 
     async updateUserData(req, res) {

@@ -1,9 +1,9 @@
 module.exports = (sequelize, DataTypes) => {
     const AssignedTask = sequelize.define('AssignedTask', {
         id: {
-            type         : DataTypes.INTEGER(11),
-            allowNull    : false,
-            primaryKey   : true,
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+            primaryKey: true,
             autoIncrement: true
         }
     }, {
@@ -12,25 +12,25 @@ module.exports = (sequelize, DataTypes) => {
 
     AssignedTask.associate = (models) => {
         AssignedTask.belongsTo(models.User, {
-            as        : 'user',
+            as: 'user',
             foreignKey: {
-                name     : 'userId',
+                name: 'userId',
                 allowNull: false
             }
         });
 
         AssignedTask.belongsTo(models.Assignment, {
-            as        : 'assignment',
+            as: 'assignment',
             foreignKey: {
-                name     : 'assignmentId',
+                name: 'assignmentId',
                 allowNull: false
             }
         });
 
         AssignedTask.belongsTo(models.Task, {
-            as        : 'task',
+            as: 'task',
             foreignKey: {
-                name     : 'taskId',
+                name: 'taskId',
                 allowNull: false
             }
         });
