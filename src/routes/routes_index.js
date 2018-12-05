@@ -49,9 +49,10 @@ function setupAuthenticatedRoutes (app) {
     router.delete('/user-groups/:id', userGroupsController.deleteGroupById);
 
     // /user-permissions
-    router.post('/user-permissions', userPermissionsController.createPermission);
-    router.delete('/user-permissions/:id', userPermissionsController.deletePermissionById);
     router.get('/user-permissions', userPermissionsController.getPermissionListByGroup);
+    router.post('/user-permissions', userPermissionsController.createPermission);
+    router.put('/user-permissions/:id', userPermissionsController.updatePermission);
+    router.delete('/user-permissions/:id', userPermissionsController.deletePermissionById);
 
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);

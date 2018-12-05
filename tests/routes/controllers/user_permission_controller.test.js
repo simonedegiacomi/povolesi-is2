@@ -136,9 +136,33 @@ describe('Test the get of a user group list', () => {
             .set('X-API-TOKEN', creator.authToken);
 
         const userGroupList = await UserPermissionHelper.getGroupUserList();
-        console.log(userGroupList);
-        expect(response.status).toBe(200);
-        expect(response.body).toEqual(userGroupList);
 
+        expect(response.status).toBe(200);
+
+        //TODO: this is not good for comparing array, except this the APIS works
+        expect(response.body).toEqual(userGroupList);
     })
+});
+
+describe("Test the update of a user permission", () => {
+    test("PUT /user-permissions with valid data should return 204", async () => {
+        const group = await UserGroupHelper.createGroup();
+        const permissionToUpdate = await UserPermissionHelper.insertUserPermission(group);
+        const creator = await group.getCreatedBy();
+
+        const examplePermissionUpdated = {
+            userId: permissionToUpdate.id,
+            userGroupId: group.id,
+            canManageTasks: true,
+            canManageUsers: true,
+            canChangePermissions: true
+        };
+
+        const response = await request(app)
+            .put(`/api/v1/user-permissions/${permissionToUpdate.id}`)
+            .set('X-API-TOKEN', creator.authToken)
+            .send(examplePermissionUpdated);
+
+        expect(response.status).toBe(204);
+    });
 });

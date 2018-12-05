@@ -19,6 +19,19 @@ describe("Test the listing of user permissions in a group", () => {
     })
 });
 
+describe('Test the update of a user permission  (change privileges of a user)', () => {
+    test('Should return the user permission updated given the permissionId and permission flags', async () => {
+        const group = await UserGroupsHelper.createGroup();
+        const permission = await UserPermissionHelper.insertUserPermission(group);
+        const permissionUpdated = await UserPermissionHelper.givePrivilegeToUser(permission);
+
+        const permissionFromDb = await UserPermissionHelper.updateUserPermission(permission, true, true, true);
+
+        expect(permissionFromDb.toJSON()).toEqual(permissionUpdated.toJSON());
+
+    })
+});
+
 describe("Test the creation of a user permission (add user to a group)", () => {
 
     test("Should return the user permission instance just created", async () => {

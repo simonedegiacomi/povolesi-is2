@@ -72,6 +72,29 @@ module.exports = {
                 status: 403
             }]);
         }
+    },
+
+    async updatePermission(req, res) {
+        const {error, value} = Joi.validate(req.body, permissionSchema);
+
+        const id = req.params.id;
+        const permissionToUpdate = await UserPermissionsService.getPermissionById(req.user, id);
+
+        if (error != null) {
+            return res.status(400).send({
+                errorMessage: error.details[0].message
+            });
+        }
+
+        try {
+            const permissionUpdated = await UserPermissionsService.updateUserPermission(req.user, permissionToUpdate, value);
+            res.status(204).send();
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error : UserPermissionsService.errors.UNAUTHORIZED,
+                status: 403
+            }]);
+        }
     }
 
 };
