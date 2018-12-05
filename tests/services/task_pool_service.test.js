@@ -1,9 +1,9 @@
 const TaskPoolService = require('../../src/services/task_pool_service');
-const TaskHelper      = require('../helpers/task_helper');
-const UserHelper      = require('../helpers/user_helper');
+const TaskHelper = require('../helpers/task_helper');
+const UserHelper = require('../helpers/user_helper');
 
 async function insertArrayTaskPool(taskPools) {
-    for(let i = 0; i<taskPools.length; i++){
+    for (let i = 0; i < taskPools.length; i++) {
         await TaskPoolService.createTaskPool(taskPools[i]);
     }
 }
@@ -12,9 +12,9 @@ async function insertArrayTaskPool(taskPools) {
 describe('creation of taskPool', () => {
 
     test('insert taskPool', async () => {
-        const creator         = await UserHelper.insertMario();
+        const creator = await UserHelper.insertMario();
         const taskPoolExample = {
-            name     : 'esempio',
+            name: 'esempio',
             createdBy: creator
         };
 
@@ -25,13 +25,14 @@ describe('creation of taskPool', () => {
     });
 
     test('insert taskPool with a task', async () => {
-        const creator         = await UserHelper.insertMario();
+
+        const creator = await UserHelper.insertMario();
 
         const taskPoolExample = {
-            name     : 'esempio',
+            name: 'esempio',
             createdBy: creator
         };
-        const task = await TaskHelper.createOpenQuestionTask(creator.id );
+        const task = await TaskHelper.createOpenQuestionTask(creator.id);
 
 
         const createdPool = await TaskPoolService.createTaskPool(taskPoolExample, [task]);
@@ -70,19 +71,19 @@ describe('creation of taskPool', () => {
 
 describe('get my taskPool', () => {
     test('get my taskPools', async () => {
-        const mario   = await UserHelper.insertMario();
+        const mario = await UserHelper.insertMario();
         const giorgio = await UserHelper.insertGiorgio();
 
         const taskPool1 = {
-            name     : 'esempio1',
+            name: 'esempio1',
             createdBy: giorgio
         };
         const taskPool2 = {
-            name     : 'esempio2',
+            name: 'esempio2',
             createdBy: giorgio
         };
         const taskPool3 = {
-            name     : 'esempio3',
+            name: 'esempio3',
             createdBy: mario
         };
 

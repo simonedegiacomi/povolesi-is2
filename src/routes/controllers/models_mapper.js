@@ -1,9 +1,9 @@
 module.exports = {
     mapUser(model) {
         return {
-            id         : model.id,
-            name       : model.name,
-            email      : model.email,
+            id: model.id,
+            name: model.name,
+            email: model.email,
             badgeNumber: model.badgeNumber
         }
     },
@@ -12,8 +12,8 @@ module.exports = {
         const createdBy = await group.getCreatedBy();
 
         return {
-            id       : group.id,
-            name     : group.name,
+            id: group.id,
+            name: group.name,
             createdBy: this.mapUser(createdBy)
         }
     },

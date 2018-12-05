@@ -1,15 +1,15 @@
 const request = require('supertest');
 
-const app             = require('../../../src/app');
-const UserHelper      = require('../../helpers/user_helper');
+const app = require('../../../src/app');
+const UserHelper = require('../../helpers/user_helper');
 const UserGroupHelper = require('../../helpers/user_groups_helper');
-const ModelsMapper    = require('../../../src/routes/controllers/models_mapper');
-const {UserGroup}      = require('../../../src/models');
+const ModelsMapper = require('../../../src/routes/controllers/models_mapper');
+const {UserGroup} = require('../../../src/models');
 
 describe('Test the user group creation', () => {
 
     test('It should create a new group', async () => {
-        const user     = await UserHelper.insertMario();
+        const user = await UserHelper.insertMario();
         const response = await request(app)
             .post('/api/v1/user-groups')
             .set('X-API-TOKEN', user.authToken)
@@ -22,7 +22,7 @@ describe('Test the user group creation', () => {
     });
 
     test('It should create a group without specifying the name', async () => {
-        const user     = await UserHelper.insertMario();
+        const user = await UserHelper.insertMario();
         const response = await request(app)
             .post('/api/v1/user-groups')
             .set('X-API-TOKEN', user.authToken)
@@ -72,8 +72,8 @@ describe('The user group collection', () => {
     });
 
     test('It should return a specific user group given its id', async () => {
-        const user             = await UserHelper.insertMario();
-        const createdGroup     = await UserGroupHelper.createGroup("A");
+        const user = await UserHelper.insertMario();
+        const createdGroup = await UserGroupHelper.createGroup("A");
         createdGroup.createdBy = await createdGroup.getCreatedBy();
 
         const response = await request(app)
@@ -106,7 +106,7 @@ describe('The user group collection', () => {
 describe("Test the user group deletion", () => {
     test('It should delete an existing user group', async () => {
         const group = await UserGroupHelper.createGroup();
-        const user  = await group.getCreatedBy();
+        const user = await group.getCreatedBy();
 
         const response = await request(app)
             .delete(`/api/v1/user-groups/${group.id}`)
@@ -134,7 +134,7 @@ describe("Test the user group deletion", () => {
 
     test("It should return 403 when someone who didn't create the group tries to delete the group", async () => {
         const group = await UserGroupHelper.createGroup();
-        const user  = await UserHelper.insertMario();
+        const user = await UserHelper.insertMario();
 
         const response = await request(app)
             .delete(`/api/v1/user-groups/${group.id}`)

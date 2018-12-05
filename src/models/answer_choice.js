@@ -1,13 +1,13 @@
 module.exports = function (sequelize, DataTypes) {
     const AnswerChoice = sequelize.define('AnswerChoice', {
-        id    : {
-            type         : DataTypes.INTEGER(11),
-            allowNull    : false,
-            primaryKey   : true,
+        id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+            primaryKey: true,
             autoIncrement: true
         },
         choice: {
-            type     : DataTypes.INTEGER(11),
+            type: DataTypes.INTEGER(11),
             allowNull: false
         }
     }, {
@@ -16,9 +16,9 @@ module.exports = function (sequelize, DataTypes) {
 
     AnswerChoice.associate = (models) => {
         AnswerChoice.belongsTo(models.Answer, {
-            as        : 'answer',
+            as: 'answer',
             foreignKey: {
-                name     : 'answerId',
+                name: 'answerId',
                 allowNull: false
             }
         });

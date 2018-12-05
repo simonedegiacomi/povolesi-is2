@@ -15,7 +15,7 @@ module.exports = (app) => {
     setupAuthenticatedRoutes(app);
 };
 
-function setupUnauthenticatedRoutes (app) {
+function setupUnauthenticatedRoutes(app) {
     const router = express.Router();
 
     router.get('/', (req, res) => res.status(200).send(`Welcome`));
@@ -25,17 +25,14 @@ function setupUnauthenticatedRoutes (app) {
     //TODO: sposta nell autheticated
     router.get('/users', userController.getAllUsers);
 
-    router.get ('/groups', userGroupsController.getAllGroups);
+    router.get('/groups', userGroupsController.getAllGroups);
     router.post('/groups', userGroupsController.createUserGroup);
-
-
-
 
 
     app.use('/api/v1', router);
 }
 
-function setupAuthenticatedRoutes (app) {
+function setupAuthenticatedRoutes(app) {
     const router = express.Router();
 
     router.use(authenticationMiddleware);
@@ -44,6 +41,7 @@ function setupAuthenticatedRoutes (app) {
     router.get('/users/me', userController.getCurrentUserData);
     router.put('/users/me', userController.updateUserData);
     router.put('/users/me/email', userController.updateEmail);
+    router.get('/users/:id', userController.getUserById);
 
     // /user-groups
     router.get('/user-groups', userGroupsController.getAllGroups);
@@ -52,14 +50,16 @@ function setupAuthenticatedRoutes (app) {
     router.delete('/user-groups/:id', userGroupsController.deleteGroupById);
 
     // /user-permissions
+    router.get('/user-permissions', userPermissionsController.getPermissionListByGroup);
     router.post('/user-permissions', userPermissionsController.createPermission);
+    router.put('/user-permissions/:id', userPermissionsController.updatePermission);
     router.delete('/user-permissions/:id', userPermissionsController.deletePermissionById);
 
     // /tasks
-    router.get ('/tasks',   taskController.getTasks);
-    router.get ('/tasks/:id',taskController.getTask);
-    router.delete ('/tasks/:id',taskController.deleteTask);
-    router.post('/tasks',   taskController.createTask);
+    router.get('/tasks', taskController.getTasks);
+    router.get('/tasks/:id', taskController.getTask);
+    router.delete('/tasks/:id', taskController.deleteTask);
+    router.post('/tasks', taskController.createTask);
 
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);

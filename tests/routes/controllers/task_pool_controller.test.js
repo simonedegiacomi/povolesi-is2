@@ -1,8 +1,11 @@
 const request = require('supertest')
 
 const app = require('../../../src/app');
-const UserHelper  = require('../../helpers/user_helper');
-const {TaskPool}      = require('../../../src/models');
+
+const UserHelper = require('../../helpers/user_helper');
+const TaskHelper = require('../../helpers/task_helper');
+const {TaskPool} = require('../../../src/models');
+
 
 
 var createTaskPoolToSend = function(user){
@@ -25,6 +28,7 @@ describe('Test for creation of new task pool', () => {
             .post('/api/v1/task-pools')
             .set('X-API-TOKEN',user.authToken)
             .send(taskPoolExample)
+
 
         expect(response.status).toBe(201);
         expect(response.body.taskPoolId).toBeDefined();

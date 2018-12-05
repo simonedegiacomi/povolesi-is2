@@ -3,10 +3,10 @@ const {sequelize, User, UserPermission, UserGroup} = require('../models');
 module.exports = {
 
     errors: {
-        UNAUTHORIZED             : 'user is not authorized',
-        USER_ALREADY_MEMBER      : 'the user that you want to add is already a member of the specified group',
-        WRONG_ARGUMENTS          : 'wrong argument number or type',
-        GROUP_NOT_FOUND          : 'group not found',
+        UNAUTHORIZED: 'user is not authorized',
+        USER_ALREADY_MEMBER: 'the user that you want to add is already a member of the specified group',
+        WRONG_ARGUMENTS: 'wrong argument number or type',
+        GROUP_NOT_FOUND: 'group not found',
         USER_PERMISSION_NOT_FOUND: 'user permission not found'
     },
 
@@ -32,10 +32,10 @@ module.exports = {
 
         try {
             return await UserPermission.create({
-                userId              : permission.userId,
-                userGroupId         : permission.userGroupId,
-                canManageTasks      : permission.canManageTasks || false,
-                canManageUsers      : permission.canManageUsers || false,
+                userId: permission.userId,
+                userGroupId: permission.userGroupId,
+                canManageTasks: permission.canManageTasks || false,
+                canManageUsers: permission.canManageUsers || false,
                 canChangePermissions: permission.canChangePermissions || false
             });
         } catch (e) {
@@ -56,7 +56,7 @@ module.exports = {
 
         const permission = await UserPermission.findOne({
             where: {
-                userId     : user.id,
+                userId: user.id,
                 userGroupId: group.id
             }
         });
@@ -104,5 +104,62 @@ module.exports = {
         }
 
         return permission;
+    },
+
+    async getPermissionListByGroup(actionPerformer, group) {
+        if (group == null) {
+            throw new Error(this.errors.GROUP_NOT_FOUND)
+        }
+
+        const permissionList =  await UserPermission.findAll({
+            where: { userGroupId: group.id }
+        });
+        if (permissionList == null) {
+            throw new Error(this.errors.GROUP_NOT_FOUND)
+        }
+
+        const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        if (!performerHasPermission && permissionList != null) {
+            throw new Error(this.errors.UNAUTHORIZED);
+        }
+
+        return permissionList;
+    },
+
+    async updateUserPermission(actionPerformer, permission, updatedPermission) {
+        if (!actionPerformer instanceof User) {
+            throw new Error(this.errors.WRONG_ARGUMENTS);
+        }
+        if (!permission || !permission.userId || !permission.userGroupId) {
+            throw new Error(this.errors.WRONG_ARGUMENTS);
+        }
+
+        const group = await UserGroup.findOne({
+            where: {id: permission.userGroupId}
+        });
+        if (group == null) {
+            throw new Error(this.errors.GROUP_NOT_FOUND);
+        }
+        console.log(group);
+
+        const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        if (!hasPermission) {
+            throw new Error(this.errors.UNAUTHORIZED);
+        }
+
+        try {
+            return await permission.update({
+                userId              : updatedPermission.userId,
+                userGroupId         : updatedPermission.userGroupId,
+                canManageTasks      : updatedPermission.canManageTasks,
+                canManageUsers      : updatedPermission.canManageUsers,
+                canChangePermissions: updatedPermission.canChangePermissions
+            });
+        } catch (e) {
+            if (this._isDuplicateMemberError(e)) {
+                throw new Error(this.errors.USER_ALREADY_MEMBER);
+            }
+            throw e;
+        }
     }
 };
