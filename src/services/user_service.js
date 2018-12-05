@@ -7,6 +7,13 @@ const ArgumentError = require('./argument_error');
 
 const BCRYPT_SALT_RAUNDS = 10;
 
+const userSchema = Joi.object().keys({
+    name: Joi.string().min(3).max(30).required(),
+    email: Joi.string().email().required(),
+    badgeNumber: Joi.string().min(1).max(45).required(),
+    password: Joi.string().min(6).required()
+});
+
 module.exports = {
 
     errors: {
@@ -19,20 +26,17 @@ module.exports = {
         INVALID_EMAIL: "\"value\" must be a valid email"
     },
 
-    constants: {
-        MIN_PASSWORD_LENGTH: 6
-    },
-
-    async registerUser(user) {
-        if (user.password.length < this.constants.MIN_PASSWORD_LENGTH) {
-            throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
+    async registerUser(data) {
+        const {error, value} = Joi.validate(data, userSchema);
+        if (error != null) {
+            throw new ArgumentError(error.details[0].message);
         }
 
-        user.password = await bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS);
-        user.authToken = this._generateToken();
+        value.password = await bcrypt.hash(value.password, BCRYPT_SALT_RAUNDS);
+        value.authToken = this._generateToken();
 
         try {
-            return await User.create(user);
+            return await User.create(value);
         } catch (ex) {
             if (ex instanceof sequelize.UniqueConstraintError) {
                 const wrongField = ex.errors[0].path;

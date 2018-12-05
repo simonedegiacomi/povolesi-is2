@@ -3,13 +3,6 @@ const UserService = require('../../services/user_service');
 const ErrorMapper = require('./error_mapper');
 const ModelMapper = require('./models_mapper');
 
-const userSchema = Joi.object().keys({
-    name: Joi.string().min(3).max(30).required(),
-    email: Joi.string().email().required(),
-    badgeNumber: Joi.string().min(1).max(45).required(),
-    password: Joi.string().required()
-});
-
 const loginSchema = Joi.object().keys({
     email: Joi.string().email().required(),
     password: Joi.string().required()
@@ -27,16 +20,8 @@ const updateUserDataSchema = Joi.object().keys({
 module.exports = {
 
     async register(req, res) {
-        const {error, value} = Joi.validate(req.body, userSchema);
-
-        if (error != null) {
-            return res.status(400).send({
-                errorMessage: error.details[0].message
-            });
-        }
-
         try {
-            const user = await UserService.registerUser(value);
+            const user = await UserService.registerUser(req.body);
             res.status(201).send({
                 userId: user.id,
                 token: user.authToken
