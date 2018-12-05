@@ -59,8 +59,8 @@ describe("Test the creation of a user permission", () => {
 
 describe("Test the deletion of a user permission (remove a user fro a group)", () => {
     test("DELETE /user-permissions/:id with valid data should return 200", async () => {
-        const permission = await UserPermissionHelper.insertUserPermission();
-        const group      = await permission.getUserGroup();
+        const group      = await UserGroupHelper.createGroup();
+        const permission = await UserPermissionHelper.insertUserPermission(group);
         const creator    = await group.getCreatedBy();
 
         const response = await request(app)
@@ -77,7 +77,8 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
     });
 
     test("DELETE /user-permissions/:id should return 403 when someone outside a group tries remove a member", async () => {
-        const permission = await UserPermissionHelper.insertUserPermission();
+        const group      = await UserGroupHelper.createGroup();
+        const permission = await UserPermissionHelper.insertUserPermission(group);
         const aUser      = await UserHelper.insertNewRandom();
 
 
@@ -90,8 +91,8 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
     });
 
     test("DELETE /user-permissions/:id should return 403 when a member without the 'manageUsers' permission tries remove a member", async () => {
-        const permission = await UserPermissionHelper.insertUserPermission();
-        const group      = await permission.getUserGroup();
+        const group      = await UserGroupHelper.createGroup();
+        const permission = await UserPermissionHelper.insertUserPermission(group);
         const creator    = await group.getCreatedBy();
 
         const memberWithoutPermission = await UserHelper.insertNewRandom();
@@ -112,8 +113,8 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
     });
 
     test("DELETE /user-permissions/:id should return 404 when someone tries to remove a non-member", async () => {
-        const permission = await UserPermissionHelper.insertUserPermission();
-        const group      = await permission.getUserGroup();
+        const group      = await UserGroupHelper.createGroup();
+        const permission = await UserPermissionHelper.insertUserPermission(group);
         const creator    = await group.getCreatedBy();
 
         const response = await request(app)
@@ -132,15 +133,16 @@ describe('Test the get of a user group list', () => {
         const creator = await group.getCreatedBy();
 
         const response = await request(app)
-            .get('/api/v1/user-permissions')
+            .get(`/api/v1/user-permissions?groupId=${group.id}`)
             .set('X-API-TOKEN', creator.authToken);
 
-        const userGroupList = await UserPermissionHelper.getGroupUserList();
+        const userGroupList = await UserPermissionHelper.getUserPermissionList(group, creator);
 
         expect(response.status).toBe(200);
 
-        //TODO: this is not good for comparing array, except this the APIS works
-        expect(response.body).toEqual(userGroupList);
+        expect(response.body.map(p => p.toJSON())).toEqual(
+            expect.arrayContaining(userGroupList.map(p => p.toJSON()))
+        );
     })
 });
 

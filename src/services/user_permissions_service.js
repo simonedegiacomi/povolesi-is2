@@ -107,7 +107,6 @@ module.exports = {
     },
 
     async getPermissionListByGroup(actionPerformer, group) {
-
         if (group == null) {
             throw new Error(this.errors.GROUP_NOT_FOUND)
         }
@@ -120,7 +119,7 @@ module.exports = {
         }
 
         const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
-        if (!performerHasPermission) {
+        if (!performerHasPermission && permissionList != null) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
 
@@ -141,6 +140,7 @@ module.exports = {
         if (group == null) {
             throw new Error(this.errors.GROUP_NOT_FOUND);
         }
+        console.log(group);
 
         const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
         if (!hasPermission) {

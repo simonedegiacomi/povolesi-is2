@@ -27,8 +27,7 @@ module.exports = {
         return await permissionList;
     },
 
-    async getUserPermissionList(group) {
-        const creator = await group.getCreatedBy();
+    async getUserPermissionList(group, creator) {
         return await UserPermissionsService.getPermissionListByGroup(creator, group);
     },
 
