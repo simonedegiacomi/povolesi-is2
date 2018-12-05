@@ -4,6 +4,7 @@ const Joi = require('joi');
 
 const {sequelize, User} = require('../models/index');
 const ArgumentError = require('./argument_error');
+const ServiceUtils = require('./utils');
 
 const BCRYPT_SALT_RAUNDS = 10;
 
@@ -12,6 +13,11 @@ const userSchema = Joi.object().keys({
     email: Joi.string().email().required(),
     badgeNumber: Joi.string().min(1).max(45).required(),
     password: Joi.string().min(6).required()
+});
+
+const loginSchema = Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required()
 });
 
 module.exports = {
@@ -27,16 +33,13 @@ module.exports = {
     },
 
     async registerUser(data) {
-        const {error, value} = Joi.validate(data, userSchema);
-        if (error != null) {
-            throw new ArgumentError(error.details[0].message);
-        }
+        ServiceUtils.validateSchemaOrThrowArgumentError(data, userSchema);
 
-        value.password = await bcrypt.hash(value.password, BCRYPT_SALT_RAUNDS);
-        value.authToken = this._generateToken();
+        data.password = await bcrypt.hash(data.password, BCRYPT_SALT_RAUNDS);
+        data.authToken = this._generateToken();
 
         try {
-            return await User.create(value);
+            return await User.create(data);
         } catch (ex) {
             if (ex instanceof sequelize.UniqueConstraintError) {
                 const wrongField = ex.errors[0].path;
@@ -52,6 +55,8 @@ module.exports = {
     },
 
     async loginUser(email, password) {
+        ServiceUtils.validateSchemaOrThrowArgumentError({email, password}, loginSchema);
+
         const user = await User.findOne({
             where: {
                 email

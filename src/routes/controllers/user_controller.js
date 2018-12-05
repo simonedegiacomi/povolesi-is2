@@ -3,11 +3,6 @@ const UserService = require('../../services/user_service');
 const ErrorMapper = require('./error_mapper');
 const ModelMapper = require('./models_mapper');
 
-const loginSchema = Joi.object().keys({
-    email: Joi.string().email().required(),
-    password: Joi.string().required()
-});
-
 const updateEmailSchema = Joi.object().keys({
     newEmail: Joi.string().email().required()
 });
@@ -41,16 +36,16 @@ module.exports = {
     },
 
     async login(req, res) {
-        const {error, value} = Joi.validate(req.body, loginSchema);
+        const credentials = req.body;
 
-        if (error != null) {
+        if (!credentials.email || !credentials.password) {
             return res.status(400).send({
-                errorMessage: error.details[0].message
+                errorMessage: 'Missing username or password'
             });
         }
 
         try {
-            const user = await UserService.loginUser(value.email, value.password);
+            const user = await UserService.loginUser(credentials.email, credentials.password);
             res.status(200).send({
                 userId: user.id,
                 token: user.authToken
