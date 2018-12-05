@@ -20,6 +20,6 @@ module.exports = {
             createdBy: userMe
         },tasks)
 
-        res.status(200).send({ id: taskPoolCreated.id})
+        res.status(201).send({ taskPoolId: taskPoolCreated.id})
     }
 };
