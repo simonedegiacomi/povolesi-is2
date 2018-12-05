@@ -3,38 +3,22 @@ const request = require('supertest');
 const UserHelper = require('../../helpers/user_helper');
 const app = require('../../../src/app');
 
-async function postUser(user) {
-    return await request(app)
+function postUser(user) {
+    return request(app)
         .post('/api/v1/register')
         .send(user);
-}
-
-async function postUserAndExpectCode(user, code) {
-    const response = await postUser(user);
-
-    expect(response.status).toBe(code);
-
-    return response;
-}
-
-async function postUserAndExpectCodeAndErrorMessage(user, code, message) {
-    const response = await postUserAndExpectCode(user, code);
-
-    expect(response.body.errorMessage).toBe(message);
-
-    return response;
 }
 
 
 describe('Test the user registration', () => {
 
-    test('It should register the new user', async () => {
-        const response = await postUserAndExpectCode({
+    test('POST /register with valid data should return 200', async () => {
+        const response = await postUser({
             name: 'Mario Blu',
             email: 'mario@blu.it',
             badgeNumber: 'AAAAAA',
             password: 'password'
-        }, 201);
+        }).expect(201);
 
         expect(response.body.token).toBeDefined();
         expect(response.body.userId).toBeDefined();
@@ -42,85 +26,76 @@ describe('Test the user registration', () => {
     });
 
     test('POST /register without the name should return 400', async () => {
-        await postUserAndExpectCode({
+        await postUser({
             email: 'mario@blu.it',
             badgeNumber: 'AAAAAA',
             password: 'password'
-        }, 400);
+        }).expect(400);
     });
 
-    test('Should not register two users with the same email', async () => {
+    test('POST /register with an already used email should return 409', async () => {
         const existingUser = await UserHelper.insertMario();
 
-        await postUserAndExpectCodeAndErrorMessage({
+        await postUser({
             name: 'Mario Rossi',
             email: existingUser.email,
             badgeNumber: 'AAAAAA',
             password: 'password'
-        }, 409, 'email already in use');
+        }).expect(409, {errorMessage: 'email already in use'});
     });
 
-    test('Should not register two users with the same badge number', async () => {
+    test('POST /register with an already used badge number should return 409', async () => {
         const existingUser = await UserHelper.insertMario();
 
-        await postUserAndExpectCodeAndErrorMessage({
+        await postUser({
             name: 'Mario Rossi',
             email: 'mario@blu.it',
             badgeNumber: existingUser.badgeNumber,
             password: 'password'
-        }, 409, 'badge number already in use');
+        }).expect(409, {errorMessage: 'badge number already in use'});
     })
 
 });
 
+function postLogin(credentials) {
+    return request(app)
+        .post('/api/v1/login')
+        .send(credentials);
+}
+
 describe('Test the user login', () => {
-    test('It should let the user login, responding with a new token', async () => {
+    test('POST /login should return 200 and a new token', async () => {
         const existingUser = await UserHelper.insertMario();
 
-        const response = await request(app)
-            .post('/api/v1/login')
-            .send({
-                email: existingUser.email,
-                password: 'password'
-            });
+        const response = await postLogin({
+            email: existingUser.email,
+            password: 'password'
+        }).expect(200);
 
-        expect(response.status).toBe(200);
         expect(response.body.token).toBeDefined();
         expect(response.body.userId).toBeDefined();
     });
 
     test('POST /login without the email should return 400', async () => {
-        const response = await request(app)
-            .post('/api/v1/login')
-            .send({
-                password: 'password'
-            });
-
-        expect(response.status).toBe(400);
+        await postLogin({
+            password: 'password'
+        }).expect(400);
     });
 
     test('It should not login a user with a wrong password', async () => {
         const existingUser = await UserHelper.insertMario();
 
-        const response = await request(app)
-            .post('/api/v1/login')
-            .send({
-                email: existingUser.email,
-                password: 'wrongPassword'
-            });
-
-        expect(response.status).toBe(400);
+        await postLogin({
+            email: existingUser.email,
+            password: 'wrongPassword'
+        }).expect(400);
     });
 
     test("It should not login a user that doesn't exists", async () => {
-        const response = await request(app)
-            .post('/api/v1/login')
-            .send({
-                email: 'notexisting@user.it',
-                password: 'password'
-            });
-
-        expect(response.status).toBe(400);
+        await postLogin({
+            email: 'notexisting@user.it',
+            password: 'password'
+        }).expect(400);
     });
 });
 
