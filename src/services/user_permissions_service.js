@@ -3,10 +3,10 @@ const {sequelize, User, UserPermission, UserGroup} = require('../models');
 module.exports = {
 
     errors: {
-        UNAUTHORIZED             : 'user is not authorized',
-        USER_ALREADY_MEMBER      : 'the user that you want to add is already a member of the specified group',
-        WRONG_ARGUMENTS          : 'wrong argument number or type',
-        GROUP_NOT_FOUND          : 'group not found',
+        UNAUTHORIZED: 'user is not authorized',
+        USER_ALREADY_MEMBER: 'the user that you want to add is already a member of the specified group',
+        WRONG_ARGUMENTS: 'wrong argument number or type',
+        GROUP_NOT_FOUND: 'group not found',
         USER_PERMISSION_NOT_FOUND: 'user permission not found'
     },
 
@@ -32,10 +32,10 @@ module.exports = {
 
         try {
             return await UserPermission.create({
-                userId              : permission.userId,
-                userGroupId         : permission.userGroupId,
-                canManageTasks      : permission.canManageTasks || false,
-                canManageUsers      : permission.canManageUsers || false,
+                userId: permission.userId,
+                userGroupId: permission.userGroupId,
+                canManageTasks: permission.canManageTasks || false,
+                canManageUsers: permission.canManageUsers || false,
                 canChangePermissions: permission.canChangePermissions || false
             });
         } catch (e) {
@@ -56,7 +56,7 @@ module.exports = {
 
         const permission = await UserPermission.findOne({
             where: {
-                userId     : user.id,
+                userId: user.id,
                 userGroupId: group.id
             }
         });

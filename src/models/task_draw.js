@@ -1,17 +1,17 @@
 module.exports = (sequelize, DataTypes) => {
     const TaskDraw = sequelize.define('TaskDraw', {
-        id                : {
-            type         : DataTypes.INTEGER(11),
-            allowNull    : false,
-            primaryKey   : true,
+        id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+            primaryKey: true,
             autoIncrement: true
         },
         numQuestionsToDraw: {
-            type     : DataTypes.INTEGER(3).UNSIGNED,
+            type: DataTypes.INTEGER(3).UNSIGNED,
             allowNull: false
         },
         minPerQuestionDraw: {
-            type     : DataTypes.INTEGER(3).UNSIGNED,
+            type: DataTypes.INTEGER(3).UNSIGNED,
             allowNull: false
         }
     }, {
@@ -20,9 +20,9 @@ module.exports = (sequelize, DataTypes) => {
 
     TaskDraw.associate = (models) => {
         TaskDraw.belongsTo(models.TaskPool, {
-            as        : 'taskPool',
+            as: 'taskPool',
             foreignKey: {
-                name     : 'taskPoolId',
+                name: 'taskPoolId',
                 allowNull: false
             }
         });

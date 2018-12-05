@@ -1,14 +1,13 @@
-
 module.exports = (sequelize, DataTypes) => {
     const UserGroup = sequelize.define('UserGroup', {
-        id  : {
-            type         : DataTypes.INTEGER(11),
-            allowNull    : false,
-            primaryKey   : true,
+        id: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
+            primaryKey: true,
             autoIncrement: true
         },
         name: {
-            type     : DataTypes.STRING(200),
+            type: DataTypes.STRING(200),
             allowNull: false
         }
     });

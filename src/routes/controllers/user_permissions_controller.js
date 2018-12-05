@@ -1,15 +1,15 @@
 const Joi = require('joi');
 
 const UserPermissionsService = require('../../services/user_permissions_service');
-const ErrorMapper            = require('./error_mapper');
-const ModelsMapper            = require('./models_mapper');
+const ErrorMapper = require('./error_mapper');
+const ModelsMapper = require('./models_mapper');
 
 const permissionSchema = Joi.object().keys({
     userId: Joi.number().integer().required(),
     userGroupId: Joi.number().integer().required(),
 
-    canManageTasks      : Joi.boolean().required(),
-    canManageUsers      : Joi.boolean().required(),
+    canManageTasks: Joi.boolean().required(),
+    canManageUsers: Joi.boolean().required(),
     canChangePermissions: Joi.boolean().required()
 });
 
@@ -29,17 +29,17 @@ module.exports = {
             res.status(201).send(ModelsMapper.mapUserPermission(permission));
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : UserPermissionsService.errors.USER_ALREADY_MEMBER,
+                error: UserPermissionsService.errors.USER_ALREADY_MEMBER,
                 status: 409
             }, {
-                error : UserPermissionsService.errors.UNAUTHORIZED,
+                error: UserPermissionsService.errors.UNAUTHORIZED,
                 status: 403
             }]);
         }
     },
 
 
-    async deletePermissionById (req, res) {
+    async deletePermissionById(req, res) {
         const id = req.params.id;
 
         try {
@@ -47,10 +47,10 @@ module.exports = {
             res.status(200).send();
         } catch (e) {
             ErrorMapper.map(res, e, [{
-                error : UserPermissionsService.errors.USER_PERMISSION_NOT_FOUND,
+                error: UserPermissionsService.errors.USER_PERMISSION_NOT_FOUND,
                 status: 404
             }, {
-                error : UserPermissionsService.errors.UNAUTHORIZED,
+                error: UserPermissionsService.errors.UNAUTHORIZED,
                 status: 403
             }]);
         }
