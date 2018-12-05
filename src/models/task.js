@@ -39,6 +39,7 @@ module.exports = (sequelize, DataTypes) => {
         Task.belongsTo(models.User, {as: 'user'});
 
         Task.belongsToMany(models.TaskPool, {
+            as: 'taskPools',
             through: 'TaskPool_Task'
         });
     };

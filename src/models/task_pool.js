@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
             }
         });
 
+        TaskPool.belongsToMany(models.Task, {
+            as: 'tasks',
+            through: 'TaskPool_Task'
+        });
 
     };
 
