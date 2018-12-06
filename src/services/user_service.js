@@ -4,8 +4,21 @@ const Joi = require('joi');
 
 const {sequelize, User} = require('../models/index');
 const ArgumentError = require('./argument_error');
+const ServiceUtils = require('./utils');
 
 const BCRYPT_SALT_ROUNDS = 10;
+
+const userSchema = Joi.object().keys({
+    name: Joi.string().min(3).max(30).required(),
+    email: Joi.string().email().required(),
+    badgeNumber: Joi.string().min(1).max(45).required(),
+    password: Joi.string().min(6).required()
+});
+
+const loginSchema = Joi.object().keys({
+    email: Joi.string().email().required(),
+    password: Joi.string().required()
+});
 
 module.exports = {
 
@@ -20,20 +33,14 @@ module.exports = {
         USER_NOT_FOUND: "user not found"
     },
 
-    constants: {
-        MIN_PASSWORD_LENGTH: 6
-    },
+    async registerUser(data) {
+        ServiceUtils.validateSchemaOrThrowArgumentError(data, userSchema);
 
-    async registerUser(user) {
-        if (user.password.length < this.constants.MIN_PASSWORD_LENGTH) {
-            throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
-        }
-
-        user.password = await bcrypt.hash(user.password, BCRYPT_SALT_ROUNDS);
-        user.authToken = this._generateToken();
+        data.password = await bcrypt.hash(data.password, BCRYPT_SALT_ROUNDS);
+        data.authToken = this._generateToken();
 
         try {
-            return await User.create(user);
+            return await User.create(data);
         } catch (ex) {
             if (ex instanceof sequelize.UniqueConstraintError) {
                 const wrongField = ex.errors[0].path;
@@ -49,6 +56,8 @@ module.exports = {
     },
 
     async loginUser(email, password) {
+        ServiceUtils.validateSchemaOrThrowArgumentError({email, password}, loginSchema);
+
         const user = await User.findOne({
             where: {
                 email

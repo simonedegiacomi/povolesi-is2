@@ -1,5 +1,26 @@
 const {TaskPool, User, Task} = require('../models/index');
 
+var isTaskExist = async function(task){
+
+    const fromDb = await Task.findOne({
+        where:
+            {id: task.id}
+    })
+
+    return fromDb !== null
+}
+
+var isTasksExist = async function(tasks){
+
+    for(let t of tasks) {
+
+        if (!(await isTaskExist(t)))
+            return false
+    }
+
+    return true
+}
+
 
 module.exports = {
 
@@ -8,7 +29,7 @@ module.exports = {
 
         NO_NAME: "task pool have no name",
         USER_NOT_EXIST: "user not exist",
-        TASK_NOT_EXIST: "task not exist"
+        TASK_NOT_EXIST: "tasks not exist"
     },
 
     async createTaskPool(taskPool, tasks = []) {
@@ -18,6 +39,8 @@ module.exports = {
         }
         else if (taskPool.createdBy == null) {
             throw new Error(this.errors.NO_CREATOR_SPECIFIED);
+        }else if (! (await isTasksExist(tasks))){
+            throw new Error(this.errors.TASK_NOT_EXIST);
         }
 
         try {
@@ -33,7 +56,6 @@ module.exports = {
             return createdTaskPool;
 
         } catch (e) {
-            console.log(e);
             throw e;
         }
     },
@@ -54,17 +76,5 @@ module.exports = {
         return jsonArray
     },
 
-    /*
-    async getTasksOf(taskPool){
-
-        const jsonResult = Task.findAll({
-            where: {
-                TaskPool_Task: taskPool.id
-            }
-        })
-
-        return jsonResult
-
-*/
 
 };

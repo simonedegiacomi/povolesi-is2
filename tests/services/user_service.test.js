@@ -1,6 +1,7 @@
 const UserService = require('../../src/services/user_service');
 const {User} = require('../../src/models');
 const UserHelper = require('../helpers/user_helper');
+const TestUtils = require('../test_utils');
 
 describe('Test the user registration', () => {
 
@@ -20,21 +21,47 @@ describe('Test the user registration', () => {
     test('Should not register two users with the same email', async () => {
         const existingUser = await UserHelper.insertMario();
 
-        try {
-            await UserService.registerUser({
-                name: 'Mario Blu',
-                email: existingUser.email,
-                badgeNumber: "AAAAAA",
-                password: 'password'
-            });
-
-            expect(true).toBe(false);
-        } catch (e) {
-            expect(e.message).toBe('email already in use');
-        }
+        await expect(UserService.registerUser({
+            name: 'Mario Blu',
+            email: existingUser.email,
+            badgeNumber: "AAAAAA",
+            password: 'password'
+        })).rejects.toThrow(new Error('email already in use'));
     });
 
+    test('Should not register two users with the same badge number', async () => {
+        const existingUser = await UserHelper.insertMario();
 
+        await expect(UserService.registerUser({
+            name: 'Mario Blu',
+            email: 'mario@blu.it',
+            badgeNumber: existingUser.badgeNumber,
+            password: 'password'
+        })).rejects.toThrow(new Error('badge number already in use'));
+    });
+});
+
+describe('Test the user login', () => {
+
+    test('Should login the user', async () => {
+        const existingUser = await UserHelper.insertMario();
+        const loggedInUser = await UserService.loginUser(existingUser.email, 'password');
+
+        const fromDb = await UserHelper.findUserInDb(loggedInUser.id);
+        expect(loggedInUser.authToken).toBe(fromDb.authToken);
+    });
+
+    test('Should throw exception when trying to login with a wrong password', async () => {
+        const existingUser = await UserHelper.insertMario();
+
+        await expect(UserService.loginUser(existingUser.email, 'wrongPassword'))
+            .rejects.toThrow(new Error('invalid credentials'));
+    });
+
+    test('Should throw exception when trying to login a user that doesn\'t exist', async () => {
+        await expect(UserService.loginUser('aaa@mail.it', 'password'))
+            .rejects.toThrow(new Error('invalid credentials'));
+    });
 });
 
 
