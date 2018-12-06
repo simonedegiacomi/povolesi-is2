@@ -1,5 +1,11 @@
+const {User, UserGroup} = require('../../models');
+
 module.exports = {
     mapUser(model) {
+        if (!(model instanceof User)) {
+            throw new Error('first argument is not an instance of User');
+        }
+
         return {
             id: model.id,
             name: model.name,
@@ -9,6 +15,10 @@ module.exports = {
     },
 
     async mapUserGroup(group) {
+        if(!(group instanceof UserGroup)) {
+            throw new Error('first argument is not an instance of UserGroup');
+        }
+
         const createdBy = await group.getCreatedBy();
 
         return {
