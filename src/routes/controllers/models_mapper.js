@@ -1,4 +1,4 @@
-const {User, UserGroup} = require('../../models');
+const {User, UserGroup, UserPermission, Task} = require('../../models');
 
 module.exports = {
     mapUser(model) {
@@ -29,10 +29,18 @@ module.exports = {
     },
 
     mapUserPermission(model) {
+        if(!(model instanceof UserPermission)) {
+            throw new Error('first argument is not an instance of UserPermission');
+        }
+
         return model.toJSON()
     },
 
     mapTask(model) {
+        if(!(model instanceof Task)) {
+            throw new Error('first argument is not an instance of Task');
+        }
+
         return model.toJSON();
     }
 };
