@@ -16,7 +16,7 @@ const loginSchema = Joi.object().keys({
 });
 
 const updateEmailSchema = Joi.object().keys({
-    newEmail: Joi.string().email()
+    newEmail: Joi.string().email().required()
 });
 
 const updateUserDataSchema = Joi.object().keys({
@@ -80,18 +80,20 @@ module.exports = {
 
     getAllUsers: async function (req, res) {
         const users = await UserService.getAllUsers();
-        res.status(200).send(users.map(u => ModelMapper.mapUser(u)));
+        res.status(200).send(users.map(u => ModelsMapper.mapUser(u)));
     },
 
     async updateEmail(req, res) {
-        if (!req.body.newEmail) {
+        const {error, value} = Joi.validate(req.body, updateEmailSchema);
+
+        if (error != null) {
             return res.status(400).send({
-                errorMessage: 'email missing'
+                errorMessage: error.details[0].message
             });
         }
 
         try {
-            await UserService.updateUserEmail(req.user, req.body.newEmail);
+            await UserService.updateUserEmail(req.user, value.newEmail);
             res.status(200).send();
         } catch (e) {
             ErrorMapper.map(res, e, [{
@@ -105,7 +107,7 @@ module.exports = {
     },
 
     getCurrentUserData(req, res) {
-        res.status(200).send(ModelMapper.mapUser(req.user));
+        res.status(200).send(ModelsMapper.mapUser(req.user));
     },
 
     async updateUserData(req, res) {

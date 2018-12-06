@@ -5,7 +5,7 @@ const Joi = require('joi');
 const {sequelize, User} = require('../models/index');
 const ArgumentError = require('./argument_error');
 
-const BCRYPT_SALT_RAUNDS = 10;
+const BCRYPT_SALT_ROUNDS = 10;
 
 module.exports = {
 
@@ -16,7 +16,8 @@ module.exports = {
 
         INVALID_USER: "invalid user",
         INVALID_CREDENTIALS: "invalid credentials",
-        INVALID_EMAIL: "\"value\" must be a valid email"
+        INVALID_EMAIL: "\"value\" must be a valid email",
+        USER_NOT_FOUND: "user not found"
     },
 
     constants: {
@@ -28,7 +29,7 @@ module.exports = {
             throw new Error(this.errors.EMAIL_ALREADY_IN_USE);
         }
 
-        user.password = await bcrypt.hash(user.password, BCRYPT_SALT_RAUNDS);
+        user.password = await bcrypt.hash(user.password, BCRYPT_SALT_ROUNDS);
         user.authToken = this._generateToken();
 
         try {

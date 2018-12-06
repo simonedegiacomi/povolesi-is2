@@ -119,7 +119,7 @@ describe('Test user email update', () => {
 
             expect(true).toBe(false);
         } catch (e) {
-            expect(e.message).toBe('\"value\" must be a valid email');
+            expect(e.message).toBe(UserService.errors.INVALID_EMAIL);
         }
     });
 
@@ -131,7 +131,7 @@ describe('Test user email update', () => {
 
             expect(true).toBe(false);
         } catch (e) {
-            expect(e.message).toBe('invalid user');
+            expect(e.message).toBe(UserService.errors.INVALID_USER);
         }
     });
 });

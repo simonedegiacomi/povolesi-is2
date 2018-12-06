@@ -1,6 +1,7 @@
 const request = require('supertest');
 
 const UserHelper = require('../../helpers/user_helper');
+const UserService = require('../../services/user_service.test');
 const app        = require('../../../src/app');
 const ModelsMapper    = require('../../../src/routes/controllers/models_mapper');
 
@@ -191,7 +192,6 @@ describe('Test user email update', () => {
             });
 
         expect(response.status).toBe(400);
-        expect(response.body.errorMessage).toBe('\"value\" must be a valid email');
     });
 
     test('Should give an error if email is missing from the request body', async () => {
@@ -203,7 +203,6 @@ describe('Test user email update', () => {
             .send({});
 
         expect(response.status).toBe(400);
-        expect(response.body.errorMessage).toBe('email missing');
     });
 });
 
