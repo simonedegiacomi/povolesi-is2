@@ -61,7 +61,7 @@ module.exports = {
 
     getAllUsers: async function (req, res) {
         const users = await UserService.getAllUsers();
-        res.status(200).send(users.map(u => ModelMapper.mapUser(u)));
+        res.status(200).send(users.map(u => ModelsMapper.mapUser(u)));
     },
 
     async updateEmail(req, res) {
@@ -86,7 +86,7 @@ module.exports = {
     },
 
     getCurrentUserData(req, res) {
-        res.status(200).send(ModelMapper.mapUser(req.user));
+        res.status(200).send(ModelsMapper.mapUser(req.user));
     },
 
     async updateUserData(req, res) {
