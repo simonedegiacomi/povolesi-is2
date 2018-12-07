@@ -205,8 +205,8 @@ describe('Test user data update', () => {
             .put('/api/v1/users/me')
             .set('X-API-TOKEN', user.authToken)
             .send({
-                newName: 'Luca Bianchi',
-                newBadgeNumber: '000002'
+                name: 'Luca Bianchi',
+                badgeNumber: '000002'
             });
 
         expect(response.status).toBe(204);

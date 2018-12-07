@@ -88,7 +88,7 @@ module.exports = {
 
     async updateUserData(req, res) {
         try {
-            await UserService.updateUserData(req.user, req.body);
+            await UserService.updateUserData(req.user.id, req.body);
             res.status(204).send();
         } catch (e) {
             ErrorMapper.map(res, e, [{
