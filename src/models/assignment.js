@@ -47,7 +47,16 @@ module.exports = function (sequelize, DataTypes) {
         });
 
         Assignment.belongsToMany(models.TaskPool, {
+            as: 'taskPools',
             through: 'Assignment_TaskPool'
+        });
+
+        Assignment.hasMany(models.AssignedTask, {
+            foreignKey: {
+                name: 'assignmentId',
+                allowNull: false
+            }
+
         });
     };
 
