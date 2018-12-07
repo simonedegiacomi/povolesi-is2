@@ -26,6 +26,17 @@ module.exports = (sequelize, DataTypes) => {
             through: 'TaskPool_Task'
         });
 
+
+
+
+        TaskPool.hasMany(models.TaskDraw, {
+            /*as: 'taskPool',*/
+            foreignKey: {
+                name: 'taskPoolId',
+                allowNull: false
+            }
+        });
+
     };
 
     return TaskPool;

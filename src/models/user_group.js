@@ -20,6 +20,14 @@ module.exports = (sequelize, DataTypes) => {
                 allowNull: false
             }
         });
+
+        UserGroup.hasMany(models.UserPermission, {
+            foreignKey: {
+                unique: 'compositeIndex',
+                name: 'userGroupId',
+                allowNull: false
+            }
+        });
     };
 
     return UserGroup;

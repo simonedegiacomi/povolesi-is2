@@ -45,6 +45,13 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false
             }
         });
+
+        Assignment.hasMany(models.AssignedTask, {
+            foreignKey: {
+                name: 'assignmentId',
+                allowNull: false
+            }
+        });
     };
 
     return Assignment;
