@@ -30,7 +30,6 @@ module.exports = (sequelize, DataTypes) => {
             as: 'assignment',
             through: 'Assignment_TaskPool'
         });
-
     };
 
     return TaskPool;
