@@ -5,10 +5,10 @@ var isTaskExist = async function(task){
     const fromDb = await Task.findOne({
         where:
             {id: task.id}
-    })
+    });
 
     return fromDb !== null
-}
+};
 
 var isTasksExist = async function(tasks){
 
@@ -19,7 +19,7 @@ var isTasksExist = async function(tasks){
     }
 
     return true
-}
+};
 
 
 module.exports = {

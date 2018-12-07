@@ -139,7 +139,7 @@ describe('Test user email update', () => {
             });
 
         expect(response.status).toBe(200);
-    })
+    });
 
     test('Should not change the email to an existing one', async () => {
         const existingUser1 = await UserHelper.insertMario();

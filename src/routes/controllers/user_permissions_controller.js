@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const UserPermissionsService    = require('../../services/user_permissions_service');
-const UserGroupService          = require('../../services/user_group_service')
+const UserGroupService          = require('../../services/user_group_service');
 const ErrorMapper               = require('./error_mapper');
 const ModelsMapper              = require('./models_mapper');
 

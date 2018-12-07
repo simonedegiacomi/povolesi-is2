@@ -1,4 +1,4 @@
-const ArgumentError = require('../../services/argument_error')
+const ArgumentError = require('../../services/argument_error');
 
 module.exports = {
     map(res, error, mappings = []) {

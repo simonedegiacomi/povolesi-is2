@@ -119,7 +119,7 @@ describe('Test the listing of existing users', () => {
 
 describe('Test user email update', () => {
     test('Should return the user with the email updated', async () => {
-        const existingUser = await UserHelper.insertMario()
+        const existingUser = await UserHelper.insertMario();
         const existingUserWithNewEmail = await UserService.updateUserEmail(existingUser, 'luca@bianchi.com');
 
         expect(existingUserWithNewEmail.email).toEqual('luca@bianchi.com');
