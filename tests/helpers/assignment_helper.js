@@ -31,7 +31,6 @@ module.exports = {
             (await TaskPoolHelper.insertTaskPoolWith2Tasks()).id,
             (await TaskPoolHelper.insertTaskPoolWith2Tasks()).id
         ]);
-
         return {
             user,
             assignment

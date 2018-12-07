@@ -56,7 +56,6 @@ module.exports = function (sequelize, DataTypes) {
                 name: 'assignmentId',
                 allowNull: false
             }
-
         });
     };
 

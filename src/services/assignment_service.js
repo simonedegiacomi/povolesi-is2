@@ -115,7 +115,6 @@ module.exports = {
             }));
         }
 
-
         // put assigned tasks
         return assignedTasks;
     }
