@@ -138,34 +138,13 @@ definitions:
       createdBy:
         $ref: '#/definitions/User'
 
-    required:
-    - name
-    - tasks
-
-  TaskDraw:
-    title: Task Draw
-    type: object
-    properties:
-      id:
-        type: integer
-
-      assignmentId:
-        type: integer
-
-      poolIDd:
-        type: integer
-
       numQuestionsToDraw:
         type: integer
 
-      minPerQuestionDraw:
-        type: integer
-
     required:
-    - assignmentId
-    - poolId
+    - name
+    - tasks
     - numQuestionsToDraw
-    - minPerQuestionDraw
 
   Task:
     title: Task
@@ -242,6 +221,11 @@ definitions:
 
       assignedToUserGroupId:
         type: integer
+
+      taskPools:
+        type: array
+        items:
+          $ref: '#/definitions/TaskPool'
 
     required:
     - name
