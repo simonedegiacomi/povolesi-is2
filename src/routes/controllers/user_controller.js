@@ -3,14 +3,9 @@ const UserService  = require('../../services/user_service');
 const ErrorMapper  = require('./error_mapper');
 const ModelsMapper = require('./models_mapper');
 
-
+//TODO: move to service
 const updateEmailSchema = Joi.object().keys({
     newEmail: Joi.string().email().required()
-});
-
-const updateUserDataSchema = Joi.object().keys({
-    newName       : Joi.string().min(3).max(30).required(),
-    newBadgeNumber: Joi.string().min(1).max(45).required()
 });
 
 module.exports = {
@@ -92,16 +87,15 @@ module.exports = {
     },
 
     async updateUserData(req, res) {
-        const {error, value} = Joi.validate(req.body, updateUserDataSchema);
-
-        if (error != null) {
-            return res.status(400).send({
-                errorMessage: error.details[0].message
-            });
+        try {
+            await UserService.updateUserData(req.user, req.body);
+            res.status(204).send();
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error: UserService.errors.BADGE_NUMBER_ALREADY_IN_USE,
+                status: 409
+            }]);
         }
-
-        UserService.updateUserData(req.user, value.newName, value.newBadgeNumber);
-        res.status(204).send();
     },
 
     async getUserById(req, res) {
@@ -115,6 +109,18 @@ module.exports = {
             ErrorMapper.map(res, e, [{
                 error : UserService.errors.USER_NOT_FOUND,
                 status: 404
+            }]);
+        }
+    },
+
+    async updateUserPassword(req, res) {
+        try {
+            await UserService.updateUserPassword(req.user.id, req.body.newPassword);
+            res.status(204).send();
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error: UserService.errors.PASSWORD_TOO_SHORT,
+                status: 400
             }]);
         }
     }

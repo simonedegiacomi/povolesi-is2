@@ -164,15 +164,17 @@ describe('Test user email update', () => {
 });
 
 describe('Test user data update', () => {
-    test('Should return the user with the data updated', (done) => {
-        UserHelper.insertMario()
-            .then(user => UserService.updateUserData(user, 'Luca Bianchi', '000002'))
-            .then(user => {
-                expect(user.name).toEqual('Luca Bianchi');
-                expect(user.badgeNumber).toEqual('000002');
-                done();
-            }).catch(console.log);
-    });
+    test('Should return the user with the data updated', async () => {
+        const user = await UserHelper.insertMario();
+
+        const updatedUser = await UserService.updateUserData(user.id, {
+            name: 'Luca Bianchi',
+            badgeNumber: '000002'
+        });
+
+        expect(updatedUser.name).toEqual('Luca Bianchi');
+        expect(updatedUser.badgeNumber).toEqual('000002');
+    })
 });
 
 describe('Test get user given its id', () => {
@@ -182,4 +184,30 @@ describe('Test get user given its id', () => {
 
         expect(user.toJSON()).toEqual(newUser.toJSON());
     })
+});
+
+describe('Test the update of a password', () => {
+   test('Should login properly using the new password', async () => {
+       const newUser = await UserHelper.insertMario();
+       const newPassword = 'newPassword';
+       const userUpdated = await UserService.updateUserPassword(newUser.id, newPassword);
+
+       const loggedInUser = await UserService.loginUser(userUpdated.email, newPassword);
+
+       expect(loggedInUser.authToken).toBeDefined();
+   });
+
+   test('Should return error when trying to change the password with a null value', async () => {
+       const newUser = await UserHelper.insertMario();
+
+       await expect(UserService.updateUserPassword(newUser.id, null))
+           .rejects.toThrow(new Error('"value" must be a string'));
+   });
+
+   test('Should return error when trying to change with a short password (less than 6 char)', async () => {
+       const newUser = await UserHelper.insertMario();
+
+       await expect(UserService.updateUserPassword(newUser.id, '12345'))
+           .rejects.toThrow(new Error('"value" length must be at least 6 characters long'));
+   });
 });

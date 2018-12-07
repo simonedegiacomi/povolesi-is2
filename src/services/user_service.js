@@ -20,6 +20,11 @@ const loginSchema = Joi.object().keys({
     password: Joi.string().required()
 });
 
+const updateUserDataSchema = Joi.object().keys({
+    name       : Joi.string().min(3).max(30).required(),
+    badgeNumber: Joi.string().min(1).max(45).required()
+});
+
 module.exports = {
 
     errors: {
@@ -31,6 +36,7 @@ module.exports = {
         INVALID_CREDENTIALS: "invalid credentials",
         INVALID_EMAIL: "\"value\" must be a valid email",
         USER_NOT_FOUND: "user not found"
+
     },
 
     async registerUser(data) {
@@ -122,11 +128,35 @@ module.exports = {
         })
     },
 
-    updateUserData (user, newName, newBadgeNumber) {
-        return user.update({
-            name: newName,
-            badgeNumber: newBadgeNumber
-        })
-    }
+    async updateUserData (userId, newData) {
+        ServiceUtils.validateSchemaOrThrowArgumentError(newData, updateUserDataSchema);
 
+        const user = await this.getUserById(userId);
+
+        try {
+            return await user.update({
+                name: newData.name,
+                badgeNumber: newData.badgeNumber
+            })
+        } catch (e) {
+            if (e instanceof sequelize.UniqueConstraintError) {
+                const wrongField = e.errors[0].path;
+                if (wrongField === 'badgeNumber') {
+                    throw new Error(this.errors.BADGE_NUMBER_ALREADY_IN_USE);
+                }
+            }
+            throw e;
+        }
+    },
+
+    async updateUserPassword(userId, newPassword) {
+        ServiceUtils.validateSchemaOrThrowArgumentError(newPassword, Joi.string().min(6).required());
+
+        const user = await this.getUserById(userId);
+        newPassword = await bcrypt.hash(newPassword, BCRYPT_SALT_ROUNDS);
+
+        return await user.update({
+            password: newPassword
+        });
+    }
 };

@@ -256,3 +256,45 @@ describe('Test get user data given its id',  () => {
         expect(user).toEqual(expectedJson);
     })
 });
+
+describe('Test the update of the user password', () => {
+    test('PUT /users/password should return 204', async () => {
+        const user = await UserHelper.insertMario();
+        const newPassword = 'newPassword';
+        const response = await request(app)
+            .put('/api/v1/users/me/password')
+            .set('X-API-TOKEN', user.authToken)
+            .send({
+                newPassword: newPassword
+            });
+
+        expect(response.status).toBe(204);
+        await postLogin({
+            email: user.email,
+            password: newPassword
+        }).expect(200);
+    });
+
+    test('PUT /users/password with a short password (less than 6 char) should return 400', async () => {
+        const user = await UserHelper.insertMario();
+        const response = await request(app)
+            .put('/api/v1/users/me/password')
+            .set('X-API-TOKEN', user.authToken)
+            .send({
+                newPassword: '12345'
+            });
+
+        expect(response.status).toBe(400);
+
+    });
+
+    test('PUT /users/password without a new password should return 400 ', async () => {
+        const user = await UserHelper.insertMario();
+        const response = await request(app)
+            .put('/api/v1/users/me/password')
+            .set('X-API-TOKEN', user.authToken)
+            .send({});
+
+        expect(response.status).toBe(400);
+    });
+});

@@ -41,6 +41,7 @@ function setupAuthenticatedRoutes(app) {
     router.get('/users/me', userController.getCurrentUserData);
     router.put('/users/me', userController.updateUserData);
     router.put('/users/me/email', userController.updateEmail);
+    router.put('/users/me/password', userController.updateUserPassword);
     router.get('/users/:id', userController.getUserById);
 
     // /user-groups
