@@ -79,22 +79,15 @@ module.exports = {
         //TODO: insert the correct query simo
         //query SELECT * WHERE user=userMe
 
-        const myTaskPools = await TaskPool.findAll({
+        return await TaskPool.findAll({
             where: {
                 createdById: userMe.id
-            }
+            },
+            include: [{
+                model: Task,
+                as: 'tasks'
+            }]
         });
-
-        let jsonArrayResult = [];
-
-        for(let t of myTaskPools){
-            jsonArrayResult.push({
-                ...t,
-                tasks: await t.getTasks()
-            })
-        }
-
-        return jsonArrayResult;
     },
 
     /*

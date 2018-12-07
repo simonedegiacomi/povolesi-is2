@@ -5,22 +5,27 @@ const UserHelper      = require('../helpers/user_helper');
 
 module.exports = {
 
-    async insertTaskPoolWith2Tasks(){
-        const giorgio = await UserHelper.insertGiorgio();
+    async insertTaskPoolWith2Tasks(user){
 
         //insert things in db
-        const task1 = await TaskHelper.createValidTask(giorgio.id,"come sta lei?");
-        const task2 = await TaskHelper.createValidTask(giorgio.id,"come stai?");
-
-
+        const task1 = await TaskHelper.createValidTask(user.id,"come sta lei?");
+        const task2 = await TaskHelper.createValidTask(user.id,"come stai?");
 
         const taskPool = {
             name: 'esempio',
-            createdBy: giorgio
+            createdBy: user
         };
 
+        return await TaskPoolService.createTaskPool(taskPool, [task1,task2] );
+    },
 
-        return await TaskPoolService.createTaskPool(taskPool, [task1,task2]);
+    async insertTaskPoolEmpty(user){
+        const taskPool = {
+            name: 'esempio',
+            createdBy: user
+        };
+
+        return await TaskPoolService.createTaskPool(taskPool);
 
     },
 

@@ -4,6 +4,7 @@ const app = require('../../../src/app');
 
 const UserHelper  = require('../../helpers/user_helper');
 const TaskHelper  = require('../../helpers/task_helper');
+const TaskPoolHelper  = require('../../helpers/task_pool_helper');
 const {TaskPool}      = require('../../../src/models');
 
 
@@ -15,7 +16,7 @@ var createTaskPoolToSend = function(user){
 };
 
 
-describe('Test of POST /task-pools', () => {
+describe('POST /task-pools', () => {
 
     test('POST /task-pools with valid data 201 with no tasks', async() => {
         const user = await UserHelper.insertNewRandom();
@@ -61,7 +62,7 @@ describe('Test of POST /task-pools', () => {
 
     });
 
-    test('POST /git push --set-upstream origin get-task-pooltask-pools with valid data 401 with inexistent tasks', async() => {
+    test('POST /task-pools with valid data 401 with inexistent tasks', async() => {
         const user = await UserHelper.insertNewRandom();
 
         const taskPoolExample = createTaskPoolToSend(user);
@@ -82,5 +83,74 @@ describe('Test of POST /task-pools', () => {
 
     });
 
+
+});
+
+describe('GET /task-pools', () => {
+
+    test('GET /task-pools with valid data 201 with no tasks', async() => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolEmpty(giorgio);
+
+        const response = await request(app)
+            .get('/api/v1/task-pools')
+            .set('X-API-TOKEN',giorgio.authToken);
+
+
+        expect(response.status).toBe(200);
+
+        const result = response.body;
+        expect(result[0].id).toEqual(taskPool.id);
+        expect(result[0].name).toEqual(taskPool.name);
+
+    });
+
+    test('GET /task-pools with valid data 201 with two tasksPool', async() => {
+        const giorgio = await UserHelper.insertGiorgio();
+
+        const taskPool1 = await TaskPoolHelper.insertTaskPoolWith2Tasks(giorgio);
+        const taskPool2 = await TaskPoolHelper.insertTaskPoolEmpty(giorgio);
+
+        const response = await request(app)
+            .get('/api/v1/task-pools')
+            .set('X-API-TOKEN',giorgio.authToken);
+
+
+        expect(response.status).toBe(200);
+
+        const result = response.body;
+        var a;
+        for(let t of result){
+            expect(t.id).toEqual(t.id);
+            expect(t.name).toEqual(t.name);
+        }
+
+        expect(result.length).toEqual(2);
+
+    });
+
+    test('GET /task-pools with valid data 201 with two tasks', async() => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks(giorgio);
+
+        const response = await request(app)
+            .get('/api/v1/task-pools')
+            .set('X-API-TOKEN',giorgio.authToken);
+
+
+        expect(response.status).toBe(200);
+
+        const result = response.body;
+        expect(result[0].tasks.length).toEqual(2);
+
+    });
+
+    test('GET /task-pools with no authentication', async() => {
+
+        const response = await request(app)
+            .get('/api/v1/task-pools');
+
+        expect(response.status).toBe(401);
+    });
 
 });

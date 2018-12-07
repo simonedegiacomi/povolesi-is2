@@ -127,9 +127,9 @@ describe('get my taskPool', () => {
     });
 
     test('get a taskPool with some task inside', async () => {
-
+        const giorgio = await UserHelper.insertGiorgio();
         //insert a taskPool with two tasks in db
-        const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks(giorgio);
 
         expect(taskPool).toBeDefined();
         expect( (await taskPool.getTasks()).length ).toEqual(2);
