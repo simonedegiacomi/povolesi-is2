@@ -64,6 +64,7 @@ function setupAuthenticatedRoutes(app) {
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);
     router.post('/task-pools', taskPoolController.postTaskPool);
+    router.get('/task-pools/:id', taskPoolController.getTaskPoolById);
 
     app.use('/api/v1', router);
 }

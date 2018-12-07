@@ -1,34 +1,15 @@
 const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment} = require('../models/index');
+const Utils = require('../utils/task_pool_utils')
 
-var isTaskExist = async function (task) {
 
-    const fromDb = await Task.findOne({
-        where:
-            {id: task.id}
-    });
 
-    return fromDb !== null;
-};
 
-var isTasksExist = async function (tasks) {
 
-    for (let t of tasks) {
 
-        if (!(await isTaskExist(t)))
-            return false;
-    }
 
-    return true;
-};
 
-var isUserExist = async function (user) {
-    const fromDb = await User.findOne({
-        where:
-            {id: user.id}
-    });
 
-    return fromDb !== null;
-};
+
 
 
 module.exports = {
@@ -38,7 +19,19 @@ module.exports = {
 
         NO_NAME: "task pool have no name",
         USER_NOT_EXIST: "user not exist",
-        TASK_NOT_EXIST: "tasks not exist"
+        TASK_NOT_EXIST: "tasks not exist",
+        TASK_POOL_ID_IS_NO_CORRECT: "taskPoolId is no correct"
+    },
+
+    async canManageThisTaskPool(taskPoolId, userId){
+        const myTaskPools = await this.getMyTaskPool(await Utils.getUserById(userId));
+
+        for(let t of myTaskPools){
+            if(t.id === taskPoolId)
+                return true;
+        }
+
+        return false;
     },
 
     async createTaskPool(taskPool, tasks = []) {
@@ -48,7 +41,7 @@ module.exports = {
         }
         else if (taskPool.createdBy == null) {
             throw new Error(this.errors.NO_CREATOR_SPECIFIED);
-        } else if (!(await isTasksExist(tasks))) {
+        } else if (!(await Utils.isTasksExist(tasks))) {
             throw new Error(this.errors.TASK_NOT_EXIST);
         }
 
@@ -72,11 +65,11 @@ module.exports = {
 
     async getMyTaskPool(userMe) {
 
-        if (!(await isUserExist(userMe))) {
+        if (!(await Utils.isUserExist(userMe))) {
             throw new Error(this.errors.USER_NOT_EXIST);
         }
 
-        //TODO: insert the correct query simo
+        //TODO: insert the correct query simo sotto ho lasciato la mezzza query che avevi fatto commentata
         //query SELECT * WHERE user=userMe
 
         return await TaskPool.findAll({
@@ -90,71 +83,37 @@ module.exports = {
         });
     },
 
-    /*
-    /!**
-     * Anche quelli che posso maneggiare secondo l'user permission
-     *!/
-    async getTaskPool(userMe) {
-        if (isUserExist(User)) {
-            throw new Error(this.errors.USER_NOT_EXIST);
+    async getTaskPoolById(taskPoolId,userId){
+        if(!(await Utils.isTaskPoolIdExist(taskPoolId))){
+            throw new Error(this.errors.TASK_POOL_ID_IS_NO_CORRECT);
+        } else if(!(await canManageThisTaskPool(taskPoolId,userId))) {
+            //TODO: go over with this function
         }
+    }
 
-
-
-        //TODO: miss a lot of helper for finish of implementation query
-        //query SELECT * WHERE user=userMe
-        const jsonArray = await Assignment.findAll({
-
-            where: {},
-
-            include: [
-                {
-                    model: Group,
-                    include: [{
-                        model: UserPermission,
-                        include: [{
-                            model: User
-                        }]
-                    }]
-                }, {
-                    model: TaskDraw,
-                    include: [{
-                        model: TaskPool
-                    }]
-                }
-            ]
-        });
-
-        const jsonArray = [
-            {
-                "id": 0,
-                "name": "string",
-                "tasks": [
-                    {
-                        "id": 1234,
-                        "question": "What is the meaning of life?",
-                        "type": "multipleAnswer",
-                        "multipleChoicesAllowed": true,
-                        "choices": [
-                            "Happiness",
-                            "Balance",
-                            42
-                        ],
-                        "maxLength": 0
-                    }
-                ],
-                "createdBy": {
-                    "id": 84,
-                    "name": "Gianni Morandi",
-                    "badgeNumber": 111244,
-                    "email": "gianni@morandi.cit"
-                }
-            }
-        ];
-
-
-        return jsonArray
-    },
-*/
 
 };
+
+//query SELECT * WHERE user=userMe
+/*
+const jsonArray = await Assignment.findAll({
+
+    where: {},
+
+    include: [
+        {
+            model: Group,
+            include: [{
+                model: UserPermission,
+                include: [{
+                    model: User
+                }]
+            }]
+        }, {
+            model: TaskDraw,
+            include: [{
+                model: TaskPool
+            }]
+        }
+    ]
+});*/

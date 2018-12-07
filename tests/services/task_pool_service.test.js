@@ -2,6 +2,7 @@ const TaskPoolService = require('../../src/services/task_pool_service');
 const TaskHelper      = require('../helpers/task_helper');
 const UserHelper      = require('../helpers/user_helper');
 const TaskPoolHelper      = require('../helpers/task_pool_helper');
+const UtilsTaskPool = require('../../src/utils/task_pool_utils')
 
 async function insertArrayTaskPool(taskPools) {
 
@@ -10,6 +11,30 @@ async function insertArrayTaskPool(taskPools) {
 
     }
 }
+
+
+describe("Test util",() => {
+    test("test from id arrive to a user",async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const user = await UtilsTaskPool.getUserById(giorgio.id);
+
+        expect(user.id).toEqual(giorgio.id);
+        expect(user.name).toEqual(giorgio.name);
+    });
+
+    test("test can manage taskPool",async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const mario = await UserHelper.insertMario();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks(giorgio);
+
+        const resultTrue = await TaskPoolService.canManageThisTaskPool(taskPool.id,giorgio.id)
+        const resultFalse = await TaskPoolService.canManageThisTaskPool(taskPool.id, mario.id)
+
+        expect(resultTrue).toEqual(true);
+        expect(resultFalse).toEqual(false);
+
+    });
+});
 
 
 describe('creation of taskPool', () => {

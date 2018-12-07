@@ -5,8 +5,8 @@ const ErrorMapper = require('./error_mapper');
 module.exports = {
     async getTaskPool(req, res) {
         try {
-            const tasks = await TaskPoolService.getMyTaskPool(req.user);
-            res.status(200).send(Mapper.mapTaskPoolArray(tasks));
+            const tasksPool = await TaskPoolService.getMyTaskPool(req.user);
+            res.status(200).send(Mapper.mapTaskPoolArray(tasksPool));
         } catch(e){
             ErrorMapper.map(res, e, [{
                 error: TaskPoolService.errors.USER_NOT_EXIST,
@@ -30,7 +30,22 @@ module.exports = {
         } catch(e) {
             res.status(401).send({message: e.message})
         }
+    },
 
+    async getTaskPoolById(req, res){
+        const taskPoolId = req.params.id;
+        const userMe = req.user.id;
+
+        try{
+            const taskPool = await TaskPoolService.getTaskPoolById(taskPoolId,userId);
+            res.status(201).send(Mapper.mapTaskPool(taskPool))
+        } catch(e) {
+            //TODO: mettere errori giusti
+            ErrorMapper.map(res, e, [{
+                error: TaskPoolService.errors.USER_NOT_EXIST,
+                status: 409
+            }]);
+        }
 
     }
 };
