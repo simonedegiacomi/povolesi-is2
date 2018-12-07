@@ -140,7 +140,6 @@ module.exports = {
         if (group == null) {
             throw new Error(this.errors.GROUP_NOT_FOUND);
         }
-        console.log(group);
 
         const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
         if (!hasPermission) {
