@@ -1,4 +1,4 @@
-const {User, UserGroup, UserPermission, Task} = require('../../models');
+const {User, UserGroup, UserPermission, Task, TaskPool} = require('../../models');
 
 module.exports = {
     mapUser(model) {
@@ -42,5 +42,20 @@ module.exports = {
         }
 
         return model.toJSON();
-    }
+    },
+
+    mapTaskPool(model){
+        if(!(model instanceof TaskPool)) {
+            throw new Error('first argument is not an instance of TaskPool');
+        }
+
+        return model.dataValues;
+    },
+
+    mapTaskPoolArray(arrayModel){
+        return arrayModel.map((m)=>{
+            return this.mapTaskPool(m);
+        });
+
+    },
 };

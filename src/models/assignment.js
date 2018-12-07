@@ -45,6 +45,10 @@ module.exports = function (sequelize, DataTypes) {
                 allowNull: false
             }
         });
+
+        Assignment.belongsToMany(models.TaskPool, {
+            through: 'Assignment_TaskPool'
+        });
     };
 
     return Assignment;
