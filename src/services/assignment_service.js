@@ -11,7 +11,7 @@ const assignmentSchema = Joi.object().keys({
     peerReviewsDeadline: Joi.date().required(),
     createdById: Joi.number().integer().required(),
     assignedUserGroupId: Joi.number().integer().required(),
-    taskPoolIds: Joi.array().items(Joi.number().integer())
+    taskPoolIds: Joi.array().items(Joi.number().integer()).required()
 });
 
 
