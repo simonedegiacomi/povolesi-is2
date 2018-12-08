@@ -17,7 +17,7 @@ describe('Test the method to get the assigned assignments to a user', () => {
     test('Should return an empty array when the user is in a group without assignments', async () => {
         const {user} = await UserGroupsHelper.createGroupWithUser();
 
-        const assignments = await AssignmentService.assignOrGetAssignmentsWithTasksOfUser(user.id);
+        const assignments = await AssignmentService.assignOrGetAssignedTasksOfUserGroupedByAssignment(user.id);
 
         expect(assignments.length).toBe(0);
     });
@@ -26,7 +26,7 @@ describe('Test the method to get the assigned assignments to a user', () => {
     test('Should return the assignment with the previously assigned tasks', async () => {
         const {user, assignedTasks} = await AssignmentHelper.createAssignedTaskForUser();
 
-        const assignments = await AssignmentService.assignOrGetAssignmentsWithTasksOfUser(user.id);
+        const assignments = await AssignmentService.assignOrGetAssignedTasksOfUserGroupedByAssignment(user.id);
 
         expect(assignments.length).toBe(1);
         const firstAssignment = assignments[0];
@@ -36,7 +36,7 @@ describe('Test the method to get the assigned assignments to a user', () => {
     test('Should return the assignment with new assigned tasks', async () => {
         const {user} = await AssignmentHelper.createAssignmentWithUserAndPools();
 
-        const assignments = await AssignmentService.assignOrGetAssignmentsWithTasksOfUser(user.id);
+        const assignments = await AssignmentService.assignOrGetAssignedTasksOfUserGroupedByAssignment(user.id);
 
 
         expect(assignments.length).toBe(1);

@@ -18,7 +18,8 @@ describe('creation of taskPool', () => {
         const creator = await UserHelper.insertMario();
         const taskPoolExample = {
             name: 'esempio',
-            createdBy: creator
+            createdBy: creator,
+            numQuestionsToDraw: 0
         };
 
         const createdPool = await TaskPoolService.createTaskPool(taskPoolExample);
@@ -33,7 +34,8 @@ describe('creation of taskPool', () => {
 
         const taskPoolExample = {
             name: 'esempio',
-            createdBy: creator
+            createdBy: creator,
+            numQuestionsToDraw: 0
         };
         const task = await TaskHelper.createOpenQuestionTask(creator.id);
 
@@ -50,6 +52,7 @@ describe('creation of taskPool', () => {
     test('insert taskPool without specifying the user', async () => {
         const taskPool = {
             name: 'esempio',
+            numQuestionsToDraw: 0
         };
 
         try {
@@ -80,15 +83,18 @@ describe('get my taskPool', () => {
 
         const taskPool1 = {
             name: 'esempio1',
-            createdBy: giorgio
+            createdBy: giorgio,
+            numQuestionsToDraw: 0
         };
         const taskPool2 = {
             name: 'esempio2',
-            createdBy: giorgio
+            createdBy: giorgio,
+            numQuestionsToDraw: 0
         };
         const taskPool3 = {
             name: 'esempio3',
-            createdBy: mario
+            createdBy: mario,
+            numQuestionsToDraw: 0
         };
 
         let array = [taskPool1, taskPool2, taskPool3];

@@ -13,7 +13,8 @@ module.exports = {
 
         const taskPool = {
             name: 'esempio',
-            createdBy: user
+            createdBy: user,
+            numQuestionsToDraw: 1
         };
 
         return await TaskPoolService.createTaskPool(taskPool, [task1, task2]);
@@ -27,7 +28,8 @@ module.exports = {
     async insertTaskPoolEmpty(user) {
         const taskPool = {
             name: 'esempio',
-            createdBy: user
+            createdBy: user,
+            numQuestionsToDraw: 0
         };
 
         return await TaskPoolService.createTaskPool(taskPool);

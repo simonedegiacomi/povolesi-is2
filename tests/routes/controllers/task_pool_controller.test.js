@@ -11,7 +11,8 @@ const {TaskPool}      = require('../../../src/models');
 var createTaskPoolToSend = function(user){
     return {
         name: 'esempio',
-        createdBy: user
+        createdBy: user,
+        numQuestionsToDraw: 0
     }
 };
 

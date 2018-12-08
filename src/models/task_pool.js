@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
         name: {
             type: DataTypes.STRING(200),
             allowNull: false
+        },
+        numQuestionsToDraw: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
         }
     });
 

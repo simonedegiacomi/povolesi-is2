@@ -24,6 +24,7 @@ module.exports = {
             //creo il task Pool
             let taskPoolCreated = await TaskPoolService.createTaskPool({
                 name: value.name,
+                numQuestionsToDraw: value.numQuestionsToDraw,
                 createdBy: userMe
             }, tasks);
             res.status(201).send({ taskPoolId: taskPoolCreated.id})
