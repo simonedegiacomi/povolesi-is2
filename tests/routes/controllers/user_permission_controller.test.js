@@ -95,7 +95,7 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
         const creator    = await group.getCreatedBy();
 
         const memberWithoutPermission = await UserHelper.insertNewRandom();
-        await UserPermissionsService.createPermission(creator, {
+        await UserPermissionsService.createPermission(creator.id, {
             userGroupId: group.id,
             userId: memberWithoutPermission.id,
             canManageTasks: false,
@@ -114,7 +114,7 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
     test("DELETE /user-permissions/:id should return 404 when someone tries to remove a non-member", async () => {
 
         const group      = await UserGroupHelper.createGroup();
-        const permission = await UserPermissionHelper.insertUserPermission(group);
+        await UserPermissionHelper.insertUserPermission(group);
         const creator    = await group.getCreatedBy();
 
         const response = await request(app)

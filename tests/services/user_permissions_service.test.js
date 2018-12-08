@@ -3,6 +3,7 @@ const UserPermissionHelper = require('../helpers/user_permission_helper');
 const UserGroupsHelper = require('../helpers/user_groups_helper');
 const UserPermissionsService = require('../../src/services/user_permissions_service.js');
 const {UserPermission} = require('../../src/models');
+const ArgumentError = require('../../src/services/argument_error');
 
 describe("Test the listing of user permissions in a group", () => {
     test("Should return the user permission list given a groupId", async () => {
@@ -77,7 +78,7 @@ describe("Test the creation of a user permission (add user to a group)", () => {
         const unauthorized = await UserHelper.insertNewRandom();
 
         try {
-            await UserPermissionsService.createPermission(unauthorized, {
+            await UserPermissionsService.createPermission(unauthorized.id, {
                 userGroupId: group.id,
                 userId: newMember.id,
                 canManageTasks: false,
@@ -100,7 +101,7 @@ describe("Test the creation of a user permission (add user to a group)", () => {
                 userId: newMember.id
             });
         } catch (e) {
-            expect(e.message).toBe(UserPermissionsService.errors.WRONG_ARGUMENTS);
+            expect(e).toBeInstanceOf(ArgumentError);
         }
     });
 
@@ -112,11 +113,11 @@ describe("Test the creation of a user permission (add user to a group)", () => {
         const newMember = await UserHelper.insertMario();
 
         try {
-            await UserPermissionsService.createPermission(creator, {
+            await UserPermissionsService.createPermission(creator.id, {
                 userId: newMember.id
             });
         } catch (e) {
-            expect(e.message).toBe(UserPermissionsService.errors.WRONG_ARGUMENTS);
+            expect(e).toBeInstanceOf(ArgumentError);
         }
     });
 
@@ -125,11 +126,11 @@ describe("Test the creation of a user permission (add user to a group)", () => {
         const creator = await group.getCreatedBy();
 
         try {
-            await UserPermissionsService.createPermission(creator, {
+            await UserPermissionsService.createPermission(creator.id, {
                 userGroupId: group.id,
             });
         } catch (e) {
-            expect(e.message).toBe(UserPermissionsService.errors.WRONG_ARGUMENTS);
+            expect(e).toBeInstanceOf(ArgumentError);
         }
     });
 
@@ -141,7 +142,7 @@ describe("Test the creation of a user permission (add user to a group)", () => {
         const member = await permission.getUser();
 
         try {
-            await UserPermissionsService.createPermission(creator, {
+            await UserPermissionsService.createPermission(creator.id, {
                 userGroupId: group.id,
                 userId: member.id
             });
@@ -160,7 +161,7 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
         const permission = await UserPermissionHelper.insertUserPermission(group);
         const creator    = await group.getCreatedBy();
 
-        await UserPermissionsService.deletePermissionById(creator, permission.id);
+        await UserPermissionsService.deletePermissionById(creator.id, permission.id);
 
         const fromDb = await UserPermission.findOne({
             where: {id: permission.id}
@@ -174,7 +175,7 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
         const aUser      = await UserHelper.insertNewRandom();
 
         try {
-            await UserPermissionsService.deletePermissionById(aUser, permission.id);
+            await UserPermissionsService.deletePermissionById(aUser.id, permission.id);
             expect(false).toBe(true);
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
@@ -189,7 +190,7 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
         const creator    = await group.getCreatedBy();
 
         const memberWithoutPermission = await UserHelper.insertNewRandom();
-        await UserPermissionsService.createPermission(creator, {
+        await UserPermissionsService.createPermission(creator.id, {
             userGroupId: group.id,
             userId: memberWithoutPermission.id,
             canManageTasks: false,
@@ -198,7 +199,7 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
         });
 
         try {
-            await UserPermissionsService.deletePermissionById(memberWithoutPermission, permission.id);
+            await UserPermissionsService.deletePermissionById(memberWithoutPermission.id, permission.id);
             expect(false).toBe(true);
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
@@ -207,11 +208,11 @@ describe("Test the deletion of a user permission (remove a user fro a group)", (
 
     test("Should throw an exception when someone tries to remove a non-member from a group", async () => {
         const group      = await UserGroupsHelper.createGroup();
-        const permission = await UserPermissionHelper.insertUserPermission(group);
+        await UserPermissionHelper.insertUserPermission(group);
         const creator    = await group.getCreatedBy();
 
         try {
-            await UserPermissionsService.deletePermissionById(creator, 999);
+            await UserPermissionsService.deletePermissionById(creator.id, 999);
             expect(false).toBe(true);
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.USER_PERMISSION_NOT_FOUND);

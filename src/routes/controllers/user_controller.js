@@ -69,7 +69,7 @@ module.exports = {
         }
 
         try {
-            await UserService.updateUserEmail(req.user, value.newEmail);
+            await UserService.updateUserEmail(req.user.id, value.newEmail);
             res.status(200).send();
         } catch (e) {
             ErrorMapper.map(res, e, [{

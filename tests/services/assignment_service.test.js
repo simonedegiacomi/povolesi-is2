@@ -38,10 +38,6 @@ describe('Test the method to get the assigned assignments to a user', () => {
 
         const assignments = await AssignmentService.assignOrGetAssignedTasksOfUserGroupedByAssignment(user.id);
 
-
         expect(assignments.length).toBe(1);
-
-        //const firstAssignment = assignments[0];
-        //expect(firstAssignment.AssignedTasks[0].toJSON()).toEqual(assignedTasks[0].toJSON());
     });
 });

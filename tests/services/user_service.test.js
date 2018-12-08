@@ -110,10 +110,11 @@ describe('Test the listing of existing users', () => {
 
 describe('Test user email update', () => {
     test('Should return the user with the email updated', async () => {
-        const existingUser = await UserHelper.insertMario();
-        const existingUserWithNewEmail = await UserService.updateUserEmail(existingUser, 'luca@bianchi.com');
+        const user = await UserHelper.insertMario();
+        await UserService.updateUserEmail(user.id, 'luca@bianchi.com');
 
-        expect(existingUserWithNewEmail.email).toEqual('luca@bianchi.com');
+        const updatedUser = await UserHelper.findUserInDb(user.id);
+        expect(updatedUser.email).toEqual('luca@bianchi.com');
     });
 
     test('Should not change the email to an existing one', async () => {
@@ -121,10 +122,10 @@ describe('Test user email update', () => {
         const existingUser2 = await UserHelper.insertGiorgio();
 
         try {
-            await UserService.updateUserEmail(existingUser1, existingUser2.email);
+            await UserService.updateUserEmail(existingUser1.id, existingUser2.email);
             expectToFail();
         } catch (e) {
-            expect(e.message).toBe('email already in use');
+            expect(e.message).toBe(UserService.errors.EMAIL_ALREADY_IN_USE);
         }
     });
 
@@ -132,7 +133,7 @@ describe('Test user email update', () => {
         const existingUser = await UserHelper.insertMario();
 
         try {
-            await UserService.updateUserEmail(existingUser, 'Not an email!');
+            await UserService.updateUserEmail(existingUser.id, 'Not an email!');
             expectToFail();
         } catch (e) {
             expect(e.message).toBe(UserService.errors.INVALID_EMAIL);
@@ -145,9 +146,7 @@ describe('Test user email update', () => {
         try {
             await UserService.updateUserEmail({field: "Not a user!"}, existingUser.email);
             expectToFail();
-        } catch (e) {
-            expect(e.message).toBe(UserService.errors.INVALID_USER);
-        }
+        } catch (e) {}
     });
 });
 

@@ -3,8 +3,9 @@ const randomstring = require("randomstring");
 const Joi = require('joi');
 
 const {sequelize, User} = require('../models/index');
-const ArgumentError = require('./argument_error');
 const ServiceUtils = require('./utils');
+const assertIsEmail = require("./parameters_helper").assertIsEmail;
+const assertIsNumber = require("./parameters_helper").assertIsNumber;
 
 const BCRYPT_SALT_ROUNDS = 10;
 
@@ -95,21 +96,15 @@ module.exports = {
         return User.findAll()
     },
 
-    async updateUserEmail(user, newEmail) {
-        if (!(user instanceof User)) {
-            throw new ArgumentError(this.errors.INVALID_USER);
-        }
-
-        const {error} = Joi.validate(newEmail, Joi.string().email().required());
-
-        if (error != null) {
-            throw new ArgumentError(error.details[0].message);
-        }
+    async updateUserEmail(userId, newEmail) {
+        assertIsNumber(userId);
+        assertIsEmail(newEmail, this.errors.INVALID_EMAIL);
 
         try {
-            return await user.update({
-                email: newEmail
-            });
+            return await User.update(
+                { email: newEmail },
+                { where: { id: userId }}
+            );
         } catch (ex) {
             if (ex instanceof sequelize.UniqueConstraintError) {
                 const wrongField = ex.errors[0].path;

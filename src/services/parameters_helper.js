@@ -3,21 +3,31 @@ const Joi = require('joi');
 const ArgumentError = require('./argument_error');
 
 module.exports = {
-    assertIsNumber(param) {
+    assertIsNumber(param, message = null) {
         let result = Joi.validate(param, Joi.number().integer().required());
         if(result.error !== null){
-            throw new ArgumentError('Wrong arguments: '+param+' is not an integer');
+            message = message || 'Wrong arguments: '+param+' is not an integer';
+            throw new ArgumentError(message);
         }
     },
-    assertIsString(param) {
+    assertIsString(param, message = null) {
         let result = Joi.validate(param, Joi.string().required());
         if(result.error !== null){
-            throw new ArgumentError('Wrong arguments: '+param+' is not a string');
+            message = message || 'Wrong arguments: '+param+' is not a string';
+            throw new ArgumentError(message);
         }
     },
-    assertIsDefined(a) {
+    assertIsEmail(param, message = null) {
+        let result = Joi.validate(param, Joi.string().email().required());
+        if(result.error !== null){
+            message = message || 'Wrong arguments: '+param+' is not a valid email';
+            throw new ArgumentError(message);
+        }
+    },
+    assertIsDefined(a, message = null) {
         if (a === null || a === undefined) {
-            throw new ArgumentError('Wrong arguments: '+param + ' is defined');
+            message = message || 'Wrong arguments: '+param + ' is defined';
+            throw new ArgumentError(message);
         }
     }
 };
