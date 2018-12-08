@@ -1,15 +1,6 @@
-const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment} = require('../models/index');
-const Utils = require('../utils/task_pool_utils')
-
-
-
-
-
-
-
-
-
-
+const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment, UserGroup} = require('../models/index');
+const Utils = require('../utils/task_pool_utils');
+const {Op} = require('sequelize');
 
 
 module.exports = {
@@ -23,11 +14,11 @@ module.exports = {
         TASK_POOL_ID_IS_NO_CORRECT: "taskPoolId is no correct"
     },
 
-    async canManageThisTaskPool(taskPoolId, userId){
-        const myTaskPools = await this.getMyTaskPool(await Utils.getUserById(userId));
+    async canManageThisTaskPool(taskPoolId, userId) {
+        const myTaskPools = await this.getMyTaskPool(userId);
 
-        for(let t of myTaskPools){
-            if(t.id === taskPoolId)
+        for (let t of myTaskPools) {
+            if (t.id === taskPoolId)
                 return true;
         }
 
@@ -62,31 +53,145 @@ module.exports = {
         }
     },
 
+    /**
+     * Return all the TaskPools that the user created and can edit. A user can edit all the TaskPools in an assignment
+     * assigned to a group in which the user has the 'canManageTasks' permission.
+     * @param userId
+     * @returns {Promise<Array<Model>>}
+     */
+    async getMyTaskPool(userId) {
+        // We need to eagerly fetch the Tasks of the TaskPools
+        const taskInclude = {
+            model: Task,
+            as: 'tasks'
+        };
 
-    async getMyTaskPool(userMe) {
-
-        if (!(await Utils.isUserExist(userMe))) {
-            throw new Error(this.errors.USER_NOT_EXIST);
-        }
-
-        //TODO: insert the correct query simo sotto ho lasciato la mezzza query che avevi fatto commentata
-        //query SELECT * WHERE user=userMe
-
-        return await TaskPool.findAll({
-            where: {
-                createdById: userMe.id
-            },
-            include: [{
-                model: Task,
-                as: 'tasks'
-            }]
+        const createdTaskPools = await TaskPool.findAll({
+            where: {createdById: userId},
+            include: taskInclude
         });
+
+        const taskPoolsInAssignmentsCreatedByUser = await TaskPool.findAll({
+            include: [{
+                model: Assignment,
+                as: 'assignment',
+                where: {createdById: userId}
+            }, taskInclude]
+        });
+
+        const taskPoolsInAssignmentsAssignedToGroupCreatedByUser = await TaskPool.findAll({
+            include: [{
+                model: Assignment,
+                as: 'assignment',
+                required: true,
+                include: [{
+                    model: UserGroup,
+                    as: 'assignedUserGroup',
+                    include: [{
+                        model: User,
+                        as: 'createdBy',
+                        where: {id: userId}
+                    }]
+                }]
+            },]
+        });
+
+        const taskPoolsInAssignmentsAssignedToGroupWhereTheUserHasEditTasksPermission = await TaskPool.findAll({
+            include: [{
+                model: Assignment,
+                as: 'assignment',
+                required: true,
+                include: [{
+                    model: UserGroup,
+                    as: 'assignedUserGroup',
+                    include: [{
+                        model: UserPermission,
+                        where: {
+                            userId,
+                            canManageTasks: true
+                        }
+                    }]
+                }]
+            }, taskInclude]
+        });
+
+        const allPools = createdTaskPools.concat(
+            taskPoolsInAssignmentsCreatedByUser,
+            taskPoolsInAssignmentsAssignedToGroupCreatedByUser,
+            taskPoolsInAssignmentsAssignedToGroupWhereTheUserHasEditTasksPermission
+        );
+
+        const distinctPools = {};
+        allPools.forEach(pool => distinctPools[pool.id] = pool);
+        return Object.values(distinctPools);
+        /*
+                return await TaskPool.findAll({
+                    where: {
+                        [Op.or]: [
+                            {
+                                '$User.createdBy'
+                            }
+                        ]
+                    },
+                    include: [
+                        // eagerly fetch the Tasks of each TaskPool
+                        {
+                            model: Task,
+                            as: 'tasks'
+                        },
+
+                        // LEFT JOIN the user table, to include the user if he created the TaskPool.
+                        // This means that, if a TaskPool retrieved from this query has the createdBy equal to null, the user
+                        // didn't create the TaskPool
+                        {
+                            model: User,
+                            as: 'createdBy',
+                            where: {
+                                id: userId
+                            },
+                            required: false
+                        },
+                        {
+                            model: Assignment,
+                            as: 'assignment',
+                            include: [
+                                // Fetch the TaskPools in assignments that the user created
+                                {
+                                    model: User,
+                                    where: {
+                                        createdById: userId
+                                    },
+                                    required: false
+                                },
+                                {
+                                    model: UserGroup,
+                                    as: 'assignedUserGroup',
+                                    include: [
+                                        {
+                                            model: UserPermission,
+                                            where: {
+                                                userId,
+                                                canManageTasks: true
+                                            },
+                                            required: false
+                                        },
+                                        {
+                                            model: User,
+                                            required: false
+                                        }
+                                    ],
+                                    required: false
+                                }
+                            ]
+                        }
+                    ]
+                });*/
     },
 
-    async getTaskPoolById(taskPoolId,userId){
-        if(!(await Utils.isTaskPoolIdExist(taskPoolId))){
+    async getTaskPoolById(taskPoolId, userId) {
+        if (!(await Utils.isTaskPoolIdExist(taskPoolId))) {
             throw new Error(this.errors.TASK_POOL_ID_IS_NO_CORRECT);
-        } else if(!(await canManageThisTaskPool(taskPoolId,userId))) {
+        } else if (!(await canManageThisTaskPool(taskPoolId, userId))) {
             //TODO: go over with this function
         }
     }

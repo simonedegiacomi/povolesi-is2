@@ -3,16 +3,13 @@ const Mapper = require('./models_mapper');
 const ErrorMapper = require('./error_mapper');
 
 module.exports = {
+
     async getTaskPool(req, res) {
-        try {
-            const tasksPool = await TaskPoolService.getMyTaskPool(req.user);
-            res.status(200).send(Mapper.mapTaskPoolArray(tasksPool));
-        } catch(e){
-            ErrorMapper.map(res, e, [{
-                error: TaskPoolService.errors.USER_NOT_EXIST,
-                status: 409
-            }]);
-        }
+        const tasksPools = await TaskPoolService.getMyTaskPool(req.user.id);
+
+        const json = Mapper.mapTaskPoolArray(tasksPools);
+
+        res.status(200).send(json);
     },
 
     async postTaskPool(req, res) {
@@ -27,20 +24,20 @@ module.exports = {
                 numQuestionsToDraw: value.numQuestionsToDraw,
                 createdBy: userMe
             }, tasks);
-            res.status(201).send({ taskPoolId: taskPoolCreated.id})
-        } catch(e) {
+            res.status(201).send({taskPoolId: taskPoolCreated.id})
+        } catch (e) {
             res.status(401).send({message: e.message})
         }
     },
 
-    async getTaskPoolById(req, res){
+    async getTaskPoolById(req, res) {
         const taskPoolId = req.params.id;
         const userMe = req.user.id;
 
-        try{
-            const taskPool = await TaskPoolService.getTaskPoolById(taskPoolId,userId);
+        try {
+            const taskPool = await TaskPoolService.getTaskPoolById(taskPoolId, userId);
             res.status(201).send(Mapper.mapTaskPool(taskPool))
-        } catch(e) {
+        } catch (e) {
             //TODO: mettere errori giusti
             ErrorMapper.map(res, e, [{
                 error: TaskPoolService.errors.USER_NOT_EXIST,
