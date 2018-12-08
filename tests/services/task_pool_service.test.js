@@ -14,7 +14,7 @@ async function insertArrayTaskPool(taskPools) {
 
 
 describe("Test util",() => {
-    test("test from id arrive to a user",async ()=>{
+    test("get user by id to a user",async ()=>{
         const giorgio = await UserHelper.insertGiorgio();
         const user = await UtilsTaskPool.getUserById(giorgio.id);
 
@@ -22,17 +22,40 @@ describe("Test util",() => {
         expect(user.name).toEqual(giorgio.name);
     });
 
-    test("test can manage taskPool",async () => {
+    test("get user by id false that give an expection",async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+
+        try {
+            const user = await UtilsTaskPool.getUserById();
+            expect(true).toBe(false)
+        } catch(e){
+            expect(e.message).toEqual(TaskPoolService.errors.USER_NOT_EXIST)
+        }
+
+    });
+
+    test("can manage taskPool",async () => {
         const giorgio = await UserHelper.insertGiorgio();
         const mario = await UserHelper.insertMario();
-        const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks(giorgio);
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
 
-        const resultTrue = await TaskPoolService.canManageThisTaskPool(taskPool.id,giorgio.id)
-        const resultFalse = await TaskPoolService.canManageThisTaskPool(taskPool.id, mario.id)
+        const resultTrue = await TaskPoolService.canManageThisTaskPool(taskPool.id,giorgio.id);
+        const resultFalse = await TaskPoolService.canManageThisTaskPool(taskPool.id, mario.id);
 
         expect(resultTrue).toEqual(true);
         expect(resultFalse).toEqual(false);
 
+    });
+
+    test("get task pooli by id without control", async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
+
+        const taskPoolResult = await UtilsTaskPool.getTaskPoolByIdWithoutControl(taskPool.id)
+
+        expect(taskPoolResult.name).toEqual(taskPool.name);
+        expect(taskPoolResult.type).toEqual(taskPool.type);
+        expect(taskPoolResult.id).toEqual(taskPool.id);
     });
 });
 
@@ -167,4 +190,59 @@ describe('get my taskPool', () => {
 
     });
 
+});
+
+describe('get task pool by id with control', () => {
+    test('get task pool with two tasks',async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
+
+        const taskPoolResult = await TaskPoolService.getTaskPoolById(taskPool.id,giorgio.id);
+
+
+        expect(taskPool.id).toEqual(taskPoolResult.id);
+        expect(taskPool.name).toEqual(taskPoolResult.name);
+
+        expect( (await taskPool.getTasks()).length ).toEqual((await taskPoolResult.getTasks()).length);
+    });
+
+    test('get task pool with no tasks',async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolEmpty(giorgio);
+
+        const taskPoolResult = await TaskPoolService.getTaskPoolById(taskPool.id,giorgio.id);
+
+        expect(taskPool.id).toEqual(taskPoolResult.id);
+        expect(taskPool.name).toEqual(taskPoolResult.name);
+    });
+
+    test('get task pool that i can\'t manage',async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const mario = await UserHelper.insertMario();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
+
+        try{
+            await TaskPoolService.getTaskPoolById(taskPool.id,mario.id);
+            expect(true).toEqual(false)
+        } catch(e) {
+            expect(e.message).toEqual(TaskPoolService.errors.YOU_CANT_MANAGE_THIS_TASKPOOL)
+        }
+    });
+
+    test('get task pool with users that no exist',async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
+
+        const mario = {
+            id: '23',
+            name: 'mario'
+        };
+
+        try{
+            await TaskPoolService.getTaskPoolById(taskPool.id,mario.id);
+            expect(true).toEqual(false)
+        } catch(e) {
+            expect(e.message).toEqual(TaskPoolService.errors.USER_NOT_EXIST)
+        }
+    });
 });

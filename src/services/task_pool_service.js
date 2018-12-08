@@ -20,18 +20,9 @@ module.exports = {
         NO_NAME: "task pool have no name",
         USER_NOT_EXIST: "user not exist",
         TASK_NOT_EXIST: "tasks not exist",
-        TASK_POOL_ID_IS_NO_CORRECT: "taskPoolId is no correct"
-    },
 
-    async canManageThisTaskPool(taskPoolId, userId){
-        const myTaskPools = await this.getMyTaskPool(await Utils.getUserById(userId));
-
-        for(let t of myTaskPools){
-            if(t.id === taskPoolId)
-                return true;
-        }
-
-        return false;
+        TASK_POOL_ID_IS_NO_CORRECT: "taskPoolId is no correct",
+        YOU_CANT_MANAGE_THIS_TASKPOOL: "you can't manage this task pool"
     },
 
     async createTaskPool(taskPool, tasks = []) {
@@ -83,12 +74,45 @@ module.exports = {
         });
     },
 
-    async getTaskPoolById(taskPoolId,userId){
-        if(!(await Utils.isTaskPoolIdExist(taskPoolId))){
-            throw new Error(this.errors.TASK_POOL_ID_IS_NO_CORRECT);
-        } else if(!(await canManageThisTaskPool(taskPoolId,userId))) {
-            //TODO: go over with this function
+    async canManageThisTaskPool(taskPoolId, userId){
+        const myTaskPools = await this.getMyTaskPool(await Utils.getUserById(userId));
+
+        for(let t of myTaskPools){
+            if(t.id === taskPoolId)
+                return true;
         }
+
+        return false;
+    },
+
+    async getTaskPoolById(taskPoolId,userId){
+        if(!(await Utils.isUserExist( await Utils.getUserById(userId) ))) {
+            throw new Error(this.errors.USER_NOT_EXIST);
+        } else if(!(await Utils.isTaskPoolIdExist(taskPoolId))){
+            throw new Error(this.errors.TASK_POOL_ID_IS_NO_CORRECT);
+        } else if(!(await this.canManageThisTaskPool(taskPoolId,userId))) {
+            throw new Error(this.errors.YOU_CANT_MANAGE_THIS_TASKPOOL);
+        }
+
+        try {
+            //const taskPool = await Utils.getTaskPoolByIdWithoutControl(taskPoolId);
+
+            return await TaskPool.findOne({
+                where: {
+                    id: taskPoolId
+                },
+                include: [{
+                    model: Task,
+                    as: 'tasks'
+                }]
+            });
+
+        } catch (e) {
+            console.log("error");
+            throw e;
+        }
+
+
     }
 
 

@@ -1,4 +1,5 @@
 const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment} = require('../models/index');
+const TaskPoolService = require('../services/task_pool_service');
 
 module.exports={
 
@@ -47,8 +48,22 @@ module.exports={
             where:
                 {id: userId}
         });
+        if(fromDb === null)
+            throw new Error('user not exist');
+            //FIXME: i don't know why but that no work
+            //throw new Error(TaskPoolService.errors.NO_CREATOR_SPECIFIED);
+        else
+            return fromDb.toJSON();
 
-        return fromDb.toJSON();
+    },
+
+    async getTaskPoolByIdWithoutControl(taskPoolId){
+        const fromDb = await TaskPool.findOne({
+            where:
+                {id: taskPoolId}
+        });
+
+        return fromDb;
     },
 
 
