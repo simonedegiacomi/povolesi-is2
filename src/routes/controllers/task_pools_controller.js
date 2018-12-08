@@ -21,7 +21,6 @@ module.exports = {
         const tasks = req.body.tasks;
 
         try {
-            //creo il task Pool
             let taskPoolCreated = await TaskPoolService.createTaskPool({
                 name: value.name,
                 numQuestionsToDraw: value.numQuestionsToDraw,
@@ -34,18 +33,24 @@ module.exports = {
     },
 
     async getTaskPoolById(req, res){
-        const taskPoolId = req.params.id;
-        const userMe = req.user.id;
+        const taskPoolId = parseInt(req.params.id);
+        const userMeId = req.user.id;
 
         try{
-            const taskPool = await TaskPoolService.getTaskPoolById(taskPoolId,userId);
+            const taskPool = await TaskPoolService.getTaskPoolById(taskPoolId,userMeId);
             res.status(201).send(Mapper.mapTaskPool(taskPool))
         } catch(e) {
-            //TODO: mettere errori giusti
             ErrorMapper.map(res, e, [{
                 error: TaskPoolService.errors.USER_NOT_EXIST,
                 status: 409
-            }]);
+                }, {
+                error: TaskPoolService.errors.TASK_POOL_ID_IS_NO_CORRECT,
+                status: 409
+                }, {
+                error: TaskPoolService.errors.YOU_CANT_MANAGE_THIS_TASKPOOL,
+                status: 401
+                }
+            ]);
         }
 
     }

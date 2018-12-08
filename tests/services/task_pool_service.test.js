@@ -47,7 +47,7 @@ describe("Test util",() => {
 
     });
 
-    test("get task pooli by id without control", async () => {
+    test("get task pool by id without control", async () => {
         const giorgio = await UserHelper.insertGiorgio();
         const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
 

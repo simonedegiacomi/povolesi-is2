@@ -1,16 +1,5 @@
 const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment} = require('../models/index');
-const Utils = require('../utils/task_pool_utils')
-
-
-
-
-
-
-
-
-
-
-
+const Utils = require('../utils/task_pool_utils');
 
 module.exports = {
 

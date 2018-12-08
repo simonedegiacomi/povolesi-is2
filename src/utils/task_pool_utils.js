@@ -54,7 +54,6 @@ module.exports={
             //throw new Error(TaskPoolService.errors.NO_CREATOR_SPECIFIED);
         else
             return fromDb.toJSON();
-
     },
 
     async getTaskPoolByIdWithoutControl(taskPoolId){
