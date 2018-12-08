@@ -1,7 +1,6 @@
 const UserService = require('../../src/services/user_service');
-const {User} = require('../../src/models');
 const UserHelper = require('../helpers/user_helper');
-const TestUtils = require('../test_utils');
+const expectToFail = require("../test_utils").expectToFail;
 
 describe('Test the user registration', () => {
 
@@ -66,14 +65,10 @@ describe('Test the user login', () => {
 
 
 describe('Test the listing of existing users', () => {
-    test('Should return zero users if no users are registered', async (done) => {
-        //elimina dal database gli utenti
-        await User.destroy({where: {}});
-
+    test('Should return zero users if no users are registered', async () => {
         const users = await UserService.getAllUsers();
 
         expect(users.length).toEqual(0);
-        done();
     });
 
     test('Should return the registered users', async () => {
@@ -89,9 +84,6 @@ describe('Test the listing of existing users', () => {
     });
 
     test('Should return array json of two user', async () => {
-        //elimina gli utenti dal database
-        await User.destroy({where: {}});
-
         const user1 = await UserService.registerUser({
             name: 'Mario Rossi',
             email: 'mario2@rossi.it',
@@ -130,8 +122,7 @@ describe('Test user email update', () => {
 
         try {
             await UserService.updateUserEmail(existingUser1, existingUser2.email);
-
-            expect(true).toBe(false);
+            expectToFail();
         } catch (e) {
             expect(e.message).toBe('email already in use');
         }
@@ -142,8 +133,7 @@ describe('Test user email update', () => {
 
         try {
             await UserService.updateUserEmail(existingUser, 'Not an email!');
-
-            expect(true).toBe(false);
+            expectToFail();
         } catch (e) {
             expect(e.message).toBe(UserService.errors.INVALID_EMAIL);
         }
@@ -154,8 +144,7 @@ describe('Test user email update', () => {
 
         try {
             await UserService.updateUserEmail({field: "Not a user!"}, existingUser.email);
-
-            expect(true).toBe(false);
+            expectToFail();
         } catch (e) {
             expect(e.message).toBe(UserService.errors.INVALID_USER);
         }
