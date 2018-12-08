@@ -91,7 +91,7 @@ module.exports = {
         });
     },
 
-    getAllUsers() {
+    async getAllUsers() {
         return User.findAll()
     },
 
@@ -100,7 +100,7 @@ module.exports = {
             throw new ArgumentError(this.errors.INVALID_USER);
         }
 
-        const {error, value} = Joi.validate(newEmail, Joi.string().email().required());
+        const {error} = Joi.validate(newEmail, Joi.string().email().required());
 
         if (error != null) {
             throw new ArgumentError(error.details[0].message);

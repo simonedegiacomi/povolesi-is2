@@ -76,17 +76,16 @@ describe('Test the listing of existing users', () => {
         done();
     });
 
-    test('Should return the registered users', async (done) => {
-        await UserHelper.insertMario();
-        UserService.getAllUsers().then(users => {
-            let firstUser = users[0];
+    test('Should return the registered users', async () => {
+        let mario = UserHelper.createUserMario();
+        await UserService.registerUser(mario);
 
-            expect(firstUser.name).toEqual('Mario Rossi');
-            expect(firstUser.email).toEqual('mario@rossi.it');
-            expect(firstUser.badgeNumber).toEqual("000001");
+        let allUsers = await UserService.getAllUsers();
 
-            done();
-        });
+        let firstUser = allUsers[0];
+        expect(firstUser.name)       .toEqual(mario.name);
+        expect(firstUser.email)      .toEqual(mario.email);
+        expect(firstUser.badgeNumber).toEqual(mario.badgeNumber);
     });
 
     test('Should return array json of two user', async () => {
