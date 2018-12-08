@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const {Assignment, AssignedTask, UserGroup, UserPermission, TaskPool, Task} = require('../models/index');
-const ServiceUtils = require('./utils');
+const ServiceUtils = require('../utils/schema_utils');
 const RandomUtils = require('./random_utils');
 
 const assignmentSchema = Joi.object().keys({
@@ -14,14 +14,14 @@ const assignmentSchema = Joi.object().keys({
     taskPoolIds: Joi.array().items(Joi.number().integer())
 });
 const concat = (x,y) =>
-    x.concat(y)
+    x.concat(y);
 
 const flatMap = (f,xs) =>
-    xs.map(f).reduce(concat, [])
+    xs.map(f).reduce(concat, []);
 
 Array.prototype.flatMap = function(f) {
     return flatMap(f,this)
-}
+};
 
 module.exports = {
 

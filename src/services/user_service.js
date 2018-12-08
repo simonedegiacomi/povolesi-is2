@@ -3,7 +3,7 @@ const randomstring = require("randomstring");
 const Joi = require('joi');
 
 const {sequelize, User} = require('../models/index');
-const ServiceUtils = require('./utils');
+const ServiceUtils = require('../utils/schema_utils');
 const assertIsEmail = require("./parameters_helper").assertIsEmail;
 const assertIsNumber = require("./parameters_helper").assertIsNumber;
 
