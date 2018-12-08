@@ -27,10 +27,10 @@ describe("Test util", () => {
         const mario = await UserHelper.insertMario();
         const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks(giorgio);
 
-        //const resultTrue = await TaskPoolService.canManageThisTaskPool(taskPool.id,giorgio.id)
+        const resultTrue = await TaskPoolService.canManageThisTaskPool(taskPool.id,giorgio.id)
         const resultFalse = await TaskPoolService.canManageThisTaskPool(taskPool.id, mario.id)
 
-        //expect(resultTrue).toEqual(true);
+        expect(resultTrue).toEqual(true);
         expect(resultFalse).toEqual(false);
 
     });

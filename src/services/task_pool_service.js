@@ -14,6 +14,7 @@ module.exports = {
         TASK_POOL_ID_IS_NO_CORRECT: "taskPoolId is no correct"
     },
 
+
     async canManageThisTaskPool(taskPoolId, userId) {
         const myTaskPools = await this.getMyTaskPool(userId);
 
@@ -70,6 +71,7 @@ module.exports = {
             where: {createdById: userId},
             include: taskInclude
         });
+
 
         const taskPoolsInAssignmentsCreatedByUser = await TaskPool.findAll({
             include: [{
