@@ -1,5 +1,34 @@
 const {sequelize, User, UserPermission, UserGroup} = require('../models');
 
+async function _canUserManageGroupUsers(user, group) {
+    if (user.id === group.createdById) {
+        return true;
+    }
+
+    const permission = await UserPermission.findOne({
+        where: {
+            userId: user.id,
+            userGroupId: group.id
+        }
+    });
+    if (permission == null) {
+        return false;
+    }
+
+    return permission.canManageUsers;
+}
+
+function _isDuplicateMemberError(e) {
+    if (e instanceof sequelize.UniqueConstraintError && e.errors.length === 2) {
+        const errors = e.errors;
+        return errors.some(e => e.path === 'userId') &&
+            errors.some(e => e.path === 'userGroupId');
+    }
+
+    return false;
+}
+
+
 module.exports = {
 
     errors: {
@@ -25,7 +54,7 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND);
         }
 
-        const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        const hasPermission = await _canUserManageGroupUsers(actionPerformer, group);
         if (!hasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
@@ -39,7 +68,7 @@ module.exports = {
                 canChangePermissions: permission.canChangePermissions || false
             });
         } catch (e) {
-            if (this._isDuplicateMemberError(e)) {
+            if (_isDuplicateMemberError(e)) {
                 throw new Error(this.errors.USER_ALREADY_MEMBER);
             }
 
@@ -47,34 +76,6 @@ module.exports = {
 
             throw e;
         }
-    },
-
-    async _canUserManageGroupUsers(user, group) {
-        if (user.id === group.createdById) {
-            return true;
-        }
-
-        const permission = await UserPermission.findOne({
-            where: {
-                userId: user.id,
-                userGroupId: group.id
-            }
-        });
-        if (permission == null) {
-            return false;
-        }
-
-        return permission.canManageUsers;
-    },
-
-    _isDuplicateMemberError(e) {
-        if (e instanceof sequelize.UniqueConstraintError && e.errors.length === 2) {
-            const errors = e.errors;
-            return errors.some(e => e.path === 'userId') &&
-                errors.some(e => e.path === 'userGroupId');
-        }
-
-        return false;
     },
 
     async deletePermissionById(actionPerformer, id) {
@@ -98,7 +99,7 @@ module.exports = {
 
         const group = await permission.getUserGroup();
 
-        const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        const performerHasPermission = await _canUserManageGroupUsers(actionPerformer, group);
         if (!performerHasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
@@ -118,8 +119,8 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND)
         }
 
-        const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
-        if (!performerHasPermission && permissionList != null) {
+        const performerHasPermission = await _canUserManageGroupUsers(actionPerformer, group);
+        if (!performerHasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
 
@@ -141,7 +142,7 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND);
         }
 
-        const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        const hasPermission = await _canUserManageGroupUsers(actionPerformer, group);
         if (!hasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
@@ -155,7 +156,7 @@ module.exports = {
                 canChangePermissions: updatedPermission.canChangePermissions
             });
         } catch (e) {
-            if (this._isDuplicateMemberError(e)) {
+            if (_isDuplicateMemberError(e)) {
                 throw new Error(this.errors.USER_ALREADY_MEMBER);
             }
             throw e;
