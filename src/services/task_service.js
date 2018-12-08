@@ -1,4 +1,3 @@
-const ArrayHelper = require('../utils/array_utils');
 const {assertIsNumber, assertIsDefined, assertIsString} = require('./parameters_helper');
 
 const {Task} = require('../../src/models');
@@ -23,7 +22,7 @@ module.exports = {
             }
         });
 
-        if (ArrayHelper.isObjectEmpty(foundTask)) {
+        if (foundTask === null) {
             throw new Error(this.errors.TASK_NOT_FOUND)
         } else {
             return foundTask;
