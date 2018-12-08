@@ -12,8 +12,8 @@ describe("Test the listing of user permissions in a group", () => {
         const permissionList = await UserPermissionHelper.insertMultipleUserPermission(group);
         const permissionListFromDb = await UserPermissionHelper.getUserPermissionList(group, creator);
 
-        expect(permissionList).toBeDefined();
-        expect(permissionListFromDb).toBeDefined();
+        expect(permissionList).toBeDefinedAndNotNull();
+        expect(permissionListFromDb).toBeDefinedAndNotNull();
 
         expect(permissionListFromDb.map(p => p.toJSON())).toEqual(
             expect.arrayContaining(permissionList.map(p => p.toJSON()))
@@ -25,7 +25,7 @@ describe("Test the listing of user permissions in a group", () => {
             const creator = await UserHelper.insertNewRandom();
             await UserPermissionHelper.getUserPermissionList(null, creator);
             //TODO: change this with test utility created for this purpose
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.GROUP_NOT_FOUND);
         }
@@ -37,7 +37,7 @@ describe("Test the listing of user permissions in a group", () => {
             const group = await UserGroupsHelper.createGroup();
             await UserPermissionHelper.getUserPermissionList(group, creator);
             //TODO: change this with test utility created for this purpose
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
         }
@@ -63,12 +63,12 @@ describe("Test the creation of a user permission (add user to a group)", () => {
         const group = await UserGroupsHelper.createGroup();
         const permission = await UserPermissionHelper.insertUserPermission(group);
 
-        expect(permission).toBeDefined();
+        expect(permission).toBeDefinedAndNotNull();
 
         const fromDb = await UserPermission.findOne({
             where: {id: permission.id}
         });
-        expect(fromDb).toBeDefined();
+        expect(fromDb).toBeDefinedAndNotNull();
     });
 
     test("Should throw an exception if a user outside the group creates a permission", async () => {
@@ -85,7 +85,7 @@ describe("Test the creation of a user permission (add user to a group)", () => {
                 canManageUsers: false,
                 canChangePermissions: false
             });
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
         }

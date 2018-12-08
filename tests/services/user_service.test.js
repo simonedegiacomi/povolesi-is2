@@ -1,6 +1,5 @@
 const UserService = require('../../src/services/user_service');
 const UserHelper = require('../helpers/user_helper');
-const expectToFail = require("../test_utils").expectToFail;
 
 describe('Test the user registration', () => {
 
@@ -14,7 +13,7 @@ describe('Test the user registration', () => {
             password: 'password'
         });
 
-        expect(newUser.id).toBeDefined();
+        expect(newUser.id).toBeAnInteger();
     });
 
     test('Should not register two users with the same email', async () => {
@@ -123,7 +122,7 @@ describe('Test user email update', () => {
 
         try {
             await UserService.updateUserEmail(existingUser1.id, existingUser2.email);
-            expectToFail();
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserService.errors.EMAIL_ALREADY_IN_USE);
         }
@@ -134,7 +133,7 @@ describe('Test user email update', () => {
 
         try {
             await UserService.updateUserEmail(existingUser.id, 'Not an email!');
-            expectToFail();
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserService.errors.INVALID_EMAIL);
         }
@@ -145,7 +144,7 @@ describe('Test user email update', () => {
 
         try {
             await UserService.updateUserEmail({field: "Not a user!"}, existingUser.email);
-            expectToFail();
+            expect().toFail();
         } catch (e) {}
     });
 });
@@ -181,7 +180,7 @@ describe('Test the update of a password', () => {
 
        const loggedInUser = await UserService.loginUser(userUpdated.email, newPassword);
 
-       expect(loggedInUser.authToken).toBeDefined();
+       expect(loggedInUser.authToken).toBeDefinedAndNotNull();
    });
 
    test('Should return error when trying to change the password with a null value', async () => {

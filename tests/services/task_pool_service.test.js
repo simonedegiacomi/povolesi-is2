@@ -126,7 +126,7 @@ describe('get my taskPool', () => {
 
         try {
             await TaskPoolService.getMyTaskPool(giorgio);
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
             expect(e.message).toEqual(TaskPoolService.errors.USER_NOT_EXIST)
         }
@@ -137,7 +137,7 @@ describe('get my taskPool', () => {
         //insert a taskPool with two tasks in db
         const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
 
-        expect(taskPool).toBeDefined();
+        expect(taskPool).toBeDefinedAndNotNull();
         expect( (await taskPool.getTasks()).length ).toEqual(2);
 
     });

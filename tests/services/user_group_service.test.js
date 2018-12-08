@@ -11,7 +11,7 @@ describe('The user group creation', () => {
         };
         const group = await UserGroupService.createGroup(groupData);
 
-        expect(group.id).toBeDefined();
+        expect(group.id).toBeAnInteger();
         const createdBy = await group.getCreatedBy();
         expect(createdBy.toJSON()).toEqual(groupData.createdBy.toJSON());
     });
@@ -43,14 +43,14 @@ describe('The user group collection', () => {
 
         const group = await UserGroupService.getGroupById(createdGroup.id);
 
-        expect(group).toBeDefined();
+        expect(group).toBeDefinedAndNotNull();
         expect(group.toJSON()).toEqual(createdGroup.toJSON());
     });
 
     test("It should throw an excpetion if I request a group that doesn't exist", async () => {
         try {
             await UserGroupService.getGroupById(123);
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserGroupService.errors.GROUP_NOT_FOUND);
         }
@@ -76,7 +76,7 @@ describe("Test the user group deletion", () => {
 
         try {
             await UserGroupService.deleteById(user, 999);
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserGroupService.errors.GROUP_NOT_FOUND);
         }
@@ -88,7 +88,7 @@ describe("Test the user group deletion", () => {
 
         try {
             await UserGroupService.deleteById(aUser, group.id);
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserGroupService.errors.UNAUTHORIZED);
         }

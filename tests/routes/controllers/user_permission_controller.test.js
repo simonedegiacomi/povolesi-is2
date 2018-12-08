@@ -28,7 +28,7 @@ describe("Test the creation of a user permission", () => {
             .send(examplePermission);
 
         expect(response.status).toBe(201);
-        expect(response.body.id).toBeDefined();
+        expect(response.body.id).toBeAnInteger();
         examplePermission.id = response.body.id;
         expect(response.body).toEqual(examplePermission);
     });
