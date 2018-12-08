@@ -22,7 +22,7 @@ describe("Test the creation of a new task", () => {
             });
             expect(true).toBe(false);
         } catch (e) {
-            expect(e.message).toBe(TaskService.errors.WRONG_ARGUMENTS);
+            expect(e.message).toContain(TaskService.errors.WRONG_ARGUMENTS);
         }
     });
 
@@ -35,7 +35,7 @@ describe("Test the creation of a new task", () => {
             });
             expect(true).toBe(false);
         } catch (e) {
-            expect(e.message).toBe(TaskService.errors.WRONG_ARGUMENTS);
+            expect(e.message).toContain(TaskService.errors.WRONG_ARGUMENTS);
         }
     });
 
@@ -48,7 +48,7 @@ describe("Test the creation of a new task", () => {
             });
             expect(true).toBe(false);
         } catch (e) {
-            expect(e.message).toBe(TaskService.errors.WRONG_ARGUMENTS);
+            expect(e.message).toContain(TaskService.errors.WRONG_ARGUMENTS);
         }
     });
 
