@@ -13,15 +13,12 @@ const assignmentSchema = Joi.object().keys({
     assignedUserGroupId: Joi.number().integer().required(),
     taskPoolIds: Joi.array().items(Joi.number().integer())
 });
-const concat = (x,y) =>
-    x.concat(y)
 
-const flatMap = (f,xs) =>
-    xs.map(f).reduce(concat, [])
 
-Array.prototype.flatMap = function(f) {
-    return flatMap(f,this)
-}
+// TODO: Should we move this declaration somewhere else?
+Array.prototype.flatMap = function (lambda) {
+    return Array.prototype.concat.apply([], this.map(lambda));
+};
 
 module.exports = {
 
@@ -58,12 +55,16 @@ module.exports = {
         const assignmentsWithTasks = await this.findAssignedAssignmentsWithAssignedTasks(userId);
 
         for (let assignment of assignmentsWithTasks) {
-            if (assignment.assignedTasks == null) {
+            if (assignment.assignedTasks == null && this.isAssignmentStarted(assignment)) {
                 assignment.assignedTasks = await this.assignTasksOfAssignmentToUser(assignment.id, userId);
             }
         }
 
         return assignmentsWithTasks;
+    },
+
+    isAssignmentStarted(assignment) {
+        return new Date() >= assignment.startsOn;
     },
 
     /**
