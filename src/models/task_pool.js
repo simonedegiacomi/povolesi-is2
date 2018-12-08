@@ -9,6 +9,10 @@ module.exports = (sequelize, DataTypes) => {
         name: {
             type: DataTypes.STRING(200),
             allowNull: false
+        },
+        numQuestionsToDraw: {
+            type: DataTypes.INTEGER(11),
+            allowNull: false,
         }
     });
 
@@ -27,9 +31,9 @@ module.exports = (sequelize, DataTypes) => {
         });
 
         TaskPool.belongsToMany(models.Assignment, {
+            as: 'assignment',
             through: 'Assignment_TaskPool'
         });
-
     };
 
     return TaskPool;

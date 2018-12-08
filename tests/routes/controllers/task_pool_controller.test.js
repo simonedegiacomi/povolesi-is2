@@ -11,7 +11,8 @@ const {TaskPool}      = require('../../../src/models');
 var createTaskPoolToSend = function(user){
     return {
         name: 'esempio',
-        createdBy: user
+        createdBy: user,
+        numQuestionsToDraw: 0
     }
 };
 
@@ -108,7 +109,7 @@ describe('GET /task-pools', () => {
     test('GET /task-pools with valid data 201 with two tasksPool', async() => {
         const giorgio = await UserHelper.insertGiorgio();
 
-        const taskPool1 = await TaskPoolHelper.insertTaskPoolWith2Tasks(giorgio);
+        const taskPool1 = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
         const taskPool2 = await TaskPoolHelper.insertTaskPoolEmpty(giorgio);
 
         const response = await request(app)
@@ -131,7 +132,7 @@ describe('GET /task-pools', () => {
 
     test('GET /task-pools with valid data 201 with two tasks', async() => {
         const giorgio = await UserHelper.insertGiorgio();
-        const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks(giorgio);
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
 
         const response = await request(app)
             .get('/api/v1/task-pools')
