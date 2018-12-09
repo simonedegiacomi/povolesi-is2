@@ -2,7 +2,7 @@ const TaskPoolService = require('../../src/services/task_pool_service');
 const TaskHelper = require('../helpers/task_helper');
 const UserHelper = require('../helpers/user_helper');
 const TaskPoolHelper = require('../helpers/task_pool_helper');
-
+const UtilsTaskPool = require('../../src/utils/task_pool_utils');
 
 describe("Test utils methods of TaskPoolService", () => {
 
@@ -157,5 +157,79 @@ describe('get task pool by id with control', () => {
 
         await expect(TaskPoolService.getTaskPoolById(taskPool.id, 123))
             .rejects.toThrow(new Error(TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL));
+    });
+
+    test('get taskPool id that no exist',async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPoolIdNoExist=11111;
+
+        try{
+            await TaskPoolService.getTaskPoolById(taskPoolIdNoExist,giorgio.id);
+            expect(true).toEqual(false)
+        } catch(e) {
+            expect(e.message).toEqual(TaskPoolService.errors.TASK_POOL_NOT_FOUND)
+        }
+    });
+});
+
+describe("test delete taskPool by id of the taskPool",() =>{
+    test("delete a taskPool that exist",async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPoolId = (await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id)).id;
+
+        await TaskPoolService.deleteTaskPoolById(taskPoolId,giorgio.id);
+
+        expect(await UtilsTaskPool.isTaskPoolIdExist(taskPoolId)).toBe(false);
+    });
+
+    test("delete a taskPool that exist that have no tasks",async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPoolId = (await TaskPoolHelper.insertTaskPoolEmpty(giorgio.id)).id;
+
+        await TaskPoolService.deleteTaskPoolById(taskPoolId,giorgio.id);
+
+        expect(await UtilsTaskPool.isTaskPoolIdExist(taskPoolId)).toBe(false);
+    });
+
+    test('delete a task pool with users that no exist',async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPoolId = (await TaskPoolHelper.insertTaskPoolEmpty(giorgio.id)).id;
+
+        const mario = {
+            id: '23',
+            name: 'mario'
+        };
+
+        try{
+            await TaskPoolService.deleteTaskPoolById(taskPoolId,mario.id);
+            expect(true).toEqual(false)
+        } catch(e) {
+            expect(e.message).toEqual(TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL)
+        }
+    });
+
+    test('delete task pool that i can\'t manage',async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const mario = await UserHelper.insertMario();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
+
+        try{
+            await TaskPoolService.deleteTaskPoolById(taskPool.id,mario.id);
+            expect(true).toEqual(false)
+        } catch(e) {
+            expect(e.message).toEqual(TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL)
+        }
+    });
+
+    test('delete taskPool id that no exist',async ()=>{
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPoolIdNoExist=11111;
+
+        try{
+            await TaskPoolService.deleteTaskPoolById(taskPoolIdNoExist,giorgio.id);
+            expect(true).toEqual(false)
+        } catch(e) {
+            expect(e.message).toEqual(TaskPoolService.errors.TASK_POOL_NOT_FOUND)
+        }
     });
 });
