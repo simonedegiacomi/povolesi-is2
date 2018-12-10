@@ -183,6 +183,11 @@ module.exports = {
                 assignmentId,
                 userId
             }
+        }, {
+            include: [{
+                model: Task,
+                as: 'task'
+            }]
         });
     }
 };

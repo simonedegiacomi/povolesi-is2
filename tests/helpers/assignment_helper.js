@@ -38,7 +38,7 @@ module.exports = {
     },
 
     /**
-     * Creates a new user, a group in which the user participate, and assignment assigned to the group and assigns task
+     * Creates a new user, a group in which the user participate, and a assignment assigned to the group and assigns task
      * to the user.
      * @returns {Promise<{user, assignedTasks: *}>}
      */
@@ -48,7 +48,8 @@ module.exports = {
 
         return {
             user,
-            assignedTasks
+            assignedTasks,
+            assignment
         };
     }
 
