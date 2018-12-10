@@ -7,6 +7,7 @@ const userGroupsController = require('./controllers/user_group_controller');
 const taskPoolController = require('./controllers/task_pools_controller');
 const userPermissionsController = require('./controllers/user_permissions_controller');
 const taskController = require('./controllers/task_controller');
+const assignmentController = require('./controllers/assignment_controller');
 
 const authenticationMiddleware = require('./middlewares/authentication');
 
@@ -39,15 +40,17 @@ function setupAuthenticatedRoutes(app) {
 
     // /user
     router.get('/users/me', userController.getCurrentUserData);
+    router.get('/users/:id', userController.getUserById);
     router.put('/users/me', userController.updateUserData);
     router.put('/users/me/email', userController.updateEmail);
     router.put('/users/me/password', userController.updateUserPassword);
-    router.get('/users/:id', userController.getUserById);
+    router.get('/users/me/assignments', assignmentController.getAssignedAssignments);
 
     // /user-groups
     router.get('/user-groups', userGroupsController.getAllGroups);
-    router.post('/user-groups', userGroupsController.createUserGroup);
     router.get('/user-groups/:id', userGroupsController.getGroupById);
+    router.post('/user-groups', userGroupsController.createUserGroup);
+    // TODO: PUT /user-groups/:id
     router.delete('/user-groups/:id', userGroupsController.deleteGroupById);
 
     // /user-permissions
@@ -59,13 +62,16 @@ function setupAuthenticatedRoutes(app) {
     // /tasks
     router.get('/tasks', taskController.getTasks);
     router.get('/tasks/:id', taskController.getTask);
-    router.delete('/tasks/:id', taskController.deleteTask);
     router.post('/tasks', taskController.createTask);
+    // TODO: PUT /tasks/:id
+    router.delete('/tasks/:id', taskController.deleteTask);
 
     // /task-pools
     router.get('/task-pools', taskPoolController.getTaskPool);
-    router.post('/task-pools', taskPoolController.postTaskPool);
     router.get('/task-pools/:id', taskPoolController.getTaskPoolById);
+    router.post('/task-pools', taskPoolController.postTaskPool);
+    // TODO: PUT /task-pools/:id
+    // TODO: DELETE /task-pools/:id
 
     app.use('/api/v1', router);
 }
