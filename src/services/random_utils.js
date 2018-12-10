@@ -7,7 +7,7 @@ module.exports = {
     },
 
     getUniqueRandomIndexesFromArray(array, itemsToChoose) {
-        if (itemsToChoose >= array.length) {
+        if (itemsToChoose > array.length) {
             throw new Error(`cannot choose ${itemsToChoose} items given an array of ${array.length} items`);
         }
 

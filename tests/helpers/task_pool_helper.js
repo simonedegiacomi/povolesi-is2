@@ -5,31 +5,36 @@ const UserHelper = require('../helpers/user_helper');
 
 module.exports = {
 
-    async insertTaskPoolWith2TasksCreatedBy(user) {
+    async insertTaskPoolWith2TasksCreatedBy(userId) {
 
         //insert things in db
-        const task1 = await TaskHelper.createValidTask(user.id, "come sta lei?");
-        const task2 = await TaskHelper.createValidTask(user.id, "come stai?");
+        const task1 = await TaskHelper.createValidTask(userId, "come sta lei?");
+        const task2 = await TaskHelper.createValidTask(userId, "come stai?");
 
         const taskPool = {
             name: 'esempio',
-            createdBy: user,
-            numQuestionsToDraw: 1
+            createdById: userId,
+            numQuestionsToDraw: 1,
+            tasks: [
+                task1.id,
+                task2.id
+            ]
         };
 
-        return await TaskPoolService.createTaskPool(taskPool, [task1, task2]);
+        return await TaskPoolService.createTaskPool(taskPool);
     },
 
     async insertTaskPoolWith2Tasks() {
         const user = await UserHelper.insertNewRandom();
-        return await this.insertTaskPoolWith2TasksCreatedBy(user);
+        return await this.insertTaskPoolWith2TasksCreatedBy(user.id);
     },
 
-    async insertTaskPoolEmpty(user) {
+    async insertTaskPoolEmpty(userId) {
         const taskPool = {
             name: 'esempio',
-            createdBy: user,
-            numQuestionsToDraw: 0
+            createdById: userId,
+            numQuestionsToDraw: 0,
+            tasks: []
         };
 
         return await TaskPoolService.createTaskPool(taskPool);

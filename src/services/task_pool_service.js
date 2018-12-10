@@ -1,56 +1,54 @@
-const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment, UserGroup} = require('../models/index');
-const Utils = require('../utils/task_pool_utils');
-const {Op} = require('sequelize');
+const {TaskPool, User, Task, UserPermission, Assignment, UserGroup} = require('../models/index');
+const Joi = require('joi');
+const SchemaUtils = require('../utils/schema_utils');
 
+const taskPoolSchema = Joi.object().keys({
+    name: Joi.string().required(),
+    createdById: Joi.number().integer().required(),
+    tasks: Joi.array().items(Joi.number().integer()).required(),
+    numQuestionsToDraw: Joi.number().integer().required()
+});
 
 module.exports = {
 
     errors: {
-        NO_CREATOR_SPECIFIED: "no creator specified",
-
-        NO_NAME: "task pool have no name",
-        USER_NOT_EXIST: "user not exist",
-        TASK_NOT_EXIST: "tasks not exist",
-        TASK_POOL_ID_IS_NO_CORRECT: "taskPoolId is no correct"
+        TASK_NOT_FOUND: 'one of the tasks doesn\'t exist',
+        NUM_QUESTIONS_TO_DRAW_TOO_HIGH: 'numQuestionsToDraw is greater than the number of tasks',
+        TASK_POOL_NOT_FOUND: 'task pool not found'
     },
 
 
-    async canManageThisTaskPool(taskPoolId, userId) {
-        const myTaskPools = await this.getMyTaskPool(userId);
+    /**
+     * Return true if the user is allowed to edit the specified TaskPool
+     * @param taskPoolId
+     * @param userId
+     * @returns {Promise<boolean>}
+     */
+    async canManageTaskPoolById(taskPoolId, userId) {
+        const userTaskPools = await this.getTaskPoolsByUserId(userId);
 
-        for (let t of myTaskPools) {
-            if (t.id === taskPoolId)
-                return true;
-        }
-
-        return false;
+        // TODO: Do not load all the taskPools
+        return userTaskPools.some(taskPool => taskPool.id === taskPoolId);
     },
 
-    async createTaskPool(taskPool, tasks = []) {
+    async createTaskPool(taskPool) {
+        SchemaUtils.validateSchemaOrThrowArgumentError(taskPool, taskPoolSchema);
+        this.validateNumQuestionsToDrawOrThrowArgumentError(taskPool);
 
-        if (taskPool.name == null) {
-            throw new Error(this.errors.NO_NAME);
-        }
-        else if (taskPool.createdBy == null) {
-            throw new Error(this.errors.NO_CREATOR_SPECIFIED);
-        } else if (!(await Utils.isTasksExist(tasks))) {
-            throw new Error(this.errors.TASK_NOT_EXIST);
-        }
+        const createdTaskPool = await TaskPool.create(taskPool);
 
         try {
-            const createdTaskPool = await TaskPool.create({
-                ...taskPool,
-                createdById: taskPool.createdBy.id
-            });
-            createdTaskPool.createdBy = taskPool.createdBy;
-
-            //aggiungo i task al taskPool creato
-            await createdTaskPool.setTasks(tasks);
-
-            return createdTaskPool;
-
+            await createdTaskPool.setTasks(taskPool.tasks);
         } catch (e) {
-            throw e;
+            throw new Error(this.errors.TASK_NOT_FOUND);
+        }
+
+        return createdTaskPool;
+    },
+
+    validateNumQuestionsToDrawOrThrowArgumentError(taskPool) {
+        if (taskPool.numQuestionsToDraw > taskPool.tasks.length) {
+            throw new Error(this.errors.NUM_QUESTIONS_TO_DRAW_TOO_HIGH);
         }
     },
 
@@ -60,7 +58,7 @@ module.exports = {
      * @param userId
      * @returns {Promise<Array<Model>>}
      */
-    async getMyTaskPool(userId) {
+    async getTaskPoolsByUserId(userId) {
         // We need to eagerly fetch the Tasks of the TaskPools
         const taskInclude = {
             model: Task,
@@ -126,76 +124,10 @@ module.exports = {
         const distinctPools = {};
         allPools.forEach(pool => distinctPools[pool.id] = pool);
         return Object.values(distinctPools);
-        /*
-                return await TaskPool.findAll({
-                    where: {
-                        [Op.or]: [
-                            {
-                                '$User.createdBy'
-                            }
-                        ]
-                    },
-                    include: [
-                        // eagerly fetch the Tasks of each TaskPool
-                        {
-                            model: Task,
-                            as: 'tasks'
-                        },
-
-                        // LEFT JOIN the user table, to include the user if he created the TaskPool.
-                        // This means that, if a TaskPool retrieved from this query has the createdBy equal to null, the user
-                        // didn't create the TaskPool
-                        {
-                            model: User,
-                            as: 'createdBy',
-                            where: {
-                                id: userId
-                            },
-                            required: false
-                        },
-                        {
-                            model: Assignment,
-                            as: 'assignment',
-                            include: [
-                                // Fetch the TaskPools in assignments that the user created
-                                {
-                                    model: User,
-                                    where: {
-                                        createdById: userId
-                                    },
-                                    required: false
-                                },
-                                {
-                                    model: UserGroup,
-                                    as: 'assignedUserGroup',
-                                    include: [
-                                        {
-                                            model: UserPermission,
-                                            where: {
-                                                userId,
-                                                canManageTasks: true
-                                            },
-                                            required: false
-                                        },
-                                        {
-                                            model: User,
-                                            required: false
-                                        }
-                                    ],
-                                    required: false
-                                }
-                            ]
-                        }
-                    ]
-                });*/
     },
 
     async getTaskPoolById(taskPoolId, userId) {
-        if (!(await Utils.isTaskPoolIdExist(taskPoolId))) {
-            throw new Error(this.errors.TASK_POOL_ID_IS_NO_CORRECT);
-        } else if (!(await canManageThisTaskPool(taskPoolId, userId))) {
-            //TODO: go over with this function
-        }
+        // TODO: Implement
     }
 
 

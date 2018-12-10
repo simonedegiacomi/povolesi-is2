@@ -5,7 +5,7 @@ const ErrorMapper = require('./error_mapper');
 module.exports = {
 
     async getTaskPool(req, res) {
-        const tasksPools = await TaskPoolService.getMyTaskPool(req.user.id);
+        const tasksPools = await TaskPoolService.getTaskPoolsByUserId(req.user.id);
 
         const json = Mapper.mapTaskPoolArray(tasksPools);
 
@@ -13,38 +13,39 @@ module.exports = {
     },
 
     async postTaskPool(req, res) {
-        const value = req.body;
-        const userMe = req.user;
-        const tasks = req.body.tasks;
-
         try {
             //creo il task Pool
             let taskPoolCreated = await TaskPoolService.createTaskPool({
-                name: value.name,
-                numQuestionsToDraw: value.numQuestionsToDraw,
-                createdBy: userMe
-            }, tasks);
+                ...req.body,
+                createdById: req.user.id
+            });
             res.status(201).send({taskPoolId: taskPoolCreated.id})
         } catch (e) {
-            res.status(401).send({message: e.message})
+            ErrorMapper.map(res, e, [{
+                error: TaskPoolService.errors.TASK_NOT_FOUND,
+                status: 404
+            }, {
+                error: TaskPoolService.errors.NUM_QUESTIONS_TO_DRAW_TOO_HIGH,
+                status: 400
+            }]);
         }
     },
 
 
     async getTaskPoolById(req, res) {
         const taskPoolId = req.params.id;
-        const userMe = req.user.id;
+        const userMeId = req.user.id;
 
         try {
-            const taskPool = await TaskPoolService.getTaskPoolById(taskPoolId, userId);
-            res.status(201).send(Mapper.mapTaskPool(taskPool))
+            const taskPool = await TaskPoolService.getTaskPoolById(taskPoolId, userMeId);
+            const json = Mapper.mapTaskPool(taskPool);
+
+            res.status(200).send(json);
         } catch (e) {
-            //TODO: mettere errori giusti
             ErrorMapper.map(res, e, [{
-                error: TaskPoolService.errors.USER_NOT_EXIST,
-                status: 409
+                error: TaskPoolService.errors.TASK_POOL_NOT_FOUND,
+                status: 404
             }]);
         }
-
     }
 };
