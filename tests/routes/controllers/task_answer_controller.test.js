@@ -61,7 +61,6 @@ describe('Test the API to create a TaskAnswer', () => {
         const giorgio = await UserHelper.insertGiorgio();
         const {assignedTasks, assignment} = await AssignmentHelper.createAssignedTaskForUser();
         const answer = {
-            userId: user.id,
             taskId: assignedTasks[0].taskId,
             assignmentId: assignment.id,
             answer: '42'
