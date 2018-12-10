@@ -31,7 +31,7 @@ describe('Test the API to get assigned assignments', () => {
         expect(response.status).toBe(200);
         expect(assignedAssignments.length).toBe(1);
         const firstAssignment = assignedAssignments[0];
-        expect(firstAssignment.AssignedTasks[0].toJSON()).toEqual(assignedTasks[0].toJSON());
+        expect(firstAssignment.AssignedTasks[0]).toEqual(assignedTasks[0].toJSON());
     });
 
     test('GET /users/me/assignments Should return the assignment with new assigned tasks', async () => {
