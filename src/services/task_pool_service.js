@@ -1,6 +1,7 @@
 const {TaskPool, User, Task, UserPermission, Assignment, UserGroup} = require('../models/index');
 const Joi = require('joi');
 const SchemaUtils = require('../utils/schema_utils');
+const {assertIsNumber} = require("./parameters_helper");
 
 const taskPoolSchema = Joi.object().keys({
     name: Joi.string().required(),
@@ -14,9 +15,9 @@ module.exports = {
     errors: {
         TASK_NOT_FOUND: 'one of the tasks doesn\'t exist',
         NUM_QUESTIONS_TO_DRAW_TOO_HIGH: 'numQuestionsToDraw is greater than the number of tasks',
-        TASK_POOL_NOT_FOUND: 'task pool not found'
+        TASK_POOL_NOT_FOUND: 'task pool not found',
+        USER_CANT_MANAGE_TASK_POOL: 'user can\'t manage task pool'
     },
-
 
     /**
      * Return true if the user is allowed to edit the specified TaskPool
@@ -24,7 +25,7 @@ module.exports = {
      * @param userId
      * @returns {Promise<boolean>}
      */
-    async canManageTaskPoolById(taskPoolId, userId) {
+    async canUserManageTaskPoolById(taskPoolId, userId) {
         const userTaskPools = await this.getTaskPoolsByUserId(userId);
 
         // TODO: Do not load all the taskPools
@@ -59,6 +60,8 @@ module.exports = {
      * @returns {Promise<Array<Model>>}
      */
     async getTaskPoolsByUserId(userId) {
+        assertIsNumber(userId);
+
         // We need to eagerly fetch the Tasks of the TaskPools
         const taskInclude = {
             model: Task,
@@ -127,32 +130,28 @@ module.exports = {
     },
 
     async getTaskPoolById(taskPoolId, userId) {
-        // TODO: Implement
-    }
+        assertIsNumber(taskPoolId);
+        assertIsNumber(userId);
 
-
-};
-
-//query SELECT * WHERE user=userMe
-/*
-const jsonArray = await Assignment.findAll({
-
-    where: {},
-
-    include: [
-        {
-            model: Group,
+        const taskPool = await TaskPool.findOne({
+            where: {
+                id: taskPoolId
+            },
             include: [{
-                model: UserPermission,
-                include: [{
-                    model: User
-                }]
+                model: Task,
+                as: 'tasks'
             }]
-        }, {
-            model: TaskDraw,
-            include: [{
-                model: TaskPool
-            }]
+        });
+
+        if (taskPool == null) {
+            throw new Error(this.errors.TASK_POOL_NOT_FOUND);
         }
-    ]
-});*/
+
+        const userCanEdit = await this.canUserManageTaskPoolById(taskPoolId, userId);
+        if (!userCanEdit) {
+            throw new Error(this.errors.USER_CANT_MANAGE_TASK_POOL);
+        }
+
+        return taskPool;
+    }
+};

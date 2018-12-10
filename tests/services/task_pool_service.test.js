@@ -10,7 +10,7 @@ describe("Test utils methods of TaskPoolService", () => {
         const giorgio = await UserHelper.insertGiorgio();
         const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
 
-        const giorgioCanEdit = await TaskPoolService.canManageTaskPoolById(taskPool.id, giorgio.id);
+        const giorgioCanEdit = await TaskPoolService.canUserManageTaskPoolById(taskPool.id, giorgio.id);
 
         expect(giorgioCanEdit).toEqual(true);
     });
@@ -19,7 +19,7 @@ describe("Test utils methods of TaskPoolService", () => {
         const mario = await UserHelper.insertMario();
         const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks();
 
-        const marioCanEdit = await TaskPoolService.canManageTaskPoolById(taskPool.id, mario.id);
+        const marioCanEdit = await TaskPoolService.canUserManageTaskPoolById(taskPool.id, mario.id);
         expect(marioCanEdit).toEqual(false);
     });
 });
@@ -116,4 +116,46 @@ describe('Get a list of the user TaskPools', () => {
         expect(taskPools.length).toBe(0);
     });
 
+});
+
+describe('get task pool by id with control', () => {
+    test('get task pool with two tasks', async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
+
+        const taskPoolResult = await TaskPoolService.getTaskPoolById(taskPool.id, giorgio.id);
+
+
+        expect(taskPool.id).toEqual(taskPoolResult.id);
+        expect(taskPool.name).toEqual(taskPoolResult.name);
+
+        expect((await taskPool.getTasks()).length).toEqual((await taskPoolResult.getTasks()).length);
+    });
+
+    test('get task pool with no tasks', async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolEmpty(giorgio.id);
+
+        const taskPoolResult = await TaskPoolService.getTaskPoolById(taskPool.id, giorgio.id);
+
+        expect(taskPool.id).toEqual(taskPoolResult.id);
+        expect(taskPool.name).toEqual(taskPoolResult.name);
+    });
+
+    test('get task pool that i can\'t manage', async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const mario = await UserHelper.insertMario();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
+
+        await expect(TaskPoolService.getTaskPoolById(taskPool.id, mario.id))
+            .rejects.toThrow(new Error(TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL));
+    });
+
+    test('get task pool with users that no exist', async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
+
+        await expect(TaskPoolService.getTaskPoolById(taskPool.id, 123))
+            .rejects.toThrow(new Error(TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL));
+    });
 });

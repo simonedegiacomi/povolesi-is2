@@ -14,7 +14,6 @@ module.exports = {
 
     async postTaskPool(req, res) {
         try {
-            //creo il task Pool
             let taskPoolCreated = await TaskPoolService.createTaskPool({
                 ...req.body,
                 createdById: req.user.id
@@ -33,18 +32,19 @@ module.exports = {
 
 
     async getTaskPoolById(req, res) {
-        const taskPoolId = req.params.id;
+        const taskPoolId = parseInt(req.params.id);
         const userMeId = req.user.id;
 
         try {
             const taskPool = await TaskPoolService.getTaskPoolById(taskPoolId, userMeId);
-            const json = Mapper.mapTaskPool(taskPool);
-
-            res.status(200).send(json);
+            res.status(200).send(Mapper.mapTaskPool(taskPool))
         } catch (e) {
             ErrorMapper.map(res, e, [{
                 error: TaskPoolService.errors.TASK_POOL_NOT_FOUND,
                 status: 404
+            }, {
+                error: TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL,
+                status: 403
             }]);
         }
     }
