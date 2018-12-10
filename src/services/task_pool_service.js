@@ -21,16 +21,6 @@ var isTasksExist = async function (tasks) {
     return true;
 };
 
-var isUserExist = async function (user) {
-    const fromDb = await User.findOne({
-        where:
-            {id: user.id}
-    });
-
-    return fromDb !== null;
-};
-
-
 module.exports = {
 
     errors: {
@@ -39,6 +29,14 @@ module.exports = {
         NO_NAME: "task pool have no name",
         USER_NOT_EXIST: "user not exist",
         TASK_NOT_EXIST: "tasks not exist"
+    },
+
+    async doesUserExists(userID) {
+        const fromDb = await User.findOne({
+            where: {id: userID}
+        });
+
+        return fromDb !== null;
     },
 
     async createTaskPool(taskPool, tasks = []) {
@@ -69,10 +67,8 @@ module.exports = {
         }
     },
 
-
-    async getMyTaskPool(userMe) {
-
-        if (!(await isUserExist(userMe))) {
+    async getAllTaskPoolsOfUser(userId) {
+        if (!(await this.doesUserExists(userId))) {
             throw new Error(this.errors.USER_NOT_EXIST);
         }
 
@@ -80,9 +76,7 @@ module.exports = {
         //query SELECT * WHERE user=userMe
 
         return await TaskPool.findAll({
-            where: {
-                createdById: userMe.id
-            },
+            where: {createdById: userId},
             include: [{
                 model: Task,
                 as: 'tasks'

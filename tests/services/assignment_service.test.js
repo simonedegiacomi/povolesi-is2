@@ -5,9 +5,7 @@ const UserGroupsHelper = require('../helpers/user_groups_helper');
 describe("Test the creation of a new assignment", () => {
 
     test('Should create a new assignment', async () => {
-        let assignment = await AssignmentHelper.createAssignment();
-
-        expect(assignment).not.toBeNull();
+        expect(await AssignmentHelper.createAssignment()).toBeDefinedAndNotNull();
     });
 
 });

@@ -31,10 +31,7 @@ module.exports = {
             (await TaskPoolHelper.insertTaskPoolWith2Tasks()).id,
             (await TaskPoolHelper.insertTaskPoolWith2Tasks()).id
         ]);
-        return {
-            user,
-            assignment
-        };
+        return {user, assignment};
     },
 
     /**
@@ -46,10 +43,7 @@ module.exports = {
         const {assignment, user} = await this.createAssignmentWithUserAndPools();
         const assignedTasks = await AssignmentService.assignTasksOfAssignmentToUser(assignment.id, user.id);
 
-        return {
-            user,
-            assignedTasks
-        };
+        return {user, assignedTasks};
     }
 
 };

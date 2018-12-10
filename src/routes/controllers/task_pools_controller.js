@@ -5,7 +5,7 @@ const ErrorMapper = require('./error_mapper');
 module.exports = {
     async getTaskPool(req, res) {
         try {
-            const tasks = await TaskPoolService.getMyTaskPool(req.user);
+            const tasks = await TaskPoolService.getAllTaskPoolsOfUser(req.user.id);
             res.status(200).send(Mapper.mapTaskPoolArray(tasks));
         } catch(e){
             ErrorMapper.map(res, e, [{

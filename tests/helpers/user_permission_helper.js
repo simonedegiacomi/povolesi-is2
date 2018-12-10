@@ -4,9 +4,9 @@ const UserGroupService = require('../../src/services/user_group_service');
 
 module.exports = {
 
-    async insertUserPermission(group) {
-        const creator = await group.getCreatedBy();
+    async createOneUserAndHisPermissionsForGroup(group) {
         const newMember = await UserHelper.insertNewRandom();
+        const creator   = await group.getCreatedBy();
 
         return await UserPermissionsService.createPermission(creator.id, {
             userGroupId: group.id,
@@ -17,13 +17,14 @@ module.exports = {
         });
     },
 
-    async insertMultipleUserPermission(group) {
+    async insertTwoUsersWithTheirPermissionsForGroup(group) {
+        const permission1 = await this.createOneUserAndHisPermissionsForGroup(group);
+        const permission2 = await this.createOneUserAndHisPermissionsForGroup(group);
+
         let permissionList = [];
-        const member1 = await this.insertUserPermission(group);
-        const member2 = await this.insertUserPermission(group);
-        permissionList.push(member1);
-        permissionList.push(member2);
-        return await permissionList;
+        permissionList.push(permission1);
+        permissionList.push(permission2);
+        return permissionList;
     },
 
     async getUserPermissionList(group, creator) {
@@ -43,12 +44,10 @@ module.exports = {
         });
     },
 
-    async givePrivilegeToUser(permission) {
+    enableAllPermissions(permission) {
         permission.canManageTasks = true;
         permission.canManageUsers = true;
         permission.canChangePermissions = true;
-        const permissionUpdated = await permission;
-        return await permissionUpdated;
     }
 
 

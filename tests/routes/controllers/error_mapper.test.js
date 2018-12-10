@@ -55,7 +55,7 @@ describe('Test the user permission mapper', () => {
 
     test('Should return the permission with the id of the group and the user and the permissions', async () => {
         const group = await UsersGroupHelper.createGroup();
-        const permission = await UserPermissionHelper.insertUserPermission(group);
+        const permission = await UserPermissionHelper.createOneUserAndHisPermissionsForGroup(group);
         const user = await permission.getUser();
         const json = ModelsMapper.mapUserPermission(permission);
 

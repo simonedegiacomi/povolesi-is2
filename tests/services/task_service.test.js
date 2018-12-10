@@ -2,7 +2,6 @@ const TaskHelper = require('../helpers/task_helper');
 const UserHelper = require('../helpers/user_helper');
 const TaskService = require('../../src/services/task_service');
 
-
 describe("Test the creation of a new task", () => {
 
     test('should crate a new open question task', async () => {
@@ -107,22 +106,6 @@ describe("Test the retrieval of all the tasks", () => {
         expect(tasksB[0].question).toBe(anotherUserQuestion.question);
     });
 
-    //TODO: implement this once the task draws are finished
-    //
-    // test('User should be able to see tasks of other users that do share a group with him', async () => {
-    //     let anotherUser         = await UserHelper.insertNewRandom();
-    //     let anotherUserQuestion = await TaskHelper.createValidTaskWithQuestion(anotherUser.id, "A");
-    //
-    //     let group = await UserGroupsHelper.createGroup();
-    //
-    //
-    //     let tasksA = await TaskService.getTasks(user.id);
-    //     expect(tasksA[0].question).toBe(firstUserQuestion.question);
-    //
-    //     let tasksB = await TaskService.getTasks(anotherUser.id);
-    //     expect(tasksB[0].question).toBe(anotherUserQuestion.question);
-    // });
-
 });
 
 describe("Test the retrieval of a task with a specific ID", () => {
@@ -131,8 +114,7 @@ describe("Test the retrieval of a task with a specific ID", () => {
         let user = await UserHelper.insertNewRandom();
         let task = await TaskHelper.createValidTaskWithQuestion(user.id, "A");
 
-        let foundTask = await TaskService.getTask(task.id, user.id);
-        expect(foundTask).toBeDefinedAndNotNull()
+        expect(await TaskService.getTask(task.id, user.id)).toBeDefinedAndNotNull()
     });
 
     test('Should fail to retrieve a non-existing task', async () => {
@@ -154,6 +136,7 @@ describe("Test the retrieval of a task with a specific ID", () => {
             await TaskService.getTask(taskCreatedByMario.id, giorgio.id);
             expect().toFail();
         } catch (e) {
+            expect(e.message).toBe("Task not found");
         }
     });
 });
@@ -176,6 +159,7 @@ describe("Test the deletion of a task with a specific ID", () => {
             await TaskService.deleteTask(1, user.id);
             expect().toFail();
         } catch (e) {
+            expect(e.message).toBe("Task not found");
         }
     });
 
@@ -189,6 +173,8 @@ describe("Test the deletion of a task with a specific ID", () => {
             await TaskService.deleteTask(taskCreatedByGiorgio.id, mario.id);
             expect().toFail();
         } catch (e) {
+            //TODO update this once the assignments are implemented
+            expect(e.message).toBe("Task not found");
         }
 
     });
