@@ -1,4 +1,4 @@
-const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment} = require('../models/index');
+const {TaskPool, User, Task} = require('../models/index');
 
 var isTaskExist = async function (task) {
 
