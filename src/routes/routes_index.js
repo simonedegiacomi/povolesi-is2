@@ -8,6 +8,7 @@ const taskPoolController = require('./controllers/task_pools_controller');
 const userPermissionsController = require('./controllers/user_permissions_controller');
 const taskController = require('./controllers/task_controller');
 const assignmentController = require('./controllers/assignment_controller');
+const taskAnswerController = require('./controllers/task_answer_controller');
 
 const authenticationMiddleware = require('./middlewares/authentication');
 
@@ -72,6 +73,13 @@ function setupAuthenticatedRoutes(app) {
     router.post('/task-pools', taskPoolController.postTaskPool);
     // TODO: PUT /task-pools/:id
     // TODO: DELETE /task-pools/:id
+
+    // /task-answers
+    // TODO: GET /task-answers
+    // TODO: GET /task-answers/{id}
+    router.post('/task-answers', taskAnswerController.postTaskAnswer);
+    // TODO: PUT /task-answers/{id}
+    // TODO: DELETE /task-answers/{id}
 
     app.use('/api/v1', router);
 }
