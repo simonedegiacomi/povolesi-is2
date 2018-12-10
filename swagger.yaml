@@ -142,31 +142,6 @@ definitions:
     - name
     - tasks
 
-  TaskDraw:
-    title: Task Draw
-    type: object
-    properties:
-      id:
-        type: integer
-
-      assignmentId:
-        type: integer
-
-      poolIDd:
-        type: integer
-
-      numQuestionsToDraw:
-        type: integer
-
-      minPerQuestionDraw:
-        type: integer
-
-    required:
-    - assignmentId
-    - poolId
-    - numQuestionsToDraw
-    - minPerQuestionDraw
-
   Task:
     title: Task
     type: object
