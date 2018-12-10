@@ -1,8 +1,8 @@
-const {Answer} = require('../../src/models');
+const {TaskAnswer} = require('../../src/models');
 
 module.exports = {
     async findTaskAnswerById(id) {
-        return await Answer.findOne({
+        return await TaskAnswer.findOne({
             where: {id}
         });
     }

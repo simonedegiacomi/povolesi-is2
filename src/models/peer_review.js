@@ -27,7 +27,7 @@ module.exports = function (sequelize, DataTypes) {
             }
         });
 
-        PeerReview.belongsTo(models.Answer, {
+        PeerReview.belongsTo(models.TaskAnswer, {
             as: 'answer',
             foreignKey: {
                 name: 'answerId',

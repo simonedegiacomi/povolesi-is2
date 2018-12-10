@@ -178,7 +178,7 @@ module.exports = {
         await AssignedTask.bulkCreate(assignedTasksToCreate);
 
         // Sequelize bulkCreate method doesn't return the ids of the insert entries, so we need to fetch them
-        return await AssignedTask.findAll({
+        const a = await AssignedTask.findAll({
             where: {
                 assignmentId,
                 userId
@@ -189,5 +189,7 @@ module.exports = {
                 as: 'task'
             }]
         });
+
+        return a;
     }
 };

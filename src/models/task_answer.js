@@ -1,5 +1,5 @@
 module.exports = function (sequelize, DataTypes) {
-    const Answer = sequelize.define('Answer', {
+    const TaskAnswer = sequelize.define('TaskAnswer', {
         id: {
             type: DataTypes.INTEGER(11),
             allowNull: false,
@@ -11,7 +11,7 @@ module.exports = function (sequelize, DataTypes) {
             allowNull: false,
             defaultValue: sequelize.literal('CURRENT_TIMESTAMP')
         },
-        openAnswer: {
+        answer: {
             type: DataTypes.TEXT,
             allowNull: true
         },
@@ -27,8 +27,8 @@ module.exports = function (sequelize, DataTypes) {
         tableName: 'answer'
     });
 
-    Answer.associate = (models) => {
-        Answer.belongsTo(models.User, {
+    TaskAnswer.associate = (models) => {
+        TaskAnswer.belongsTo(models.User, {
             as: 'user',
             foreignKey: {
                 name: 'userId',
@@ -36,7 +36,7 @@ module.exports = function (sequelize, DataTypes) {
             }
         });
 
-        Answer.belongsTo(models.Task, {
+        TaskAnswer.belongsTo(models.Task, {
             as: 'task',
             foreignKey: {
                 name: 'taskId',
@@ -44,7 +44,7 @@ module.exports = function (sequelize, DataTypes) {
             }
         });
 
-        Answer.belongsTo(models.Assignment, {
+        TaskAnswer.belongsTo(models.Assignment, {
             as: 'assignment',
             foreignKey: {
                 name: 'assignmentId',
@@ -53,5 +53,5 @@ module.exports = function (sequelize, DataTypes) {
         });
     };
 
-    return Answer;
+    return TaskAnswer;
 };
