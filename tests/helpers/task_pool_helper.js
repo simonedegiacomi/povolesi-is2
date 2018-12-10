@@ -5,17 +5,20 @@ const {TaskPool} = require('../../src/models');
 
 module.exports = {
 
-    async insertTaskPoolWith2TasksCreatedBy(user) {
-
-        //insert things in db
-        const task1 = await TaskHelper.createValidTask(user.id, "come sta lei?");
-        const task2 = await TaskHelper.createValidTask(user.id, "come stai?");
-
-        const taskPool = {
+    createSampleTaskPool(user) {
+        return {
             name: 'esempio',
             createdBy: user,
             numQuestionsToDraw: 1
         };
+    },
+
+    async insertTaskPoolWith2TasksCreatedBy(user) {
+        //insert things in db
+        const task1 = await TaskHelper.createValidTask(user.id, "come sta lei?");
+        const task2 = await TaskHelper.createValidTask(user.id, "come stai?");
+
+        const taskPool = this.createSampleTaskPool(user);
 
         return await TaskPoolService.createTaskPool(taskPool, [task1, task2]);
     },

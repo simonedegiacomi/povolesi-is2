@@ -133,9 +133,7 @@ describe('Test user email update', () => {
         const response = await request(app)
             .put('/api/v1/users/me/email')
             .set('X-API-TOKEN', existingUser.authToken)
-            .send({
-                newEmail: 'luca@bianchi.com'
-            });
+            .send({newEmail: 'luca@bianchi.com'});
 
         expect(response.status).toBe(200);
     });
@@ -147,9 +145,7 @@ describe('Test user email update', () => {
         const response = await request(app)
             .put('/api/v1/users/me/email')
             .set('X-API-TOKEN', existingUser1.authToken)
-            .send({
-                newEmail: existingUser2.email
-            });
+            .send({ newEmail: existingUser2.email });
 
         expect(response.status).toBe(409);
         expect(response.body.errorMessage).toBe('email already in use');
@@ -161,9 +157,7 @@ describe('Test user email update', () => {
         const response = await request(app)
             .put('/api/v1/users/me/email')
             .set('X-API-TOKEN', existingUser.authToken)
-            .send({
-                newEmail: 'Not an email!'
-            });
+            .send({ newEmail: 'Not an email!' });
 
         expect(response.status).toBe(400);
     });
@@ -260,12 +254,11 @@ describe('Test the update of the user password', () => {
     test('PUT /users/password should return 204', async () => {
         const user = await UserHelper.insertMario();
         const newPassword = 'newPassword';
+
         const response = await request(app)
             .put('/api/v1/users/me/password')
             .set('X-API-TOKEN', user.authToken)
-            .send({
-                newPassword: newPassword
-            });
+            .send({newPassword: newPassword});
 
         expect(response.status).toBe(204);
         await postLogin({
@@ -279,9 +272,7 @@ describe('Test the update of the user password', () => {
         const response = await request(app)
             .put('/api/v1/users/me/password')
             .set('X-API-TOKEN', user.authToken)
-            .send({
-                newPassword: '12345'
-            });
+            .send({newPassword: '12345'});
 
         expect(response.status).toBe(400);
 

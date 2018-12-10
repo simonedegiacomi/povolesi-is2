@@ -7,22 +7,12 @@ const TaskHelper  = require('../../helpers/task_helper');
 const TaskPoolHelper  = require('../../helpers/task_pool_helper');
 const {TaskPool}      = require('../../../src/models');
 
-
-var createTaskPoolToSend = function(user){
-    return {
-        name: 'esempio',
-        createdBy: user,
-        numQuestionsToDraw: 0
-    }
-};
-
-
 describe('POST /task-pools', () => {
 
     test('POST /task-pools with valid data 201 with no tasks', async() => {
         const user = await UserHelper.insertNewRandom();
 
-        const taskPoolExample = createTaskPoolToSend(user);
+        const taskPoolExample = TaskPoolHelper.createSampleTaskPool(user);
         const response = await request(app)
             .post('/api/v1/task-pools')
             .set('X-API-TOKEN',user.authToken)
@@ -44,7 +34,7 @@ describe('POST /task-pools', () => {
         const user = await UserHelper.insertNewRandom();
         const task1 = await TaskHelper.createValidTask(user.id,"come sta lei?");
         const task2 = await TaskHelper.createValidTask(user.id,"come stai?");
-        const taskPoolExample = createTaskPoolToSend(user);
+        const taskPoolExample = TaskPoolHelper.createSampleTaskPool(user);
 
         const response = await request(app)
             .post('/api/v1/task-pools')
@@ -66,7 +56,7 @@ describe('POST /task-pools', () => {
     test('POST /task-pools with valid data 401 with inexistent tasks', async() => {
         const user = await UserHelper.insertNewRandom();
 
-        const taskPoolExample = createTaskPoolToSend(user);
+        const taskPoolExample = TaskPoolHelper.createSampleTaskPool(user);
         const response = await request(app)
             .post('/api/v1/task-pools')
             .set('X-API-TOKEN',user.authToken)

@@ -152,18 +152,16 @@ describe("Test the update of a user permission", () => {
         const permissionToUpdate = await UserPermissionHelper.createOneUserAndHisPermissionsForGroup(group);
         const creator = await group.getCreatedBy();
 
-        const examplePermissionUpdated = {
-            userId: permissionToUpdate.id,
-            userGroupId: group.id,
-            canManageTasks: true,
-            canManageUsers: true,
-            canChangePermissions: true
-        };
-
         const response = await request(app)
             .put(`/api/v1/user-permissions/${permissionToUpdate.id}`)
             .set('X-API-TOKEN', creator.authToken)
-            .send(examplePermissionUpdated);
+            .send({
+                userId: permissionToUpdate.id,
+                userGroupId: group.id,
+                canManageTasks: true,
+                canManageUsers: true,
+                canChangePermissions: true
+            });
 
         expect(response.status).toBe(204);
     });
