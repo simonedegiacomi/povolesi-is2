@@ -30,14 +30,14 @@ describe('POST /task-pools', () => {
 
 
         expect(response.status).toBe(201);
-        expect(response.body.taskPoolId).toBeDefined();
+        expect(response.body.taskPoolId).toBeDefinedAndNotNull();
 
         const fromDb = await TaskPool.findOne({
             where: {id: response.body.taskPoolId}
         });
 
 
-        expect(fromDb).toBeDefined();
+        expect(fromDb).toBeDefinedAndNotNull();
     });
 
     test('POST /task-pools with valid data 401 with valid tasks', async() => {
@@ -60,7 +60,7 @@ describe('POST /task-pools', () => {
         const fromDb = await TaskPool.findOne({
             where: {id: response.body.taskPoolId}
         });
-
+        expect(fromDb).toBeNull();
     });
 
     test('POST /task-pools with valid data 401 with inexistent tasks', async() => {
@@ -81,7 +81,7 @@ describe('POST /task-pools', () => {
         const fromDb = await TaskPool.findOne({
             where: {id: response.body.taskPoolId}
         });
-
+        expect(fromDb).toBeNull();
     });
 
 
@@ -109,8 +109,8 @@ describe('GET /task-pools', () => {
     test('GET /task-pools with valid data 201 with two tasksPool', async() => {
         const giorgio = await UserHelper.insertGiorgio();
 
-        const taskPool1 = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
-        const taskPool2 = await TaskPoolHelper.insertTaskPoolEmpty(giorgio);
+        await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
+        await TaskPoolHelper.insertTaskPoolEmpty(giorgio);
 
         const response = await request(app)
             .get('/api/v1/task-pools')
@@ -120,7 +120,6 @@ describe('GET /task-pools', () => {
         expect(response.status).toBe(200);
 
         const result = response.body;
-        var a;
         for(let t of result){
             expect(t.id).toEqual(t.id);
             expect(t.name).toEqual(t.name);
@@ -132,7 +131,7 @@ describe('GET /task-pools', () => {
 
     test('GET /task-pools with valid data 201 with two tasks', async() => {
         const giorgio = await UserHelper.insertGiorgio();
-        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
+        await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio);
 
         const response = await request(app)
             .get('/api/v1/task-pools')

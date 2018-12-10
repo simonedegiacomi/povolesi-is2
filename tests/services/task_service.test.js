@@ -1,7 +1,6 @@
 const TaskHelper = require('../helpers/task_helper');
 const UserHelper = require('../helpers/user_helper');
 const TaskService = require('../../src/services/task_service');
-const expectToFail = require("../test_utils").expectToFail;
 
 
 describe("Test the creation of a new task", () => {
@@ -20,9 +19,9 @@ describe("Test the creation of a new task", () => {
                 maxLength: 255,
                 canBePeerReviewed: true
             });
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
-            expect(e.message).toBe(TaskService.errors.WRONG_ARGUMENTS);
+            expect(e.message).toContain(TaskService.errors.WRONG_ARGUMENTS);
         }
     });
 
@@ -33,9 +32,9 @@ describe("Test the creation of a new task", () => {
                 maxLength: 255,
                 canBePeerReviewed: true
             });
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
-            expect(e.message).toBe(TaskService.errors.WRONG_ARGUMENTS);
+            expect(e.message).toContain(TaskService.errors.WRONG_ARGUMENTS);
         }
     });
 
@@ -46,9 +45,9 @@ describe("Test the creation of a new task", () => {
                 name: 'a',
                 canBePeerReviewed: true
             });
-            expect(true).toBe(false);
+            expect().toFail();
         } catch (e) {
-            expect(e.message).toBe(TaskService.errors.WRONG_ARGUMENTS);
+            expect(e.message).toContain(TaskService.errors.WRONG_ARGUMENTS);
         }
     });
 
@@ -133,13 +132,13 @@ describe("Test the retrieval of a task with a specific ID", () => {
         let task = await TaskHelper.createValidTaskWithQuestion(user.id, "A");
 
         let foundTask = await TaskService.getTask(task.id, user.id);
-        expect(foundTask).toBeDefined()
+        expect(foundTask).toBeDefinedAndNotNull()
     });
 
     test('Should fail to retrieve a non-existing task', async () => {
         try {
             await TaskService.getTask(10000, 0);
-            expectToFail();
+            expect().toFail();
         } catch (e) {
         }
 
@@ -153,7 +152,7 @@ describe("Test the retrieval of a task with a specific ID", () => {
 
         try {
             await TaskService.getTask(taskCreatedByMario.id, giorgio.id);
-            expectToFail();
+            expect().toFail();
         } catch (e) {
         }
     });
@@ -175,7 +174,7 @@ describe("Test the deletion of a task with a specific ID", () => {
         let user = await UserHelper.insertNewRandom();
         try {
             await TaskService.deleteTask(1, user.id);
-            expectToFail();
+            expect().toFail();
         } catch (e) {
         }
     });
@@ -188,7 +187,7 @@ describe("Test the deletion of a task with a specific ID", () => {
 
         try {
             await TaskService.deleteTask(taskCreatedByGiorgio.id, mario.id);
-            expectToFail();
+            expect().toFail();
         } catch (e) {
         }
 

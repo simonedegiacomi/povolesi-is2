@@ -1,4 +1,3 @@
-const ArrayHelper = require('../utils/array_utils');
 const {assertIsNumber, assertIsDefined, assertIsString} = require('./parameters_helper');
 
 const {Task} = require('../../src/models');
@@ -7,13 +6,13 @@ const {Task} = require('../../src/models');
 module.exports = {
 
     errors: {
-        TASK_NOT_FOUND: 'task not found',
-        WRONG_ARGUMENTS: 'wrong arguments'
+        TASK_NOT_FOUND: 'Task not found',
+        WRONG_ARGUMENTS: 'Wrong arguments'
     },
 
     async getTask(taskId, authenticatedUserId) {
-        assertIsNumber(taskId, this.errors.WRONG_ARGUMENTS);
-        assertIsNumber(authenticatedUserId, this.errors.WRONG_ARGUMENTS);
+        assertIsNumber(taskId);
+        assertIsNumber(authenticatedUserId);
 
         //TODO: implement other users' tasks searches once the task draws are finished
         let foundTask = await Task.findOne({
@@ -23,7 +22,7 @@ module.exports = {
             }
         });
 
-        if (ArrayHelper.isObjectEmpty(foundTask)) {
+        if (foundTask === null) {
             throw new Error(this.errors.TASK_NOT_FOUND)
         } else {
             return foundTask;
@@ -48,9 +47,9 @@ module.exports = {
     },
 
     async createTask(taskData) {
-        assertIsDefined(taskData, this.errors.WRONG_ARGUMENTS);
-        assertIsString(taskData.question, this.errors.WRONG_ARGUMENTS);
-        assertIsNumber(taskData.userId, this.errors.WRONG_ARGUMENTS);
+        assertIsDefined(taskData);
+        assertIsString(taskData.question);
+        assertIsNumber(taskData.userId);
 
         if (typeof taskData.type !== 'string' || Task.Types.every(t => taskData.type !== t)) {
             throw new Error(this.errors.WRONG_ARGUMENTS);

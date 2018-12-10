@@ -18,7 +18,7 @@ describe('Test the user group creation', () => {
             });
 
         expect(response.status).toBe(201);
-        expect(response.body.userGroupId).toBeDefined();
+        expect(response.body.userGroupId).toBeAnInteger();
     });
 
     test('It should create a group without specifying the name', async () => {
@@ -84,7 +84,7 @@ describe('The user group collection', () => {
         expect(response.status).toBe(200);
 
         const group = response.body;
-        expect(group).toBeDefined();
+        expect(group).toBeDefinedAndNotNull();
 
         const expectedJson = await ModelsMapper.mapUserGroup(createdGroup);
         expect(group).toEqual(expectedJson);

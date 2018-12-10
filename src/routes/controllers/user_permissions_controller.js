@@ -28,7 +28,7 @@ module.exports = {
 
 
         try {
-            const permissionList = await UserPermissionsService.getPermissionListByGroup(req.user, group);
+            const permissionList = await UserPermissionsService.getPermissionListByGroup(req.user.id, group);
             res.status(200).send(permissionList)
         } catch (e) {
             ErrorMapper.map(res, e, [{
@@ -51,7 +51,7 @@ module.exports = {
         }
 
         try {
-            const permission = await UserPermissionsService.createPermission(req.user, value);
+            const permission = await UserPermissionsService.createPermission(req.user.id, value);
             res.status(201).send(ModelsMapper.mapUserPermission(permission));
         } catch (e) {
             ErrorMapper.map(res, e, [{
@@ -69,7 +69,7 @@ module.exports = {
         const id = req.params.id;
 
         try {
-            await UserPermissionsService.deletePermissionById(req.user, id);
+            await UserPermissionsService.deletePermissionById(req.user.id, id);
             res.status(200).send();
         } catch (e) {
             ErrorMapper.map(res, e, [{
@@ -86,7 +86,7 @@ module.exports = {
         const {error, value} = Joi.validate(req.body, permissionSchema);
 
         const id = req.params.id;
-        const permissionToUpdate = await UserPermissionsService.getPermissionById(req.user, id);
+        const permissionToUpdate = await UserPermissionsService.getPermissionById(req.user.id, id);
 
         if (error != null) {
             return res.status(400).send({
@@ -95,7 +95,7 @@ module.exports = {
         }
 
         try {
-            const permissionUpdated = await UserPermissionsService.updateUserPermission(req.user, permissionToUpdate, value);
+            await UserPermissionsService.updateUserPermission(req.user.id, permissionToUpdate, value);
             res.status(204).send();
         } catch (e) {
             ErrorMapper.map(res, e, [{

@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const {Assignment, AssignedTask, UserGroup, UserPermission, TaskPool, Task} = require('../models/index');
-const ServiceUtils = require('./utils');
+const ServiceUtils = require('../utils/schema_utils');
 const RandomUtils = require('./random_utils');
 
 const assignmentSchema = Joi.object().keys({

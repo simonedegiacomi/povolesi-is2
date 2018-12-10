@@ -1,7 +1,6 @@
 const request = require('supertest');
 
 const UserHelper = require('../../helpers/user_helper');
-const UserService = require('../../services/user_service.test');
 const app        = require('../../../src/app');
 const ModelsMapper    = require('../../../src/routes/controllers/models_mapper');
 
@@ -22,8 +21,8 @@ describe('Test the user registration', () => {
             password: 'password'
         }).expect(201);
 
-        expect(response.body.token).toBeDefined();
-        expect(response.body.userId).toBeDefined();
+        expect(response.body.token).toBeDefinedAndNotNull();
+        expect(response.body.userId).toBeAnInteger();
         await UserHelper.expectUserToExist(response.body.userId);
     });
 
@@ -74,8 +73,8 @@ describe('Test the user login', () => {
             password: 'password'
         }).expect(200);
 
-        expect(response.body.token).toBeDefined();
-        expect(response.body.userId).toBeDefined();
+        expect(response.body.token).toBeDefinedAndNotNull();
+        expect(response.body.userId).toBeAnInteger();
     });
 
     test('POST /login without the email should return 400', async () => {
@@ -114,13 +113,13 @@ describe('test the /users path', () => {
         const response = await request(app).get('/api/v1/users');
 
         response.body.forEach(u => {
-            expect(u.id).toBeDefined();
-            expect(u.name).toBeDefined();
-            expect(u.email).toBeDefined();
-            expect(u.badgeNumber).toBeDefined();
+            expect(u.id).toBeAnInteger();
+            expect(u.name).toBeDefinedAndNotNull();
+            expect(u.email).toBeDefinedAndNotNull();
+            expect(u.badgeNumber).toBeDefinedAndNotNull();
 
-            expect(u.password).not.toBeDefined();
-            expect(u.authCode).not.toBeDefined();
+            expect(u.password).not.toBeDefinedAndNotNull();
+            expect(u.authCode).not.toBeDefinedAndNotNull();
         });
     });
 
@@ -250,7 +249,7 @@ describe('Test get user data given its id',  () => {
         expect(response.status).toBe(200);
 
         const user = response.body;
-        expect(user).toBeDefined();
+        expect(user).toBeDefinedAndNotNull();
 
         const expectedJson = await ModelsMapper.mapUser(newUSer);
         expect(user).toEqual(expectedJson);

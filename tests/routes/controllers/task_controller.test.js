@@ -29,14 +29,14 @@ async function expectTaskWithIdToBeInDb(taskId) {
     const fromDb = await Task.findOne({
         where: {id: taskId}
     });
-    expect(fromDb).toBeDefined();
+    expect(fromDb).toBeDefinedAndNotNull();
 }
 
 async function postTaskWithAuthenticatedUserHavingCodeAndExpectToBeDefined(body, code) {
     const response = await postTaskWithAuthenticatedUserAndExpectCode(body, code);
 
     let taskId = response.body.taskId;
-    expect(taskId).toBeDefined();
+    expect(taskId).toBeAnInteger();
 
     await expectTaskWithIdToBeInDb(taskId);
 }
@@ -171,7 +171,7 @@ describe("Test the deletion of a single task", () => {
             .set('X-API-TOKEN', user.authToken)
             .send();
 
-        TaskHelper.expectTaskToNotExistInDb(task.id)
+        await TaskHelper.expectTaskToNotExistInDb(task.id)
     });
 
     test('Should not delete tasks that do not exist', async () => {

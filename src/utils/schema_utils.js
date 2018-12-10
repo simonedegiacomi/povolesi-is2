@@ -1,6 +1,6 @@
 const Joi = require('joi');
 
-const ArgumentError = require('./argument_error');
+const ArgumentError = require('../services/argument_error');
 
 module.exports = {
     validateSchemaOrThrowArgumentError(data, schema) {
