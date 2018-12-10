@@ -1,7 +1,7 @@
 const Joi = require('joi');
 
 const {Assignment, AssignedTask, UserGroup, UserPermission, TaskPool, Task} = require('../models/index');
-const ServiceUtils = require('./utils');
+const ServiceUtils = require('../utils/schema_utils');
 const RandomUtils = require('./random_utils');
 
 const assignmentSchema = Joi.object().keys({
@@ -13,15 +13,12 @@ const assignmentSchema = Joi.object().keys({
     assignedUserGroupId: Joi.number().integer().required(),
     taskPoolIds: Joi.array().items(Joi.number().integer())
 });
-const concat = (x,y) =>
-    x.concat(y)
 
-const flatMap = (f,xs) =>
-    xs.map(f).reduce(concat, [])
 
-Array.prototype.flatMap = function(f) {
-    return flatMap(f,this)
-}
+// TODO: Should we move this declaration somewhere else?
+Array.prototype.flatMap = function (lambda) {
+    return Array.prototype.concat.apply([], this.map(lambda));
+};
 
 module.exports = {
 
@@ -58,12 +55,16 @@ module.exports = {
         const assignmentsWithTasks = await this.findAssignedAssignmentsWithAssignedTasks(userId);
 
         for (let assignment of assignmentsWithTasks) {
-            if (assignment.assignedTasks == null) {
+            if (assignment.assignedTasks == null && this.isAssignmentStarted(assignment)) {
                 assignment.assignedTasks = await this.assignTasksOfAssignmentToUser(assignment.id, userId);
             }
         }
 
         return assignmentsWithTasks;
+    },
+
+    isAssignmentStarted(assignment) {
+        return new Date() >= assignment.startsOn;
     },
 
     /**
@@ -177,11 +178,18 @@ module.exports = {
         await AssignedTask.bulkCreate(assignedTasksToCreate);
 
         // Sequelize bulkCreate method doesn't return the ids of the insert entries, so we need to fetch them
-        return await AssignedTask.findAll({
+        const a = await AssignedTask.findAll({
             where: {
                 assignmentId,
                 userId
             }
+        }, {
+            include: [{
+                model: Task,
+                as: 'task'
+            }]
         });
+
+        return a;
     }
 };

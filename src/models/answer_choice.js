@@ -15,7 +15,7 @@ module.exports = function (sequelize, DataTypes) {
     });
 
     AnswerChoice.associate = (models) => {
-        AnswerChoice.belongsTo(models.Answer, {
+        AnswerChoice.belongsTo(models.TaskAnswer, {
             as: 'answer',
             foreignKey: {
                 name: 'answerId',

@@ -1,4 +1,34 @@
-const {sequelize, User, UserPermission, UserGroup} = require('../models');
+const {assertIsNumber, assertIsDefined}= require("./parameters_helper");
+const {sequelize, UserPermission, UserGroup} = require('../models');
+
+async function _canUserManageGroupUsers(userId, group) {
+    if (userId === group.createdById) {
+        return true;
+    }
+
+    const permission = await UserPermission.findOne({
+        where: {
+            userId: userId,
+            userGroupId: group.id
+        }
+    });
+    if (permission == null) {
+        return false;
+    }
+
+    return permission.canManageUsers;
+}
+
+function _isDuplicateMemberError(e) {
+    if (e instanceof sequelize.UniqueConstraintError && e.errors.length === 2) {
+        const errors = e.errors;
+        return errors.some(e => e.path === 'userId') &&
+            errors.some(e => e.path === 'userGroupId');
+    }
+
+    return false;
+}
+
 
 module.exports = {
 
@@ -10,13 +40,13 @@ module.exports = {
         USER_PERMISSION_NOT_FOUND: 'user permission not found'
     },
 
-    async createPermission(actionPerformer, permission) {
-        if (!actionPerformer instanceof User) {
-            throw new Error(this.errors.WRONG_ARGUMENTS);
-        }
-        if (!permission || !permission.userId || !permission.userGroupId) {
-            throw new Error(this.errors.WRONG_ARGUMENTS);
-        }
+    async createPermission(userId, permission) {
+        assertIsNumber(userId);
+
+        //TODO: use joi
+        assertIsDefined(permission);
+        assertIsNumber(permission.userId);
+        assertIsNumber(permission.userGroupId);
 
         const group = await UserGroup.findOne({
             where: {id: permission.userGroupId}
@@ -25,7 +55,7 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND);
         }
 
-        const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        const hasPermission = await _canUserManageGroupUsers(userId, group);
         if (!hasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
@@ -39,7 +69,7 @@ module.exports = {
                 canChangePermissions: permission.canChangePermissions || false
             });
         } catch (e) {
-            if (this._isDuplicateMemberError(e)) {
+            if (_isDuplicateMemberError(e)) {
                 throw new Error(this.errors.USER_ALREADY_MEMBER);
             }
 
@@ -49,45 +79,15 @@ module.exports = {
         }
     },
 
-    async _canUserManageGroupUsers(user, group) {
-        if (user.id === group.createdById) {
-            return true;
-        }
+    async deletePermissionById(userId, id) {
+        assertIsNumber(userId);
 
-        const permission = await UserPermission.findOne({
-            where: {
-                userId: user.id,
-                userGroupId: group.id
-            }
-        });
-        if (permission == null) {
-            return false;
-        }
-
-        return permission.canManageUsers;
-    },
-
-    _isDuplicateMemberError(e) {
-        if (e instanceof sequelize.UniqueConstraintError && e.errors.length === 2) {
-            const errors = e.errors;
-            return errors.some(e => e.path === 'userId') &&
-                errors.some(e => e.path === 'userGroupId');
-        }
-
-        return false;
-    },
-
-    async deletePermissionById(actionPerformer, id) {
-        if (!actionPerformer instanceof User || !id) {
-            throw new Error(this.errors.WRONG_ARGUMENTS);
-        }
-
-        const permission = await this.getPermissionById(actionPerformer, id);
+        const permission = await this.getPermissionById(userId, id);
         await permission.destroy();
 
     },
 
-    async getPermissionById(actionPerformer, id) {
+    async getPermissionById(userId, id) {
         const permission = await UserPermission.findOne({
             where: {id}
         });
@@ -98,7 +98,7 @@ module.exports = {
 
         const group = await permission.getUserGroup();
 
-        const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        const performerHasPermission = await _canUserManageGroupUsers(userId, group);
         if (!performerHasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
@@ -106,7 +106,7 @@ module.exports = {
         return permission;
     },
 
-    async getPermissionListByGroup(actionPerformer, group) {
+    async getPermissionListByGroup(actionPerformerId, group) {
         if (group == null) {
             throw new Error(this.errors.GROUP_NOT_FOUND)
         }
@@ -118,21 +118,21 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND)
         }
 
-        const performerHasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
-        if (!performerHasPermission && permissionList != null) {
+        const performerHasPermission = await _canUserManageGroupUsers(actionPerformerId, group);
+        if (!performerHasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
 
         return permissionList;
     },
 
-    async updateUserPermission(actionPerformer, permission, updatedPermission) {
-        if (!actionPerformer instanceof User) {
-            throw new Error(this.errors.WRONG_ARGUMENTS);
-        }
-        if (!permission || !permission.userId || !permission.userGroupId) {
-            throw new Error(this.errors.WRONG_ARGUMENTS);
-        }
+    async updateUserPermission(userId, permission, updatedPermission) {
+        assertIsNumber(userId);
+
+        //TODO: use joi
+        assertIsDefined(permission);
+        assertIsNumber(permission.userId);
+        assertIsNumber(permission.userGroupId);
 
         const group = await UserGroup.findOne({
             where: {id: permission.userGroupId}
@@ -141,7 +141,7 @@ module.exports = {
             throw new Error(this.errors.GROUP_NOT_FOUND);
         }
 
-        const hasPermission = await this._canUserManageGroupUsers(actionPerformer, group);
+        const hasPermission = await _canUserManageGroupUsers(userId, group);
         if (!hasPermission) {
             throw new Error(this.errors.UNAUTHORIZED);
         }
@@ -155,7 +155,7 @@ module.exports = {
                 canChangePermissions: updatedPermission.canChangePermissions
             });
         } catch (e) {
-            if (this._isDuplicateMemberError(e)) {
+            if (_isDuplicateMemberError(e)) {
                 throw new Error(this.errors.USER_ALREADY_MEMBER);
             }
             throw e;

@@ -1,7 +1,5 @@
 const UserService = require('../../src/services/user_service');
-const {User} = require('../../src/models');
 const UserHelper = require('../helpers/user_helper');
-const TestUtils = require('../test_utils');
 
 describe('Test the user registration', () => {
 
@@ -15,7 +13,7 @@ describe('Test the user registration', () => {
             password: 'password'
         });
 
-        expect(newUser.id).toBeDefined();
+        expect(newUser.id).toBeAnInteger();
     });
 
     test('Should not register two users with the same email', async () => {
@@ -66,33 +64,25 @@ describe('Test the user login', () => {
 
 
 describe('Test the listing of existing users', () => {
-    test('Should return zero users if no users are registered', async (done) => {
-        //elimina dal database gli utenti
-        await User.destroy({where: {}});
-
+    test('Should return zero users if no users are registered', async () => {
         const users = await UserService.getAllUsers();
 
         expect(users.length).toEqual(0);
-        done();
     });
 
-    test('Should return the registered users', async (done) => {
-        await UserHelper.insertMario();
-        UserService.getAllUsers().then(users => {
-            let firstUser = users[0];
+    test('Should return the registered users', async () => {
+        let mario = UserHelper.createUserMario();
+        await UserService.registerUser(mario);
 
-            expect(firstUser.name).toEqual('Mario Rossi');
-            expect(firstUser.email).toEqual('mario@rossi.it');
-            expect(firstUser.badgeNumber).toEqual("000001");
+        let allUsers = await UserService.getAllUsers();
 
-            done();
-        });
+        let firstUser = allUsers[0];
+        expect(firstUser.name)       .toEqual(mario.name);
+        expect(firstUser.email)      .toEqual(mario.email);
+        expect(firstUser.badgeNumber).toEqual(mario.badgeNumber);
     });
 
     test('Should return array json of two user', async () => {
-        //elimina gli utenti dal database
-        await User.destroy({where: {}});
-
         const user1 = await UserService.registerUser({
             name: 'Mario Rossi',
             email: 'mario2@rossi.it',
@@ -119,10 +109,11 @@ describe('Test the listing of existing users', () => {
 
 describe('Test user email update', () => {
     test('Should return the user with the email updated', async () => {
-        const existingUser = await UserHelper.insertMario();
-        const existingUserWithNewEmail = await UserService.updateUserEmail(existingUser, 'luca@bianchi.com');
+        const user = await UserHelper.insertMario();
+        await UserService.updateUserEmail(user.id, 'luca@bianchi.com');
 
-        expect(existingUserWithNewEmail.email).toEqual('luca@bianchi.com');
+        const updatedUser = await UserHelper.findUserInDb(user.id);
+        expect(updatedUser.email).toEqual('luca@bianchi.com');
     });
 
     test('Should not change the email to an existing one', async () => {
@@ -130,11 +121,10 @@ describe('Test user email update', () => {
         const existingUser2 = await UserHelper.insertGiorgio();
 
         try {
-            await UserService.updateUserEmail(existingUser1, existingUser2.email);
-
-            expect(true).toBe(false);
+            await UserService.updateUserEmail(existingUser1.id, existingUser2.email);
+            expect().toFail();
         } catch (e) {
-            expect(e.message).toBe('email already in use');
+            expect(e.message).toBe(UserService.errors.EMAIL_ALREADY_IN_USE);
         }
     });
 
@@ -142,9 +132,8 @@ describe('Test user email update', () => {
         const existingUser = await UserHelper.insertMario();
 
         try {
-            await UserService.updateUserEmail(existingUser, 'Not an email!');
-
-            expect(true).toBe(false);
+            await UserService.updateUserEmail(existingUser.id, 'Not an email!');
+            expect().toFail();
         } catch (e) {
             expect(e.message).toBe(UserService.errors.INVALID_EMAIL);
         }
@@ -155,11 +144,8 @@ describe('Test user email update', () => {
 
         try {
             await UserService.updateUserEmail({field: "Not a user!"}, existingUser.email);
-
-            expect(true).toBe(false);
-        } catch (e) {
-            expect(e.message).toBe(UserService.errors.INVALID_USER);
-        }
+            expect().toFail();
+        } catch (e) {}
     });
 });
 
@@ -194,7 +180,7 @@ describe('Test the update of a password', () => {
 
        const loggedInUser = await UserService.loginUser(userUpdated.email, newPassword);
 
-       expect(loggedInUser.authToken).toBeDefined();
+       expect(loggedInUser.authToken).toBeDefinedAndNotNull();
    });
 
    test('Should return error when trying to change the password with a null value', async () => {

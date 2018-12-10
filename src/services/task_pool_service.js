@@ -1,160 +1,157 @@
-const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment} = require('../models/index');
+const {TaskPool, User, Task, UserPermission, Assignment, UserGroup} = require('../models/index');
+const Joi = require('joi');
+const SchemaUtils = require('../utils/schema_utils');
+const {assertIsNumber} = require("./parameters_helper");
 
-var isTaskExist = async function (task) {
-
-    const fromDb = await Task.findOne({
-        where:
-            {id: task.id}
-    });
-
-    return fromDb !== null;
-};
-
-var isTasksExist = async function (tasks) {
-
-    for (let t of tasks) {
-
-        if (!(await isTaskExist(t)))
-            return false;
-    }
-
-    return true;
-};
-
-var isUserExist = async function (user) {
-    const fromDb = await User.findOne({
-        where:
-            {id: user.id}
-    });
-
-    return fromDb !== null;
-};
-
+const taskPoolSchema = Joi.object().keys({
+    name: Joi.string().required(),
+    createdById: Joi.number().integer().required(),
+    tasks: Joi.array().items(Joi.number().integer()).required(),
+    numQuestionsToDraw: Joi.number().integer().required()
+});
 
 module.exports = {
 
     errors: {
-        NO_CREATOR_SPECIFIED: "no creator specified",
-
-        NO_NAME: "task pool have no name",
-        USER_NOT_EXIST: "user not exist",
-        TASK_NOT_EXIST: "tasks not exist"
+        TASK_NOT_FOUND: 'one of the tasks doesn\'t exist',
+        NUM_QUESTIONS_TO_DRAW_TOO_HIGH: 'numQuestionsToDraw is greater than the number of tasks',
+        TASK_POOL_NOT_FOUND: 'task pool not found',
+        USER_CANT_MANAGE_TASK_POOL: 'user can\'t manage task pool'
     },
 
-    async createTaskPool(taskPool, tasks = []) {
+    /**
+     * Return true if the user is allowed to edit the specified TaskPool
+     * @param taskPoolId
+     * @param userId
+     * @returns {Promise<boolean>}
+     */
+    async canUserManageTaskPoolById(taskPoolId, userId) {
+        const userTaskPools = await this.getTaskPoolsByUserId(userId);
 
-        if (taskPool.name == null) {
-            throw new Error(this.errors.NO_NAME);
-        }
-        else if (taskPool.createdBy == null) {
-            throw new Error(this.errors.NO_CREATOR_SPECIFIED);
-        } else if (!(await isTasksExist(tasks))) {
-            throw new Error(this.errors.TASK_NOT_EXIST);
-        }
+        // TODO: Do not load all the taskPools
+        return userTaskPools.some(taskPool => taskPool.id === taskPoolId);
+    },
+
+    async createTaskPool(taskPool) {
+        SchemaUtils.validateSchemaOrThrowArgumentError(taskPool, taskPoolSchema);
+        this.validateNumQuestionsToDrawOrThrowArgumentError(taskPool);
+
+        const createdTaskPool = await TaskPool.create(taskPool);
 
         try {
-            const createdTaskPool = await TaskPool.create({
-                ...taskPool,
-                createdById: taskPool.createdBy.id
-            });
-            createdTaskPool.createdBy = taskPool.createdBy;
-
-            //aggiungo i task al taskPool creato
-            await createdTaskPool.setTasks(tasks);
-
-            return createdTaskPool;
-
+            await createdTaskPool.setTasks(taskPool.tasks);
         } catch (e) {
-            throw e;
+            throw new Error(this.errors.TASK_NOT_FOUND);
+        }
+
+        return createdTaskPool;
+    },
+
+    validateNumQuestionsToDrawOrThrowArgumentError(taskPool) {
+        if (taskPool.numQuestionsToDraw > taskPool.tasks.length) {
+            throw new Error(this.errors.NUM_QUESTIONS_TO_DRAW_TOO_HIGH);
         }
     },
 
+    /**
+     * Return all the TaskPools that the user created and can edit. A user can edit all the TaskPools in an assignment
+     * assigned to a group in which the user has the 'canManageTasks' permission.
+     * @param userId
+     * @returns {Promise<Array<Model>>}
+     */
+    async getTaskPoolsByUserId(userId) {
+        assertIsNumber(userId);
 
-    async getMyTaskPool(userMe) {
+        // We need to eagerly fetch the Tasks of the TaskPools
+        const taskInclude = {
+            model: Task,
+            as: 'tasks'
+        };
 
-        if (!(await isUserExist(userMe))) {
-            throw new Error(this.errors.USER_NOT_EXIST);
-        }
+        const createdTaskPools = await TaskPool.findAll({
+            where: {createdById: userId},
+            include: taskInclude
+        });
 
-        //TODO: insert the correct query simo
-        //query SELECT * WHERE user=userMe
 
-        return await TaskPool.findAll({
+        const taskPoolsInAssignmentsCreatedByUser = await TaskPool.findAll({
+            include: [{
+                model: Assignment,
+                as: 'assignment',
+                where: {createdById: userId}
+            }, taskInclude]
+        });
+
+        const taskPoolsInAssignmentsAssignedToGroupCreatedByUser = await TaskPool.findAll({
+            include: [{
+                model: Assignment,
+                as: 'assignment',
+                required: true,
+                include: [{
+                    model: UserGroup,
+                    as: 'assignedUserGroup',
+                    include: [{
+                        model: User,
+                        as: 'createdBy',
+                        where: {id: userId}
+                    }]
+                }]
+            },]
+        });
+
+        const taskPoolsInAssignmentsAssignedToGroupWhereTheUserHasEditTasksPermission = await TaskPool.findAll({
+            include: [{
+                model: Assignment,
+                as: 'assignment',
+                required: true,
+                include: [{
+                    model: UserGroup,
+                    as: 'assignedUserGroup',
+                    include: [{
+                        model: UserPermission,
+                        where: {
+                            userId,
+                            canManageTasks: true
+                        }
+                    }]
+                }]
+            }, taskInclude]
+        });
+
+        const allPools = createdTaskPools.concat(
+            taskPoolsInAssignmentsCreatedByUser,
+            taskPoolsInAssignmentsAssignedToGroupCreatedByUser,
+            taskPoolsInAssignmentsAssignedToGroupWhereTheUserHasEditTasksPermission
+        );
+
+        const distinctPools = {};
+        allPools.forEach(pool => distinctPools[pool.id] = pool);
+        return Object.values(distinctPools);
+    },
+
+    async getTaskPoolById(taskPoolId, userId) {
+        assertIsNumber(taskPoolId);
+        assertIsNumber(userId);
+
+        const taskPool = await TaskPool.findOne({
             where: {
-                createdById: userMe.id
+                id: taskPoolId
             },
             include: [{
                 model: Task,
                 as: 'tasks'
             }]
         });
-    },
 
-    /*
-    /!**
-     * Anche quelli che posso maneggiare secondo l'user permission
-     *!/
-    async getTaskPool(userMe) {
-        if (isUserExist(User)) {
-            throw new Error(this.errors.USER_NOT_EXIST);
+        if (taskPool == null) {
+            throw new Error(this.errors.TASK_POOL_NOT_FOUND);
         }
 
+        const userCanEdit = await this.canUserManageTaskPoolById(taskPoolId, userId);
+        if (!userCanEdit) {
+            throw new Error(this.errors.USER_CANT_MANAGE_TASK_POOL);
+        }
 
-
-        //TODO: miss a lot of helper for finish of implementation query
-        //query SELECT * WHERE user=userMe
-        const jsonArray = await Assignment.findAll({
-
-            where: {},
-
-            include: [
-                {
-                    model: Group,
-                    include: [{
-                        model: UserPermission,
-                        include: [{
-                            model: User
-                        }]
-                    }]
-                }, {
-                    model: TaskDraw,
-                    include: [{
-                        model: TaskPool
-                    }]
-                }
-            ]
-        });
-
-        const jsonArray = [
-            {
-                "id": 0,
-                "name": "string",
-                "tasks": [
-                    {
-                        "id": 1234,
-                        "question": "What is the meaning of life?",
-                        "type": "multipleAnswer",
-                        "multipleChoicesAllowed": true,
-                        "choices": [
-                            "Happiness",
-                            "Balance",
-                            42
-                        ],
-                        "maxLength": 0
-                    }
-                ],
-                "createdBy": {
-                    "id": 84,
-                    "name": "Gianni Morandi",
-                    "badgeNumber": 111244,
-                    "email": "gianni@morandi.cit"
-                }
-            }
-        ];
-
-
-        return jsonArray
-    },
-*/
-
+        return taskPool;
+    }
 };

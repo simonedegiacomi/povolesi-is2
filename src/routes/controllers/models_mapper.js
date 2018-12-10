@@ -15,7 +15,7 @@ module.exports = {
     },
 
     async mapUserGroup(group) {
-        if(!(group instanceof UserGroup)) {
+        if (!(group instanceof UserGroup)) {
             throw new Error('first argument is not an instance of UserGroup');
         }
 
@@ -29,7 +29,7 @@ module.exports = {
     },
 
     mapUserPermission(model) {
-        if(!(model instanceof UserPermission)) {
+        if (!(model instanceof UserPermission)) {
             throw new Error('first argument is not an instance of UserPermission');
         }
 
@@ -37,25 +37,33 @@ module.exports = {
     },
 
     mapTask(model) {
-        if(!(model instanceof Task)) {
+        if (!(model instanceof Task)) {
             throw new Error('first argument is not an instance of Task');
         }
 
         return model.toJSON();
     },
 
-    mapTaskPool(model){
-        if(!(model instanceof TaskPool)) {
+    mapTaskPool(model) {
+        if (!(model instanceof TaskPool)) {
             throw new Error('first argument is not an instance of TaskPool');
         }
 
         return model.dataValues;
     },
 
-    mapTaskPoolArray(arrayModel){
-        return arrayModel.map((m)=>{
+    mapTaskPoolArray(arrayModel) {
+        return arrayModel.map((m) => {
             return this.mapTaskPool(m);
         });
 
     },
+
+    mapAssignment(assignment) {
+        return assignment.toJSON();
+    },
+
+    mapAssignments(assignments) {
+        return assignments.map(a => this.mapAssignment(a));
+    }
 };
