@@ -253,7 +253,16 @@ describe('Test get user data given its id',  () => {
 
         const expectedJson = await ModelsMapper.mapUser(newUSer);
         expect(user).toEqual(expectedJson);
-    })
+    });
+
+    test("GET /users/:id given an id that doesn't exists", async () => {
+        const newUSer = await UserHelper.insertMario();
+        const response = await request(app)
+            .get(`/api/v1/users/457`)
+            .set('X-API-TOKEN', newUSer.authToken);
+
+        expect(response.status).toBe(404);
+    });
 });
 
 describe('Test the update of the user password', () => {

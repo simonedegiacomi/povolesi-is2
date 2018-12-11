@@ -117,10 +117,16 @@ module.exports = {
         }
     },
 
-    getUserById(userId) {
-        return User.findOne({
+    async getUserById(userId) {
+        const user = await User.findOne({
             where: {id: userId}
-        })
+        });
+
+        if (user == null) {
+            throw new Error(this.errors.USER_NOT_FOUND);
+        }
+
+        return user;
     },
 
     async updateUserData (userId, newData) {

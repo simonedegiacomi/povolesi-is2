@@ -169,7 +169,19 @@ describe('Test get user given its id', () => {
         const user = await UserService.getUserById(newUser.id);
 
         expect(user.toJSON()).toEqual(newUser.toJSON());
-    })
+    });
+
+    test('Should return error if user is not found', async () => {
+        await expect(UserService.getUserById('756'))
+            .rejects.toThrow(new Error(UserService.errors.USER_NOT_FOUND));
+
+    });
+
+    test('Should return error if id is null', async () => {
+        await expect(UserService.getUserById(null))
+            .rejects.toThrow(new Error(UserService.errors.USER_NOT_FOUND));
+
+    });
 });
 
 describe('Test the update of a password', () => {
