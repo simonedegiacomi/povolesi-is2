@@ -13,9 +13,7 @@ describe('Test the user group creation', () => {
         const response = await request(app)
             .post('/api/v1/user-groups')
             .set('X-API-TOKEN', user.authToken)
-            .send({
-                name: 'IS2'
-            });
+            .send({name: 'IS2'});
 
         expect(response.status).toBe(201);
         expect(response.body.userGroupId).toBeAnInteger();
@@ -53,7 +51,7 @@ describe('The user group collection', () => {
         expect(groups.length).toBe(3);
 
         const names = groups.map(item => item.name);
-        expect(['A', 'B', 'C'].every(name => names.indexOf(name) > -1));
+        expect(['A', 'B', 'C'].every(name => names.indexOf(name) > -1)).toBe(true);
 
     });
 

@@ -17,25 +17,23 @@ describe('Test the user registration', () => {
     });
 
     test('Should not register two users with the same email', async () => {
-        const existingUser = await UserHelper.insertMario();
+        const giorgio = await UserHelper.insertGiorgio();
 
-        await expect(UserService.registerUser({
-            name: 'Mario Blu',
-            email: existingUser.email,
-            badgeNumber: "AAAAAA",
-            password: 'password'
-        })).rejects.toThrow(new Error('email already in use'));
+        const mario = await UserHelper.createUserMario();
+        mario.email = giorgio.email;
+
+        await expect(UserService.registerUser(mario))
+            .rejects.toThrow(new Error('email already in use'));
     });
 
     test('Should not register two users with the same badge number', async () => {
-        const existingUser = await UserHelper.insertMario();
+        const giorgio = await UserHelper.insertGiorgio();
 
-        await expect(UserService.registerUser({
-            name: 'Mario Blu',
-            email: 'mario@blu.it',
-            badgeNumber: existingUser.badgeNumber,
-            password: 'password'
-        })).rejects.toThrow(new Error('badge number already in use'));
+        const mario = await UserHelper.createUserMario();
+        mario.badgeNumber = giorgio.badgeNumber;
+
+        await expect(UserService.registerUser(mario))
+            .rejects.toThrow(new Error('badge number already in use'));
     });
 });
 
@@ -83,19 +81,8 @@ describe('Test the listing of existing users', () => {
     });
 
     test('Should return array json of two user', async () => {
-        const user1 = await UserService.registerUser({
-            name: 'Mario Rossi',
-            email: 'mario2@rossi.it',
-            badgeNumber: "000000",
-            password: 'password'
-        });
-
-        const user2 = await UserService.registerUser({
-            name: 'Giorgio Segalla',
-            email: 'giorgio@segalla.it',
-            badgeNumber: "000021",
-            password: 'passwsard'
-        });
+        let user1 = await UserHelper.insertMario();
+        let user2 = await UserHelper.insertGiorgio();
 
         const users = await UserService.getAllUsers();
         expect(users.map(u => u.toJSON())).toEqual([
@@ -143,7 +130,7 @@ describe('Test user email update', () => {
         const existingUser = await UserHelper.insertMario();
 
         try {
-            await UserService.updateUserEmail({field: "Not a user!"}, existingUser.email);
+            await UserService.updateUserEmail({field: "INVALID"}, existingUser.email);
             expect().toFail();
         } catch (e) {}
     });
