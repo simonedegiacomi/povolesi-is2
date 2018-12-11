@@ -9,9 +9,10 @@ describe('The user group creation', () => {
             name: "test group",
             createdBy: await UserHelper.insertNewRandom()
         };
-        const group = await UserGroupService.createGroup(groupData);
 
+        const group = await UserGroupService.createGroup(groupData);
         expect(group.id).toBeAnInteger();
+
         const createdBy = await group.getCreatedBy();
         expect(createdBy.toJSON()).toEqual(groupData.createdBy.toJSON());
     });
@@ -33,9 +34,7 @@ describe('The user group collection', () => {
     });
 
     test('It should return an empty array when there are no groups', async () => {
-        const groups = await UserGroupService.getAllGroups();
-
-        expect(groups.length).toBe(0);
+        expect(await UserGroupService.getAllGroups()).toEqual([]);
     });
 
     test('It should return a specific user group given its id', async () => {

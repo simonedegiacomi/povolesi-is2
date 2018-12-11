@@ -203,3 +203,51 @@ describe('GET /task-pools/id', () => {
     });
 
 });
+
+function sendDeleteTaskPoolById(taskPoolId, user) {
+    return request(app)
+        .delete(`/api/v1/task-pools/${taskPoolId}`)
+        .set('X-API-TOKEN', user.authToken);
+}
+
+describe('DELETE /task-pools/id', () => {
+
+
+
+    test('DELETE /task-pools/id should return 200', async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
+
+        const response = await sendDeleteTaskPoolById(taskPool.id, giorgio);
+        const result = response.body;
+
+        expect(response.status).toBe(200);
+        expect(result).toBeDefinedAndNotNull();
+        expect(result.id).toEqual(taskPool.id);
+        expect(result.name).toEqual(taskPool.name);
+
+    });
+
+    test('DELETE /task-pools/id with a user that can\'t manage the specified task should return 403', async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+        const mario = await UserHelper.insertMario();
+        const taskPool = await TaskPoolHelper.insertTaskPoolEmpty(giorgio.id);
+
+        const response = await sendDeleteTaskPoolById(taskPool.id, mario);
+        const result = response.body;
+
+        expect(response.status).toBe(403);
+        expect(result).toEqual({errorMessage: TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL})
+    });
+
+    test('DELETE /task-pools/id which not exist should return 404', async () => {
+        const giorgio = await UserHelper.insertGiorgio();
+
+        const response = await sendDeleteTaskPoolById(123, giorgio);
+        const result = response.body;
+
+        expect(response.status).toBe(404);
+        expect(result).toEqual({errorMessage: TaskPoolService.errors.TASK_POOL_NOT_FOUND})
+    });
+
+});

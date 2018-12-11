@@ -13,7 +13,7 @@ module.exports = {
 
     async createGroupWithUser() {
         const group = await this.createGroup();
-        const permission = await UserPermissionHelper.insertUserPermission(group);
+        const permission = await UserPermissionHelper.createOneUserAndHisPermissionsForGroup(group);
 
         return {
             group,
