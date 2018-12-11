@@ -46,7 +46,7 @@ describe('Test the update of a user permission  (change privileges of a user)', 
 
     });
 
-    test('Should return error wit', async () => {
+    test('Should return error with actionPerformer a random UNAUTHORIZED user', async () => {
         const group = await UserGroupsHelper.createGroup();
         const permission = await UserPermissionHelper.insertUserPermission(group);
 
