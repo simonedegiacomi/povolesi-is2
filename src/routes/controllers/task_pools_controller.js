@@ -47,5 +47,26 @@ module.exports = {
                 status: 403
             }]);
         }
+
+    },
+
+    async deleteTaskPoolById(req, res){
+        const taskPoolId = parseInt(req.params.id);
+        const userMeId = req.user.id;
+
+        try{
+            const taskPoolValue = await TaskPoolService.deleteTaskPoolById(taskPoolId,userMeId);
+            res.status(200).send(taskPoolValue); //se metto 204 non invia niente
+        } catch(e) {
+            ErrorMapper.map(res, e, [{
+                error: TaskPoolService.errors.TASK_POOL_NOT_FOUND,
+                status: 404
+            }, {
+                error: TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL,
+                status: 403
+            }
+            ]);
+        }
+
     }
 };

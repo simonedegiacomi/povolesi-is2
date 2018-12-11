@@ -161,5 +161,23 @@ module.exports = {
         }
 
         return taskPool;
+    },
+
+    async deleteTaskPoolById(taskPoolId,userId){
+        assertIsNumber(taskPoolId);
+        assertIsNumber(userId);
+
+        try{
+            const taskPool = await this.getTaskPoolById(taskPoolId,userId);
+            const value = taskPool.toJSON();
+            await taskPool.destroy();
+
+            return value;
+        } catch(e){
+            console.log("Error in deleteTaskPoolById");
+            console.log(e.message);
+            throw e;
+        }
+
     }
 };

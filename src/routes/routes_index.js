@@ -72,7 +72,7 @@ function setupAuthenticatedRoutes(app) {
     router.get('/task-pools/:id', taskPoolController.getTaskPoolById);
     router.post('/task-pools', taskPoolController.postTaskPool);
     // TODO: PUT /task-pools/:id
-    // TODO: DELETE /task-pools/:id
+    router.delete('/task-pools/:id', taskPoolController.deleteTaskPoolById);
 
     // /task-answers
     // TODO: GET /task-answers
@@ -80,6 +80,7 @@ function setupAuthenticatedRoutes(app) {
     router.post('/task-answers', taskAnswerController.postTaskAnswer);
     // TODO: PUT /task-answers/{id}
     // TODO: DELETE /task-answers/{id}
+
 
     app.use('/api/v1', router);
 }
