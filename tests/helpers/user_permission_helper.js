@@ -42,6 +42,18 @@ module.exports = {
             canChangePermissions: canChangePermissions
         });
     },
+    async updateUserPermissionWithoutPermission(permission, canManageTasks, canManageUsers, canChangePermissions) {
+        const groupId = await permission.userGroupId;
+        const group = await UserGroupService.getGroupById(groupId);
+        const user = await UserHelper.insertMario();
+        return await UserPermissionsService.updateUserPermission(user.id, permission, {
+            userGroupId: group.id,
+            userId: permission.id,
+            canManageTasks: canManageTasks,
+            canManageUsers: canManageUsers,
+            canChangePermissions: canChangePermissions
+        });
+    },
 
     async givePrivilegeToUser(permission) {
         permission.canManageTasks = true;

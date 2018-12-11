@@ -191,4 +191,26 @@ describe("Test the update of a user permission", () => {
 
         expect(response.status).toBe(204);
     });
+
+    test("PUT /user-permissions with valid data should return 403 if the performer doesn't has privileges", async () => {
+        const userWithoutPermission = await UserHelper.insertNewRandom();
+        const group = await UserGroupHelper.createGroup();
+        const permissionToUpdate = await UserPermissionHelper.insertUserPermission(group);
+
+        const examplePermissionUpdated = {
+            userId: permissionToUpdate.id,
+            userGroupId: group.id,
+            canManageTasks: true,
+            canManageUsers: true,
+            canChangePermissions: true
+        };
+
+        const response = await request(app)
+            .put(`/api/v1/user-permissions/${permissionToUpdate.id}`)
+            .set('X-API-TOKEN', userWithoutPermission.authToken)
+            .send(examplePermissionUpdated);
+
+        expect(response.status).toBe(403);
+    });
+
 });

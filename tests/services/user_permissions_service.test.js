@@ -45,6 +45,15 @@ describe('Test the update of a user permission  (change privileges of a user)', 
         expect(permissionFromDb.toJSON()).toEqual(permissionUpdated.toJSON());
 
     });
+
+    test('Should return error wit', async () => {
+        const group = await UserGroupsHelper.createGroup();
+        const permission = await UserPermissionHelper.insertUserPermission(group);
+
+        await expect(UserPermissionHelper.updateUserPermissionWithoutPermission(permission, true, true, true))
+            .rejects.toThrow(UserPermissionsService.errors.UNAUTHORIZED);
+
+    });
 });
 
 describe("Test the creation of a user permission (add user to a group)", () => {
