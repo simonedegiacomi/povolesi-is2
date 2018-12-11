@@ -143,6 +143,30 @@ describe('Test the get of a user group list', () => {
         expect(response.body.map(p => p.toJSON())).toEqual(
             expect.arrayContaining(userGroupList.map(p => p.toJSON()))
         );
+    });
+
+    test("GET /user-permission should return 404 if group doesn't exists", async () => {
+
+        const group = await UserGroupHelper.createGroup();
+        const creator = await group.getCreatedBy();
+
+        const response = await request(app)
+            .get(`/api/v1/user-permissions?groupId=458`)
+            .set('X-API-TOKEN', creator.authToken);
+
+        expect(response.status).toBe(404);
+    })
+
+    test("GET /user-permission should return 400 if groupId is not specified", async () => {
+
+        const group = await UserGroupHelper.createGroup();
+        const creator = await group.getCreatedBy();
+
+        const response = await request(app)
+            .get(`/api/v1/user-permissions`)
+            .set('X-API-TOKEN', creator.authToken);
+
+        expect(response.status).toBe(400);
     })
 });
 

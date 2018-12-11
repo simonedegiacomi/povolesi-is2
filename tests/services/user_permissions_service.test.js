@@ -21,26 +21,16 @@ describe("Test the listing of user permissions in a group", () => {
     });
 
     test("Should return error group not found given a group that is null", async () => {
-        try {
-            const creator = await UserHelper.insertNewRandom();
-            await UserPermissionHelper.getUserPermissionList(null, creator);
-            //TODO: change this with test utility created for this purpose
-            expect().toFail();
-        } catch (e) {
-            expect(e.message).toBe(UserPermissionsService.errors.GROUP_NOT_FOUND);
-        }
+        const creator = await UserHelper.insertNewRandom();
+        await expect(UserPermissionHelper.getUserPermissionList(null, creator))
+            .rejects.toThrow(UserPermissionsService.errors.GROUP_NOT_FOUND);
     });
 
     test("Should return error user unathorized", async () => {
-        try {
-            const creator = await UserHelper.insertNewRandom();
-            const group = await UserGroupsHelper.createGroup();
-            await UserPermissionHelper.getUserPermissionList(group, creator);
-            //TODO: change this with test utility created for this purpose
-            expect().toFail();
-        } catch (e) {
-            expect(e.message).toBe(UserPermissionsService.errors.UNAUTHORIZED);
-        }
+        const creator = await UserHelper.insertNewRandom();
+        const group = await UserGroupsHelper.createGroup();
+        await expect(UserPermissionHelper.getUserPermissionList(group, creator))
+            .rejects.toThrow(UserPermissionsService.errors.UNAUTHORIZED);
     });
 });
 

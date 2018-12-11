@@ -19,15 +19,14 @@ module.exports = {
     async getPermissionListByGroup(req, res) {
         if (req.query.groupId == null) {
             return res.status(400).send({
-                errorMessage: error.details[0].message
+                errorMessage: "Missing groupId query"
             });
         }
 
         const groupId = req.query.groupId;
-        const group = await UserGroupService.getGroupById(groupId);
-
 
         try {
+            const group = await UserGroupService.getGroupById(groupId);
             const permissionList = await UserPermissionsService.getPermissionListByGroup(req.user.id, group);
             res.status(200).send(permissionList)
         } catch (e) {
