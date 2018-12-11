@@ -1,5 +1,4 @@
 const TaskPoolService = require('../../src/services/task_pool_service');
-const TaskHelper      = require('../helpers/task_helper');
 const UserHelper      = require('../helpers/user_helper');
 const TaskPoolHelper  = require('../helpers/task_pool_helper');
 
@@ -52,8 +51,9 @@ describe('Test the creation of a TaskPool', () => {
         expect(poolFromDb.name).toEqual(createdPool.name);
         expect(poolFromDb.createdById).toEqual(creator.id);
 
-        const tasksFromDb = await poolFromDb.getTasks();
-        expect(tasksFromDb[0].id).toEqual(task.id);
+        const tasksFromDb  = await poolFromDb.getTasks();
+        const tasksCreated = await createdPool.getTasks();
+        expect(tasksFromDb.length).toEqual(tasksCreated.length);
 
     });
 
