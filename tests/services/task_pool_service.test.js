@@ -1,7 +1,7 @@
 const TaskPoolService = require('../../src/services/task_pool_service');
-const TaskHelper = require('../helpers/task_helper');
-const UserHelper = require('../helpers/user_helper');
-const TaskPoolHelper = require('../helpers/task_pool_helper');
+const TaskHelper      = require('../helpers/task_helper');
+const UserHelper      = require('../helpers/user_helper');
+const TaskPoolHelper  = require('../helpers/task_pool_helper');
 
 
 describe("Test utils methods of TaskPoolService", () => {
@@ -33,11 +33,12 @@ describe('Test the creation of a TaskPool', () => {
 
         expect(createdPool.name).toEqual('esempio');
         expect(createdPool.createdById).toEqual(creator.id);
+
+        await TaskPoolHelper.expectToExistInDb(createdPool.id);
     });
 
     test('insert a TaskPool with a two task', async () => {
         const creator = await UserHelper.insertMario();
-        const task = await TaskHelper.createOpenQuestionTask(creator.id);
         const createdPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(creator.id);
 
         expect(createdPool.name).toEqual('esempio');
@@ -45,6 +46,15 @@ describe('Test the creation of a TaskPool', () => {
 
         const tasksFromPool = await createdPool.getTasks();
         expect(tasksFromPool.length).toEqual(2);
+
+
+        let poolFromDb = await TaskPoolHelper.findById(createdPool.id);
+        expect(poolFromDb.name).toEqual(createdPool.name);
+        expect(poolFromDb.createdById).toEqual(creator.id);
+
+        const tasksFromDb = await poolFromDb.getTasks();
+        expect(tasksFromDb[0].id).toEqual(task.id);
+
     });
 
     test('insert a TaskPool without specifying the user', async () => {
@@ -105,8 +115,7 @@ describe('Get a list of the user TaskPools', () => {
         const mario = await UserHelper.insertMario();
         const result = await TaskPoolService.getTaskPoolsByUserId(mario.id);
 
-        expect(result).toBeDefinedAndNotNull();
-        expect(result.length).toEqual(0);
+        expect(result).toEqual([]);
     });
 
     test('Get taskPools of user that don\'t exist', async () => {
@@ -124,7 +133,6 @@ describe('get task pool by id with control', () => {
         const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
 
         const taskPoolResult = await TaskPoolService.getTaskPoolById(taskPool.id, giorgio.id);
-
 
         expect(taskPool.id).toEqual(taskPoolResult.id);
         expect(taskPool.name).toEqual(taskPoolResult.name);

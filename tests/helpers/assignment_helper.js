@@ -1,9 +1,9 @@
 const AssignmentService = require('../../src/services/assignment_service');
-const {Assignment, TaskDraw} = require('../../src/models/index');
+
 const UserHelper = require('./user_helper');
 const UserGroupsHelper = require('./user_groups_helper');
 const TaskPoolHelper = require('../helpers/task_pool_helper');
-const UserPermissionHelper = require('../helpers/user_permission_helper');
+
 
 
 module.exports = {
@@ -31,10 +31,7 @@ module.exports = {
             (await TaskPoolHelper.insertTaskPoolWith2Tasks()).id,
             (await TaskPoolHelper.insertTaskPoolWith2Tasks()).id
         ]);
-        return {
-            user,
-            assignment
-        };
+        return {user, assignment};
     },
 
     /**
@@ -46,11 +43,7 @@ module.exports = {
         const {assignment, user} = await this.createAssignmentWithUserAndPools();
         const assignedTasks = await AssignmentService.assignTasksOfAssignmentToUser(assignment.id, user.id);
 
-        return {
-            user,
-            assignedTasks,
-            assignment
-        };
+        return {user, assignedTasks, assignment};
     }
 
 };

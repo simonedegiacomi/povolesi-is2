@@ -83,18 +83,14 @@ module.exports = {
                     as: 'assignedUserGroup',
                     include: {
                         model: UserPermission,
-                        where: {
-                            userId
-                        }
+                        where: { userId }
                     }
                 },
 
                 // Join the AssignedTask table to get the task assigned to the user in an assignment
                 {
                     model: AssignedTask,
-                    where: {
-                        userId
-                    },
+                    where: {userId},
 
                     // LEFT JOIN: When there aren't assigned tasks for an assignment, the assignment will have the
                     // assignedTasks field null, so we know we have to assign some tasks
@@ -117,9 +113,7 @@ module.exports = {
             include: [{
                 model: Assignment,
                 as: 'assignment',
-                where: {
-                    id: assignmentId
-                }
+                where: {id: assignmentId }
             }, {
                 model: Task, // eagerly load tasks, we'll need them,
                 as: 'tasks'
@@ -168,17 +162,13 @@ module.exports = {
      */
     async assignTasksToUser(assignmentId, tasksIdsToAssign, userId) {
         const assignedTasksToCreate = tasksIdsToAssign.map(taskId => {
-            return {
-                userId,
-                taskId,
-                assignmentId
-            }
+            return {userId, taskId, assignmentId}
         });
 
         await AssignedTask.bulkCreate(assignedTasksToCreate);
 
         // Sequelize bulkCreate method doesn't return the ids of the insert entries, so we need to fetch them
-        const a = await AssignedTask.findAll({
+        return await AssignedTask.findAll({
             where: {
                 assignmentId,
                 userId
@@ -189,7 +179,5 @@ module.exports = {
                 as: 'task'
             }]
         });
-
-        return a;
     }
 };
