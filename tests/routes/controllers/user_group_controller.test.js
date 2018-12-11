@@ -5,15 +5,13 @@ const UserHelper = require('../../helpers/user_helper');
 const UserGroupHelper = require('../../helpers/user_groups_helper');
 const ModelsMapper = require('../../../src/routes/controllers/models_mapper');
 const {UserGroup} = require('../../../src/models');
+const {postUserGroup} = require('./common');
 
 describe('Test the user group creation', () => {
 
     test('It should create a new group', async () => {
         const user = await UserHelper.insertMario();
-        const response = await request(app)
-            .post('/api/v1/user-groups')
-            .set('X-API-TOKEN', user.authToken)
-            .send({name: 'IS2'});
+        const response = await postUserGroup({name: 'IS2'}, user);
 
         expect(response.status).toBe(201);
         expect(response.body.userGroupId).toBeAnInteger();
@@ -21,10 +19,7 @@ describe('Test the user group creation', () => {
 
     test('It should create a group without specifying the name', async () => {
         const user = await UserHelper.insertMario();
-        const response = await request(app)
-            .post('/api/v1/user-groups')
-            .set('X-API-TOKEN', user.authToken)
-            .send({});
+        const response = await postUserGroup({}, user);
 
         expect(response.status).toBe(400);
     });

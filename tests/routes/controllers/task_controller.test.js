@@ -4,13 +4,7 @@ const app = require('../../../src/app');
 const UserHelper = require('../../helpers/user_helper');
 const TaskHelper = require('../../helpers/task_helper');
 const {Task} = require('../../../src/models');
-
-async function postTaskWithUser(user, taskBody) {
-    return await request(app)
-        .post('/api/v1/tasks')
-        .set('X-API-TOKEN', user.authToken)
-        .send(taskBody);
-}
+const {postTaskWithUser}=require('./common');
 
 async function postTaskWithAuthenticatedUser(taskBody) {
     const user = await UserHelper.insertNewRandom();

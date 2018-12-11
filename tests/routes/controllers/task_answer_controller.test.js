@@ -1,15 +1,7 @@
-const request = require('supertest');
 const UserHelper = require('../../helpers/user_helper');
 const AssignmentHelper = require('../../helpers/assignment_helper');
 const TaskAnswerHelper = require('../../helpers/task_answer_helper');
-const app = require('../../../src/app');
-
-function postTaskAnswer(user, taskAnswer) {
-    return request(app)
-        .post('/api/v1/task-answers')
-        .set('X-API-TOKEN', user.authToken)
-        .send(taskAnswer);
-}
+const {postTaskAnswer} = require('./common');
 
 describe('Test the API to create a TaskAnswer', () => {
 
@@ -69,7 +61,6 @@ describe('Test the API to create a TaskAnswer', () => {
 
         expect(response.status).toBe(400);
     });
-
 
 
     test('Should not create a TaskAnswer with an empty answer', async () => {

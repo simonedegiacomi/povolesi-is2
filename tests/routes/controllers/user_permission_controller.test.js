@@ -6,6 +6,7 @@ const UserGroupHelper = require('../../helpers/user_groups_helper');
 const UserPermissionHelper = require('../../helpers/user_permission_helper');
 const UserPermissionsService = require('../../../src/services/user_permissions_service');
 const {UserPermission} = require('../../../src/models');
+const {postUserPermission} = require('./common');
 
 describe("Test the creation of a user permission", () => {
 
@@ -22,10 +23,7 @@ describe("Test the creation of a user permission", () => {
             canChangePermissions: false
         };
 
-        const response = await request(app)
-            .post('/api/v1/user-permissions')
-            .set('X-API-TOKEN', creator.authToken)
-            .send(examplePermission);
+        const response = await postUserPermission(examplePermission, creator);
 
         expect(response.status).toBe(201);
         expect(response.body.id).toBeAnInteger();
@@ -39,16 +37,13 @@ describe("Test the creation of a user permission", () => {
 
         const aUser = await UserHelper.insertNewRandom();
 
-        const response = await request(app)
-            .post('/api/v1/user-permissions')
-            .set('X-API-TOKEN', aUser.authToken)
-            .send({
+        const response = await postUserPermission({
                 userId: user.id,
                 userGroupId: group.id,
                 canManageTasks: false,
                 canManageUsers: false,
                 canChangePermissions: false
-            });
+            }, aUser);
 
         expect(response.status).toBe(403);
     });

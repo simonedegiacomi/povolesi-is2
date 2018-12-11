@@ -1,15 +1,9 @@
 const request = require('supertest');
 
 const UserHelper = require('../../helpers/user_helper');
-const app        = require('../../../src/app');
-const ModelsMapper    = require('../../../src/routes/controllers/models_mapper');
-
-function postUser(user) {
-    return request(app)
-        .post('/api/v1/register')
-        .send(user);
-}
-
+const app = require('../../../src/app');
+const ModelsMapper = require('../../../src/routes/controllers/models_mapper');
+const {postUser} = require('./common');
 
 describe('Test the user registration', () => {
 
@@ -145,7 +139,7 @@ describe('Test user email update', () => {
         const response = await request(app)
             .put('/api/v1/users/me/email')
             .set('X-API-TOKEN', existingUser1.authToken)
-            .send({ newEmail: existingUser2.email });
+            .send({newEmail: existingUser2.email});
 
         expect(response.status).toBe(409);
         expect(response.body.errorMessage).toBe('email already in use');
@@ -157,7 +151,7 @@ describe('Test user email update', () => {
         const response = await request(app)
             .put('/api/v1/users/me/email')
             .set('X-API-TOKEN', existingUser.authToken)
-            .send({ newEmail: 'Not an email!' });
+            .send({newEmail: 'Not an email!'});
 
         expect(response.status).toBe(400);
     });
@@ -233,7 +227,7 @@ describe('Test user data update', () => {
     });
 });
 
-describe('Test get user data given its id',  () => {
+describe('Test get user data given its id', () => {
     test('GET /users/:id', async () => {
         const newUSer = await UserHelper.insertMario();
         const response = await request(app)
