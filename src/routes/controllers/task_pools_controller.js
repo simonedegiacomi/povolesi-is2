@@ -56,17 +56,14 @@ module.exports = {
 
         try{
             const taskPoolValue = await TaskPoolService.deleteTaskPoolById(taskPoolId,userMeId);
-            res.status(204).res(taskPoolValue);
+            res.status(200).send(taskPoolValue); //se metto 204 non invia niente
         } catch(e) {
             ErrorMapper.map(res, e, [{
-                error: TaskPoolService.errors.USER_NOT_EXIST,
-                status: 409
+                error: TaskPoolService.errors.TASK_POOL_NOT_FOUND,
+                status: 404
             }, {
-                error: TaskPoolService.errors.TASK_POOL_ID_IS_NO_CORRECT,
-                status: 409
-            }, {
-                error: TaskPoolService.errors.YOU_CANT_MANAGE_THIS_TASKPOOL,
-                status: 401
+                error: TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL,
+                status: 403
             }
             ]);
         }
