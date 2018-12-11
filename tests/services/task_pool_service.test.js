@@ -175,20 +175,25 @@ describe('get task pool by id with control', () => {
 describe("test delete taskPool by id of the taskPool",() =>{
     test("delete a taskPool that exist",async ()=>{
         const giorgio = await UserHelper.insertGiorgio();
-        const taskPoolId = (await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id)).id;
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
 
-        await TaskPoolService.deleteTaskPoolById(taskPoolId,giorgio.id);
 
-        expect(await UtilsTaskPool.isTaskPoolIdExist(taskPoolId)).toBe(false);
+        const value = await TaskPoolService.deleteTaskPoolById(taskPool.id,giorgio.id);
+
+        expect(await UtilsTaskPool.isTaskPoolIdExist(taskPool.id)).toBe(false);
+
+        expect(value.id).toBe(taskPool.id);
+
     });
 
     test("delete a taskPool that exist that have no tasks",async ()=>{
         const giorgio = await UserHelper.insertGiorgio();
         const taskPoolId = (await TaskPoolHelper.insertTaskPoolEmpty(giorgio.id)).id;
 
-        await TaskPoolService.deleteTaskPoolById(taskPoolId,giorgio.id);
+        const value = await TaskPoolService.deleteTaskPoolById(taskPoolId,giorgio.id);
 
         expect(await UtilsTaskPool.isTaskPoolIdExist(taskPoolId)).toBe(false);
+        expect(value.id).toBe(taskPoolId);
     });
 
     test('delete a task pool with users that no exist',async ()=>{

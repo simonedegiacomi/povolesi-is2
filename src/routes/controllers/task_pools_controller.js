@@ -47,5 +47,29 @@ module.exports = {
                 status: 403
             }]);
         }
+
+    },
+
+    async deleteTaskPoolById(req, res){
+        const taskPoolId = parseInt(req.params.id);
+        const userMeId = req.user.id;
+
+        try{
+            const taskPoolValue = await TaskPoolService.deleteTaskPoolById(taskPoolId,userMeId);
+            res.status(204).res(taskPoolValue);
+        } catch(e) {
+            ErrorMapper.map(res, e, [{
+                error: TaskPoolService.errors.USER_NOT_EXIST,
+                status: 409
+            }, {
+                error: TaskPoolService.errors.TASK_POOL_ID_IS_NO_CORRECT,
+                status: 409
+            }, {
+                error: TaskPoolService.errors.YOU_CANT_MANAGE_THIS_TASKPOOL,
+                status: 401
+            }
+            ]);
+        }
+
     }
 };

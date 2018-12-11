@@ -161,7 +161,10 @@ module.exports = {
 
         try{
             const taskPool = await this.getTaskPoolById(taskPoolId,userId);
+            const value = taskPool.toJSON();
             await taskPool.destroy();
+
+            return value
         } catch(e){
             console.log("Error in deleteTaskPoolById");
             throw e;
