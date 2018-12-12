@@ -3,11 +3,19 @@ const AssignmentService = require('../../../src/services/assignment_service');
 const AssignmentHelper = require('../../helpers/assignment_helper');
 const UserGroupsHelper = require('../../helpers/user_groups_helper');
 const app = require('../../../src/app');
+const {Assignment} = require('../../../src/models');
 
 function sendGetAssignments(user) {
     return request(app)
         .get('/api/v1/users/me/assignments')
         .set('X-API-TOKEN', user.authToken);
+}
+
+async function expectAssignmentWithIdToBeInDb(assignmentId) {
+    const fromDb = await Assignment.findOne({
+        where: {id: assignmentId}
+    });
+    expect(fromDb).toBeDefinedAndNotNull();
 }
 
 describe('Test the creation of assignments', () => {
@@ -29,6 +37,7 @@ describe('Test the creation of assignments', () => {
             });
 
         expect(response.status).toBe(201);
+        await expectAssignmentWithIdToBeInDb(response.body.assignmentId);
     });
 
 });
