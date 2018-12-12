@@ -2,6 +2,7 @@ const request = require('supertest');
 const AssignmentService = require('../../../src/services/assignment_service');
 const AssignmentHelper = require('../../helpers/assignment_helper');
 const UserGroupsHelper = require('../../helpers/user_groups_helper');
+const TaskPoolHelper = require('../../helpers/task_pool_helper');
 const app = require('../../../src/app');
 const {Assignment} = require('../../../src/models');
 
@@ -22,6 +23,7 @@ describe('Test the creation of assignments', () => {
 
     test('Should create an assignment', async () => {
         const {user, group} = await UserGroupsHelper.createGroupWithUser();
+        const taskPool = await TaskPoolHelper.insertTaskPoolWith2Tasks();
 
         const response = await request(app)
             .post('/api/v1/assignments')
@@ -29,11 +31,11 @@ describe('Test the creation of assignments', () => {
             .send({
                 name: 'Esame di Gennaio',
                 startsOn: '01/01/2018 09:00',
-                submissionDeadline: '01/01/2018 09:00',
-                peerReviewsDeadline: '01/01/2018 09:00',
+                submissionDeadline: '01/01/2018 10:00',
+                peerReviewsDeadline: '01/01/2018 11:00',
                 createdById: user.id,
                 assignedUserGroupId: group.id,
-                taskPoolIds: []
+                taskPoolIds: [taskPool.id]
             });
 
         expect(response.status).toBe(201);
