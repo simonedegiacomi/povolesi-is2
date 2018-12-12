@@ -5,8 +5,10 @@ const AssignmentService = require('../../services/assignment_service');
 module.exports = {
 
     async postAssignment (req, res) {
-        await AssignmentService.createAssignment(req.body);
-        res.status(201).end();
+        const assignment = await AssignmentService.createAssignment(req.body);
+        res.status(201).send({
+            assignmentId: assignment.id
+        });
     },
 
     async getAssignedAssignments (req, res) {
