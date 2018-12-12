@@ -8,7 +8,7 @@ const {postTaskWithUser}=require('./common');
 
 async function postTaskWithAuthenticatedUser(taskBody) {
     const user = await UserHelper.insertNewRandom();
-    return await postTaskWithUser(user, taskBody);
+    return await postTaskWithUser(taskBody, user);
 }
 
 async function postTaskWithAuthenticatedUserAndExpectCode(body, code) {
@@ -100,7 +100,7 @@ function createValidTaskWithQuestion(question) {
 
 async function createValidTaskWithQuestionAndUser(user, question) {
     let task = createValidTaskWithQuestion(question);
-    let response = await postTaskWithUser(user, task);
+    let response = await postTaskWithUser(task, user);
 
     task.id = response.body.taskId;
     return task;

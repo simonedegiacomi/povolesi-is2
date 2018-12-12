@@ -5,6 +5,7 @@ const UserGroupService          = require('../../services/user_group_service');
 const ErrorMapper               = require('./error_mapper');
 const ModelsMapper              = require('./models_mapper');
 
+// TODO: Move to service layer
 const permissionSchema = Joi.object().keys({
     userId: Joi.number().integer().required(),
     userGroupId: Joi.number().integer().required(),

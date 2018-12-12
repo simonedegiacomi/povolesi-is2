@@ -60,7 +60,10 @@ module.exports = {
     },
 
     mapAssignment(assignment) {
-        return assignment.toJSON();
+        return {
+            ...assignment.toJSON(),
+            assignedTasks: assignment.assignedTasks
+        };
     },
 
     mapAssignments(assignments) {

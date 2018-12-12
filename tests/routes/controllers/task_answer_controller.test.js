@@ -14,7 +14,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: assignment.id,
             answer: '42'
         };
-        const response = await postTaskAnswer(user, answer);
+        const response = await postTaskAnswer(answer, user);
 
         expect(response.status).toBe(201);
 
@@ -31,7 +31,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: assignment.id,
             answer: '42'
         };
-        const response = await postTaskAnswer(user, answer);
+        const response = await postTaskAnswer(answer, user);
 
         expect(response.status).toBe(400);
     });
@@ -44,7 +44,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: 123,
             answer: '42'
         };
-        const response = await postTaskAnswer(user, answer);
+        const response = await postTaskAnswer(answer, user);
 
         expect(response.status).toBe(400);
     });
@@ -57,7 +57,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: assignment.id,
             answer: '42'
         };
-        const response = await postTaskAnswer(giorgio, answer);
+        const response = await postTaskAnswer(answer, giorgio);
 
         expect(response.status).toBe(400);
     });
@@ -71,7 +71,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: assignment.id,
             answer: ''
         };
-        const response = await postTaskAnswer(user, answer);
+        const response = await postTaskAnswer(answer, user);
 
         expect(response.status).toBe(400);
     });

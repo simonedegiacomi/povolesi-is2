@@ -14,8 +14,6 @@ const assignmentSchema = Joi.object().keys({
     taskPoolIds: Joi.array().items(Joi.number().integer()).required()
 });
 
-
-// TODO: Should we move this declaration somewhere else?
 Array.prototype.flatMap = function (lambda) {
     return Array.prototype.concat.apply([], this.map(lambda));
 };
@@ -57,7 +55,7 @@ module.exports = {
         const assignmentsWithTasks = await this.findAssignedAssignmentsWithAssignedTasks(userId);
 
         for (let assignment of assignmentsWithTasks) {
-            if (assignment.assignedTasks == null && this.isAssignmentStarted(assignment)) {
+            if (assignment.assignedTasks == null && this.isAssignmentRunning(assignment)) {
                 assignment.assignedTasks = await this.assignTasksOfAssignmentToUser(assignment.id, userId);
             }
         }
@@ -65,8 +63,8 @@ module.exports = {
         return assignmentsWithTasks;
     },
 
-    isAssignmentStarted(assignment) {
-        return new Date() >= assignment.startsOn;
+    isAssignmentRunning(assignment) {
+        return new Date() >= assignment.startsOn && new Date() <= assignment.submissionDeadline;
     },
 
     /**

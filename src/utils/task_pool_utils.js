@@ -1,9 +1,9 @@
 const {TaskPool, User, Task, Group, UserPermission, TaskDraw, Assignment} = require('../models/index');
 const TaskPoolService = require('../services/task_pool_service');
 
-module.exports={
+module.exports = {
 
-    async isTaskExist(task){
+    async isTaskExist(task) {
 
         const fromDb = await Task.findOne({
             where:
@@ -33,7 +33,7 @@ module.exports={
         return fromDb !== null;
     },
 
-    async isTaskPoolIdExist(taskPoolId){
+    async isTaskPoolIdExist(taskPoolId) {
         const fromDb = await TaskPool.findOne({
             where:
                 {id: taskPoolId}
@@ -43,28 +43,29 @@ module.exports={
 
     },
 
-    async getUserById(userId){
+  /*  async getUserById(userId) {
         const fromDb = await User.findOne({
-            where:
-                {id: userId}
+            where: {id: userId}
         });
-        if(fromDb === null)
-            throw new Error('user not exist');
-            //FIXME: i don't know why but that no work
-            //throw new Error(TaskPoolService.errors.NO_CREATOR_SPECIFIED);
-        else
-            return fromDb.toJSON();
-    },
 
-    async getTaskPoolByIdWithoutControl(taskPoolId){
+        if (fromDb === null) {
+            throw new ArgumentError('user not exist');
+        }
+
+        return fromDb;
+    },*/
+
+    async getTaskPoolByIdWithoutControl(taskPoolId) {
         const fromDb = await TaskPool.findOne({
-            where:
-                {id: taskPoolId}
+            where: {id: taskPoolId}
         });
+
+        if (fromDb == null) {
+
+        }
 
         return fromDb;
     },
-
 
 
 };

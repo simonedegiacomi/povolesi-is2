@@ -1,5 +1,6 @@
 const {assertIsNumber, assertIsDefined, assertIsString} = require('./parameters_helper');
 
+const ArgumentError = require('./argument_error');
 const {Task} = require('../../src/models');
 
 
@@ -7,26 +8,43 @@ module.exports = {
 
     errors: {
         TASK_NOT_FOUND: 'Task not found',
-        WRONG_ARGUMENTS: 'Wrong arguments'
+        WRONG_ARGUMENTS: 'Wrong arguments',
+        ONLY_THE_CREATOR_CAN_DELETE_A_TASK: 'only the creator can delete a task'
     },
 
+    /**
+     *
+     * @param taskId
+     * @param authenticatedUserId
+     * @returns {Promise<Model>}
+     */
     async getTask(taskId, authenticatedUserId) {
         assertIsNumber(taskId);
         assertIsNumber(authenticatedUserId);
 
-        //TODO: implement other users' tasks searches once the task draws are finished
-        let foundTask = await Task.findOne({
-            where: {
-                userId: authenticatedUserId,
-                id: taskId
-            }
+        let foundTask = await this._getTaskById(taskId);
+
+        // TODO: Check if user can see the task
+
+        return foundTask;
+    },
+
+    /**
+     * Retrieves the task from the database, regardless of who asked for it
+     * @param taskId
+     * @returns {Promise<Model>}
+     * @private
+     */
+    async _getTaskById(id) {
+        const foundTask = await Task.findOne({
+            where: {id}
         });
 
         if (foundTask === null) {
             throw new Error(this.errors.TASK_NOT_FOUND)
-        } else {
-            return foundTask;
         }
+
+        return foundTask;
     },
 
     async getTasks(authenticatedUserId) {
@@ -36,14 +54,15 @@ module.exports = {
     },
 
     async deleteTask(taskId, authenticatedUserId) {
-        let taskWithId = await this.getTask(taskId, authenticatedUserId);
+        const task = await this._getTaskById(taskId);
 
-        //No need to check whenever the user can delete tasks. It's always possible for a user that can retrieve a task
-        //to delete it
+        if (task.userId !== authenticatedUserId) {
+            throw new ArgumentError(this.errors.ONLY_THE_CREATOR_CAN_DELETE_A_TASK);
+        }
 
         //TODO: the deletion of a task will become extremely messy once we will implement assignment, peer review, etc..
         //We'll have to think about how to manage that situation
-        await taskWithId.destroy();
+        await task.destroy();
     },
 
     async createTask(taskData) {
