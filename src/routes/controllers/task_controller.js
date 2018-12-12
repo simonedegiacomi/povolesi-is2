@@ -2,6 +2,7 @@ const Joi = require('joi');
 const TaskService = require('../../services/task_service');
 const ErrorMapper = require('./error_mapper');
 
+// TODO: Move to service layer
 const taskSchema = Joi.object().keys({
     question: Joi.string().required(),
     type: Joi.string().required(),
@@ -37,6 +38,9 @@ module.exports = {
             ErrorMapper.map(res, e, [{
                 error: TaskService.errors.TASK_NOT_FOUND,
                 status: 404
+            }, {
+                error: TaskService.errors.ONLY_THE_CREATOR_CAN_DELETE_A_TASK,
+                status: 403
             }]);
         }
     },

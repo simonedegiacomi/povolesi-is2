@@ -1,16 +1,10 @@
-const request = require('supertest');
 const UserHelper = require('../../helpers/user_helper');
 const AssignmentHelper = require('../../helpers/assignment_helper');
 const TaskAnswerHelper = require('../../helpers/task_answer_helper');
 const TaskAnswerService = require('../../../src/services/task_answer_service');
-const app = require('../../../src/app');
 
-function postTaskAnswer(user, taskAnswer) {
-    return request(app)
-        .post('/api/v1/task-answers')
-        .set('X-API-TOKEN', user.authToken)
-        .send(taskAnswer);
-}
+const {postTaskAnswer} = require('./common');
+
 
 describe('Test the API to create a TaskAnswer', () => {
 
@@ -23,7 +17,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: assignment.id,
             answer: '42'
         };
-        const response = await postTaskAnswer(user, answer);
+        const response = await postTaskAnswer(answer, user);
 
         expect(response.status).toBe(201);
 
@@ -40,7 +34,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: assignment.id,
             answer: '42'
         };
-        const response = await postTaskAnswer(user, answer);
+        const response = await postTaskAnswer(answer, user);
 
         expect(response.status).toBe(400);
     });
@@ -53,7 +47,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: 123,
             answer: '42'
         };
-        const response = await postTaskAnswer(user, answer);
+        const response = await postTaskAnswer(answer, user);
 
         expect(response.status).toBe(400);
     });
@@ -66,7 +60,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: assignment.id,
             answer: '42'
         };
-        const response = await postTaskAnswer(giorgio, answer);
+        const response = await postTaskAnswer(answer, giorgio);
 
         expect(response.status).toBe(400);
     });
@@ -80,7 +74,7 @@ describe('Test the API to create a TaskAnswer', () => {
             assignmentId: assignment.id,
             answer: ''
         };
-        const response = await postTaskAnswer(user, answer);
+        const response = await postTaskAnswer(answer, user);
 
         expect(response.status).toBe(400);
     });

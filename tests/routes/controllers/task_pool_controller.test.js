@@ -7,6 +7,7 @@ const TaskHelper = require('../../helpers/task_helper');
 const TaskPoolHelper = require('../../helpers/task_pool_helper');
 const {TaskPool} = require('../../../src/models');
 const TaskPoolService = require('../../../src/services/task_pool_service');
+const {postTaskPool} = require('./common');
 
 function createTaskPoolToSend() {
     return {
@@ -15,14 +16,6 @@ function createTaskPoolToSend() {
         tasks: []
     }
 }
-
-function postTaskPool(pool, user) {
-    return request(app)
-        .post('/api/v1/task-pools')
-        .set('X-API-TOKEN', user.authToken)
-        .send(pool);
-}
-
 
 describe('POST /task-pools', () => {
 

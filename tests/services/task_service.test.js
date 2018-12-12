@@ -126,7 +126,8 @@ describe("Test the retrieval of a task with a specific ID", () => {
 
     });
 
-    test('Should fail to retrieve a task of other users that do not share a group with him', async () => {
+    // TODO: See issue #133
+    /*test('Should fail to retrieve a task of other users that do not share a group with him', async () => {
         let mario = await UserHelper.insertMario();
         let giorgio = await UserHelper.insertGiorgio();
 
@@ -138,7 +139,7 @@ describe("Test the retrieval of a task with a specific ID", () => {
         } catch (e) {
             expect(e.message).toBe("Task not found");
         }
-    });
+    });*/
 });
 
 
@@ -174,7 +175,7 @@ describe("Test the deletion of a task with a specific ID", () => {
             expect().toFail();
         } catch (e) {
             //TODO update this once the assignments are implemented
-            expect(e.message).toBe("Task not found");
+            expect(e.message).toBe(TaskService.errors.ONLY_THE_CREATOR_CAN_DELETE_A_TASK);
         }
 
     });

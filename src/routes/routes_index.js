@@ -82,6 +82,9 @@ function setupAuthenticatedRoutes(app) {
     // TODO: PUT /task-answers/{id}
     // TODO: DELETE /task-answers/{id}
 
+    // /assignments
+    router.post('/assignments', assignmentController.postAssignment);
+
 
     app.use('/api/v1', router);
 }
