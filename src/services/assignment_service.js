@@ -11,7 +11,7 @@ const assignmentSchema = Joi.object().keys({
     peerReviewsDeadline: Joi.date().required(),
     createdById: Joi.number().integer().required(),
     assignedUserGroupId: Joi.number().integer().required(),
-    taskPoolIds: Joi.array().items(Joi.number().integer())
+    taskPoolIds: Joi.array().items(Joi.number().integer()).required()
 });
 
 
@@ -28,6 +28,8 @@ module.exports = {
 
     async createAssignment(assignmentData) {
         ServiceUtils.validateSchemaOrThrowArgumentError(assignmentData, assignmentSchema);
+
+        // TODO: controlli sulle date
 
         const assignment = await Assignment.create(assignmentData);
         await assignment.setTaskPools(assignmentData.taskPoolIds);

@@ -10,6 +10,29 @@ function sendGetAssignments(user) {
         .set('X-API-TOKEN', user.authToken);
 }
 
+describe('Test the creation of assignments', () => {
+
+    test('Should create an assignment', async () => {
+        const {user, group} = await UserGroupsHelper.createGroupWithUser();
+
+        const response = await request(app)
+            .post('/api/v1/assignments')
+            .set('X-API-TOKEN', user.authToken)
+            .send({
+                name: 'Esame di Gennaio',
+                startsOn: '01/01/2018 09:00',
+                submissionDeadline: '01/01/2018 09:00',
+                peerReviewsDeadline: '01/01/2018 09:00',
+                createdById: user.id,
+                assignedUserGroupId: group.id,
+                taskPoolIds: []
+            });
+
+        expect(response.status).toBe(201);
+    });
+
+});
+
 describe('Test the API to get assigned assignments', () => {
 
     test('GET /users/me/assignments should return array when the user is in a group without assignments', async () => {
