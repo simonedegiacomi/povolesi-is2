@@ -8,7 +8,7 @@ const TaskPoolHelper = require('../helpers/task_pool_helper');
 
 module.exports = {
 
-    async createAssignmentAssignedToGroup(groupId, taskPoolIds = []) {
+    async createAssignmentAssignedToGroup(groupId, taskPoolIds) {
         return await AssignmentService.createAssignment({
             name: 'Esame di Gennaio',
             startsOn: '01/01/2018 09:00',
@@ -18,11 +18,6 @@ module.exports = {
             assignedUserGroupId: groupId,
             taskPoolIds
         });
-    },
-
-    async createAssignment() {
-        const group = await UserGroupsHelper.createGroup();
-        return await this.createAssignmentAssignedToGroup(group.id);
     },
 
     async createAssignmentWithUserAndPools() {

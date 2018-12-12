@@ -7,7 +7,7 @@ const UserHelper = require('../helpers/user_helper');
 describe("Test the creation of a new assignment", () => {
 
     test('Should create a new assignment', async () => {
-        const assignment = await AssignmentHelper.createAssignment();
+        const {assignment} = await AssignmentHelper.createAssignmentWithUserAndPools();
 
         const fromDb = await Assignment.findOne({
             where: {id: assignment.id}
