@@ -1,9 +1,12 @@
+const request = require('supertest');
+
+const app = require('../../../src/app');
 const UserHelper = require('../../helpers/user_helper');
 const AssignmentHelper = require('../../helpers/assignment_helper');
 const TaskAnswerHelper = require('../../helpers/task_answer_helper');
 const TaskAnswerService = require('../../../src/services/task_answer_service');
 
-const {postTaskAnswer} = require('./common');
+const {postTaskAnswer, getTaskAnswerByAssignmentIdAndUserId} = require('./common');
 
 
 describe('Test the API to create a TaskAnswer', () => {
@@ -84,11 +87,9 @@ describe('Test the API to create a TaskAnswer', () => {
 
 describe('Test the API to get a list of task answers given userId and assignmentId', () => {
     test('GET /task-answers with valid query parameters should return 200 and a list of task answers', async () => {
-        const {taskAnswers, user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
+        const {user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
 
-        const response = await request(app)
-            .get(`/api/v1/task-answers?userId=${user.id}&assignmentId=${assignment.id}`)
-            .set('X-API-TOKEN', user.authToken);
+        const response = await getTaskAnswerByAssignmentIdAndUserId(assignment.id, user.id, user);
 
         expect(response.status).toBe(200);
 

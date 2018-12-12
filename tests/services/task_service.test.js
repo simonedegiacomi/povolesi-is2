@@ -127,7 +127,7 @@ describe("Test the retrieval of a task with a specific ID", () => {
     });
 
     // TODO: See issue #133
-    /*test('Should fail to retrieve a task of other users that do not share a group with him', async () => {
+    xtest('Should fail to retrieve a task of other users that do not share a group with him', async () => {
         let mario = await UserHelper.insertMario();
         let giorgio = await UserHelper.insertGiorgio();
 
@@ -139,7 +139,7 @@ describe("Test the retrieval of a task with a specific ID", () => {
         } catch (e) {
             expect(e.message).toBe("Task not found");
         }
-    });*/
+    });
 });
 
 

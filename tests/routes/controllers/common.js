@@ -58,5 +58,9 @@ module.exports = {
 
     getTask (taskId, user) {
         return authenticatedGet(`/api/v1/tasks/${taskId}`, user);
+    },
+
+    getTaskAnswerByAssignmentIdAndUserId(assignmentId, userId, user) {
+        return authenticatedGet(`/api/v1/task-answers?userId=${userId}&assignmentId=${assignmentId}`, user);
     }
 };
