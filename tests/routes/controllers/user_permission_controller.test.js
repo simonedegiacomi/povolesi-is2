@@ -193,7 +193,7 @@ describe("Test the update of a user permission", () => {
     test("PUT /user-permissions with valid data should return 403 if the performer doesn't has privileges", async () => {
         const userWithoutPermission = await UserHelper.insertNewRandom();
         const group = await UserGroupHelper.createGroup();
-        const permissionToUpdate = await UserPermissionHelper.insertUserPermission(group);
+        const permissionToUpdate = await UserPermissionHelper.createOneUserAndHisPermissionsForGroup(group);
 
         const examplePermissionUpdated = {
             userId: permissionToUpdate.id,
