@@ -45,22 +45,7 @@ module.exports = {
     },
 
     postAssignment(assignment, user) {
-        // TODO: Replace code with the real code when the controller for the assignment is ready
-        //return authenticatedPostRequestWithBody('/api/v1/assignments', assignment, user);
-
-        return new Promise((resolve) => {
-            AssignmentService.createAssignment({
-                ...assignment,
-                createdById: user.id
-            }).then(createdAssignment => {
-                    resolve({
-                        status: 201,
-                        body: {
-                            assignmentId: createdAssignment.id
-                        }
-                    })
-                });
-        });
+        return authenticatedPostRequestWithBody('/api/v1/assignments', assignment, user);
     },
 
     getAssignedAssignments(user) {
