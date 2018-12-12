@@ -1,7 +1,6 @@
 const request = require('supertest');
 
 const app = require('../../../src/app');
-const AssignmentService = require('../../../src/services/assignment_service');
 
 function authenticatedPostRequestWithBody(path, body, user) {
     return request(app)

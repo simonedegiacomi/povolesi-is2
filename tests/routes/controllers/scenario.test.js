@@ -168,13 +168,14 @@ describe('Test a complete scenario', () => {
         expect(mattiaFirstAssignment.assignedTasks.length).toBe(1);
 
         // Students resolve the exams
-        const slavaAnswersCount = await resolveExam(slavaAssignments[0], slava);
-        const mattiaAnswersCount = await resolveExam(mattiaAssignments[0], mattia);
-        const totalAnswers = slavaAnswersCount + mattiaAnswersCount;
+        await resolveExam(slavaAssignments[0], slava);
+        await resolveExam(mattiaAssignments[0], mattia);
 
         // The TA read the answers of the students
-        //const taskAnswers = await common.getTaskAnswersOfAssignment(assignmentId, ta);
-        //expect(taskAnswers.length).toBe(totalAnswers);
+        const slavaAnswers = await expectOkAndReturnResponse(common.getTaskAnswerByAssignmentIdAndUserId(assignmentId, slava.id, ta));
+        const mattiaAnswers = await expectOkAndReturnResponse(common.getTaskAnswerByAssignmentIdAndUserId(assignmentId, slava.id, ta));
+        expect(slavaAnswers.length).toBe(1);
+        expect(mattiaAnswers.length).toBe(1);
     });
 
 });
