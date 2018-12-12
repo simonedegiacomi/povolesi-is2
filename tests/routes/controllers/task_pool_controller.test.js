@@ -212,9 +212,7 @@ function sendDeleteTaskPoolById(taskPoolId, user) {
 
 describe('DELETE /task-pools/id', () => {
 
-
-
-    test('DELETE /task-pools/id should return 200', async () => {
+test('DELETE /task-pools/id should return 200', async () => {
         const giorgio = await UserHelper.insertGiorgio();
         const taskPool = await TaskPoolHelper.insertTaskPoolWith2TasksCreatedBy(giorgio.id);
 

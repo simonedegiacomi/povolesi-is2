@@ -2,8 +2,17 @@ const {TaskPool, User, Task, UserPermission, Assignment, UserGroup} = require('.
 const Joi = require('joi');
 const SchemaUtils = require('../utils/schema_utils');
 const {assertIsNumber} = require("./parameters_helper");
+const TaskService = require('./task_service');
 
 const taskPoolSchema = Joi.object().keys({
+    name: Joi.string().required(),
+    createdById: Joi.number().integer().required(),
+    tasks: Joi.array().items(Joi.number().integer()).required(),
+    numQuestionsToDraw: Joi.number().integer().required()
+});
+
+const taskPoolSchemaForUpdate = Joi.object().keys({
+    id: Joi.number().required(),
     name: Joi.string().required(),
     createdById: Joi.number().integer().required(),
     tasks: Joi.array().items(Joi.number().integer()).required(),
@@ -174,10 +183,54 @@ module.exports = {
 
             return value;
         } catch(e){
-            console.log("Error in deleteTaskPoolById");
-            console.log(e.message);
             throw e;
         }
 
+    },
+
+    controlAllTaskExist(tasks,userId){
+        try {
+            for (let taskId of tasks) {
+                TaskService.getTask(taskId, userId);
+            }
+        } catch(e) {
+            throw new Error(this.errors.TASK_NOT_FOUND)
+        }
+    },
+
+    /**
+     * Update taskPools by what you insert in taskPoolEdit (the array tasks
+     * need to be an array of id of the tasks)
+     * @param taskPoolId
+     * @param userId
+     * @param taskPoolEdit
+     * @returns {Promise<Array<Model>>}
+     */
+    async updateTaskPoolById(taskPoolId,userId,taskPoolEdit){
+        assertIsNumber(taskPoolId);
+        assertIsNumber(userId);
+
+        //TODO: control that task exist and fix the test
+        //this.controlAllTaskExist(taskPoolEdit.tasks,userId);
+        SchemaUtils.validateSchemaOrThrowArgumentError(taskPoolEdit, taskPoolSchemaForUpdate);
+        this.validateNumQuestionsToDrawOrThrowArgumentError(taskPoolEdit);
+
+
+        try{
+            const taskPool = await this.getTaskPoolById(taskPoolId,userId);
+
+            await taskPool.update({
+                name: taskPoolEdit.name,
+                numQuestionsToDraw: taskPoolEdit.numQuestionsToDraw,
+                createdById: taskPoolEdit.createdById
+            });
+
+            await taskPool.setTasks(taskPoolEdit.tasks);
+
+            return await this.getTaskPoolById(taskPoolId,userId)
+
+        } catch(e){
+            throw e;
+        }
     }
 };

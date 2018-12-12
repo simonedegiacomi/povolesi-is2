@@ -57,12 +57,10 @@ module.exports={
     },
 
     async getTaskPoolByIdWithoutControl(taskPoolId){
-        const fromDb = await TaskPool.findOne({
+        return await TaskPool.findOne({
             where:
                 {id: taskPoolId}
         });
-
-        return fromDb;
     },
 
 
