@@ -23,7 +23,8 @@ Array.prototype.flatMap = function (lambda) {
 module.exports = {
 
     errors: {
-        TOO_FEW_TASKS_IN_TASK_POOL: 'too few taks in task pool'
+        TOO_FEW_TASKS_IN_TASK_POOL: 'too few taks in task pool',
+        ASSIGNMENT_NOT_FOUND: 'assignment not found'
     },
 
     async createAssignment(assignmentData) {
@@ -179,5 +180,17 @@ module.exports = {
                 as: 'task'
             }]
         });
+    },
+
+    async getAssignmentById(assignmentId) {
+        const assignment = await Assignment.findOne({
+            where: {id: assignmentId}
+        });
+
+        if (assignment == null) {
+            throw new Error(this.errors.ASSIGNMENT_NOT_FOUND);
+        }
+
+        return assignment;
     }
 };

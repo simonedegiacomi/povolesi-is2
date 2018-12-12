@@ -155,7 +155,7 @@ describe('Test the get of a user group list', () => {
             .set('X-API-TOKEN', creator.authToken);
 
         expect(response.status).toBe(404);
-    })
+    });
 
     test("GET /user-permission should return 400 if groupId is not specified", async () => {
 
@@ -193,7 +193,7 @@ describe("Test the update of a user permission", () => {
     test("PUT /user-permissions with valid data should return 403 if the performer doesn't has privileges", async () => {
         const userWithoutPermission = await UserHelper.insertNewRandom();
         const group = await UserGroupHelper.createGroup();
-        const permissionToUpdate = await UserPermissionHelper.insertUserPermission(group);
+        const permissionToUpdate = await UserPermissionHelper.createOneUserAndHisPermissionsForGroup(group);
 
         const examplePermissionUpdated = {
             userId: permissionToUpdate.id,

@@ -2,6 +2,7 @@ const request = require('supertest');
 const UserHelper = require('../../helpers/user_helper');
 const AssignmentHelper = require('../../helpers/assignment_helper');
 const TaskAnswerHelper = require('../../helpers/task_answer_helper');
+const TaskAnswerService = require('../../../src/services/task_answer_service');
 const app = require('../../../src/app');
 
 function postTaskAnswer(user, taskAnswer) {
@@ -71,7 +72,6 @@ describe('Test the API to create a TaskAnswer', () => {
     });
 
 
-
     test('Should not create a TaskAnswer with an empty answer', async () => {
         const {user, assignedTasks, assignment} = await AssignmentHelper.createAssignedTaskForUser();
         const answer = {
@@ -86,4 +86,97 @@ describe('Test the API to create a TaskAnswer', () => {
     });
 
 
+});
+
+describe('Test the API to get a list of task answers given userId and assignmentId', () => {
+    test('GET /task-answers with valid query parameters should return 200 and a list of task answers', async () => {
+        const {taskAnswers, user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
+
+        const response = await request(app)
+            .get(`/api/v1/task-answers?userId=${user.id}&assignmentId=${assignment.id}`)
+            .set('X-API-TOKEN', user.authToken);
+
+        expect(response.status).toBe(200);
+
+        const fromDb = await TaskAnswerService.getTaskAnswerByUserAndAssignment(user.id, assignment.id);
+
+        const fromDbJSON = fromDb.map(t => t.toJSON());
+        fromDbJSON[0].submittedOn = await response.body[0].submittedOn;
+        fromDbJSON[1].submittedOn = await response.body[1].submittedOn;
+
+
+        expect(fromDb).toBeDefinedAndNotNull();
+        expect(response.body).toEqual(
+            expect.arrayContaining(fromDbJSON)
+        );
+    });
+
+
+    test('GET /task-answers without userId query parameter should return 400', async () => {
+        const {taskAnswers, user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
+
+        const response = await request(app)
+            .get(`/api/v1/task-answers?assignmentId=${assignment.id}`)
+            .set('X-API-TOKEN', user.authToken);
+
+        expect(response.status).toBe(400);
+    });
+
+    test('GET /task-answers without assignmentId query parameter should return 400', async () => {
+        const {taskAnswers, user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
+
+        const response = await request(app)
+            .get(`/api/v1/task-answers?userId=${user.id}`)
+            .set('X-API-TOKEN', user.authToken);
+
+        expect(response.status).toBe(400);
+    });
+
+    //test parametro insesistente
+    test('GET /task-answers with a non existing userId query parameter should return 404', async () => {
+        const {taskAnswers, user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
+
+        const response = await request(app)
+            .get(`/api/v1/task-answers?userId=892&assignmentId=${assignment.id}`)
+            .set('X-API-TOKEN', user.authToken);
+
+        expect(response.status).toBe(404);
+    });
+
+    test('GET /task-answers with a non existing assignmentId query parameter should return 404', async () => {
+        const {taskAnswers, user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
+
+        const response = await request(app)
+            .get(`/api/v1/task-answers?userId=${user.id}&assignmentId=649`)
+            .set('X-API-TOKEN', user.authToken);
+
+        expect(response.status).toBe(404);
+    });
+});
+
+describe('Test the API that get a task-answer given its taskAnswerId', () => {
+    test('GET /task-answers/:id should return 200 and the task answer', async () => {
+        const {taskAnswers, user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
+        const newTaskAnswer = taskAnswers[0];
+
+        const response = await request(app)
+            .get(`/api/v1/task-answers/${newTaskAnswer.id}`)
+            .set('X-API-TOKEN', user.authToken);
+
+        expect(response.status).toBe(200);
+
+        const newTaskAnswerJSON = newTaskAnswer.toJSON();
+        newTaskAnswerJSON.submittedOn = response.body.submittedOn;
+        expect(response.body).toEqual(newTaskAnswerJSON);
+    });
+
+    test('GET /task-answers/:id with a not existing taskAnswerId should return 404', async () => {
+        const {taskAnswers, user, assignment} = await TaskAnswerHelper.createSomeTaskAnswer();
+
+        const response = await request(app)
+            .get('/api/v1/task-answers/799')
+            .set('X-API-TOKEN', user.authToken);
+
+        expect(response.status).toBe(404);
+    })
 });
