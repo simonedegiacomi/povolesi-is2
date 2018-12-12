@@ -17,87 +17,99 @@ describe("Test the creation of a new assignment", () => {
     });
 
     test('Should not create an assignment without a name', async () => {
-        const group = await UserGroupsHelper.createGroup();
-        await expect(AssignmentService.createAssignment({
-            startsOn: '01/01/2018 09:00',
-            submissionDeadline: '01/01/2018 09:00',
-            peerReviewsDeadline: '01/01/2018 09:00',
-            createdById: (await UserHelper.insertNewRandom()).id,
-            assignedUserGroupId: group.id,
-            taskPoolIds : []
-        })).rejects.toThrow(new Error('"name" is required'));
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.name = undefined;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('"name" is required'));
     });
 
     test('Should not create an assignment without startsOn', async () => {
-        const group = await UserGroupsHelper.createGroup();
-        await expect(AssignmentService.createAssignment({
-            name: 'Esame di Gennaio',
-            submissionDeadline: '01/01/2018 09:00',
-            peerReviewsDeadline: '01/01/2018 09:00',
-            createdById: (await UserHelper.insertNewRandom()).id,
-            assignedUserGroupId: group.id,
-            taskPoolIds : []
-        })).rejects.toThrow(new Error('"startsOn" is required'));
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.startsOn = undefined;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('"startsOn" is required'));
     });
 
     test('Should not create an assignment without a submissionDeadline', async () => {
-        const group = await UserGroupsHelper.createGroup();
-        await expect(AssignmentService.createAssignment({
-            name: 'Esame di Gennaio',
-            startsOn: '01/01/2018 09:00',
-            peerReviewsDeadline: '01/01/2018 09:00',
-            createdById: (await UserHelper.insertNewRandom()).id,
-            assignedUserGroupId: group.id,
-            taskPoolIds : []
-        })).rejects.toThrow(new Error('"submissionDeadline" is required'));
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.submissionDeadline = undefined;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('"submissionDeadline" is required'));
     });
 
     test('Should not create an assignment without a peerReviewsDeadline', async () => {
-        const group = await UserGroupsHelper.createGroup();
-        await expect(AssignmentService.createAssignment({
-            name: 'Esame di Gennaio',
-            startsOn: '01/01/2018 09:00',
-            submissionDeadline: '01/01/2018 09:00',
-            createdById: (await UserHelper.insertNewRandom()).id,
-            assignedUserGroupId: group.id,
-            taskPoolIds : []
-        })).rejects.toThrow(new Error('"peerReviewsDeadline" is required'));
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.peerReviewsDeadline = undefined;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('"peerReviewsDeadline" is required'));
     });
 
     test('Should not create an assignment without createdById', async () => {
-        const group = await UserGroupsHelper.createGroup();
-        await expect(AssignmentService.createAssignment({
-            name: 'Esame di Gennaio',
-            startsOn: '01/01/2018 09:00',
-            submissionDeadline: '01/01/2018 09:00',
-            peerReviewsDeadline: '01/01/2018 09:00',
-            assignedUserGroupId: group.id,
-            taskPoolIds : []
-        })).rejects.toThrow(new Error('"createdById" is required'));
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.createdById = undefined;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('"createdById" is required'));
     });
 
     test('Should not create an assignment without assignedUserGroupId', async () => {
-        const group = await UserGroupsHelper.createGroup();
-        await expect(AssignmentService.createAssignment({
-            name: 'Esame di Gennaio',
-            startsOn: '01/01/2018 09:00',
-            submissionDeadline: '01/01/2018 09:00',
-            peerReviewsDeadline: '01/01/2018 09:00',
-            createdById: (await UserHelper.insertNewRandom()).id,
-            taskPoolIds : []
-        })).rejects.toThrow(new Error('"assignedUserGroupId" is required'));
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.assignedUserGroupId = undefined;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('"assignedUserGroupId" is required'));
     });
 
     test('Should not create an assignment without taskPoolIds', async () => {
-        const group = await UserGroupsHelper.createGroup();
-        await expect(AssignmentService.createAssignment({
-            name: 'Esame di Gennaio',
-            startsOn: '01/01/2018 09:00',
-            submissionDeadline: '01/01/2018 09:00',
-            peerReviewsDeadline: '01/01/2018 09:00',
-            createdById: (await UserHelper.insertNewRandom()).id,
-            assignedUserGroupId: group.id,
-        })).rejects.toThrow(new Error('"taskPoolIds" is required'));
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.taskPoolIds = undefined;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('"taskPoolIds" is required'));
+    });
+
+    test('Should not create an assignment with an empty taskPoolIds array', async () => {
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.taskPoolIds = [];
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('"taskPoolIds" does not contain 1 required value(s)'));
+    });
+
+    test('Should not allow submissionDeadline to be equal to startsOn', async () => {
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.submissionDeadline = assignment.startsOn;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('deadlines are invalid'));
+    });
+
+    test('Should not allow submissionDeadline to be equal to submissionDeadline', async () => {
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.peerReviewsDeadline = assignment.submissionDeadline;
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('deadlines are invalid'));
+    });
+
+    test('Should not allow submissionDeadline to be before startsOn', async () => {
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.submissionDeadline = '01/01/2018 08:00';
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('deadlines are invalid'));
+    });
+
+    test('Should not allow submissionDeadline to be before submissionDeadline', async () => {
+        const assignment = await AssignmentHelper.getValidAssignment();
+        assignment.peerReviewsDeadline = '01/01/2018 08:00';
+
+        await expect(AssignmentService.createAssignment(assignment))
+            .rejects.toThrow(new Error('deadlines are invalid'));
     });
 
 });

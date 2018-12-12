@@ -8,12 +8,24 @@ const TaskPoolHelper = require('../helpers/task_pool_helper');
 
 module.exports = {
 
+    async getValidAssignment() {
+        return {
+            name: 'Esame di Gennaio',
+            startsOn: '01/01/2018 09:00',
+            submissionDeadline: '01/01/2018 10:00',
+            peerReviewsDeadline: '01/01/2018 11:00',
+            createdById: (await UserHelper.insertNewRandom()).id,
+            assignedUserGroupId: (await UserGroupsHelper.createGroup()).id,
+            taskPoolIds : [(await TaskPoolHelper.insertTaskPoolWith2Tasks()).id]
+        }
+    },
+    
     async createAssignmentAssignedToGroup(groupId, taskPoolIds) {
         return await AssignmentService.createAssignment({
             name: 'Esame di Gennaio',
             startsOn: '01/01/2018 09:00',
-            submissionDeadline: '01/01/2018 09:00',
-            peerReviewsDeadline: '01/01/2018 09:00',
+            submissionDeadline: '01/01/2018 10:00',
+            peerReviewsDeadline: '01/01/2018 11:00',
             createdById: (await UserHelper.insertNewRandom()).id,
             assignedUserGroupId: groupId,
             taskPoolIds

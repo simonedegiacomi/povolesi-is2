@@ -31,8 +31,8 @@ describe('Test the creation of assignments', () => {
             .send({
                 name: 'Esame di Gennaio',
                 startsOn: '01/01/2018 09:00',
-                submissionDeadline: '01/01/2018 09:00',
-                peerReviewsDeadline: '01/01/2018 09:00',
+                submissionDeadline: '01/01/2018 10:00',
+                peerReviewsDeadline: '01/01/2018 11:00',
                 createdById: user.id,
                 assignedUserGroupId: group.id,
                 taskPoolIds: [taskPool.id]

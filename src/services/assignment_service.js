@@ -3,6 +3,7 @@ const Joi = require('joi');
 const {Assignment, AssignedTask, UserGroup, UserPermission, TaskPool, Task} = require('../models/index');
 const ServiceUtils = require('../utils/schema_utils');
 const RandomUtils = require('./random_utils');
+const ArgumentError = require('../services/argument_error');
 
 const assignmentSchema = Joi.object().keys({
     name: Joi.string().min(3).max(200).required(),
@@ -21,13 +22,16 @@ Array.prototype.flatMap = function (lambda) {
 module.exports = {
 
     errors: {
-        TOO_FEW_TASKS_IN_TASK_POOL: 'too few taks in task pool'
+        TOO_FEW_TASKS_IN_TASK_POOL: 'too few taks in task pool',
+        INVALID_DEADLINES: 'deadlines are invalid'
     },
 
     async createAssignment(assignmentData) {
         ServiceUtils.validateSchemaOrThrowArgumentError(assignmentData, assignmentSchema);
 
-        // TODO: controlli sulle date
+        if (new Date(assignmentData.submissionDeadline) <= new Date(assignmentData.startsOn) || new Date(assignmentData.peerReviewsDeadline) <= new Date(assignmentData.submissionDeadline)) {
+            throw new ArgumentError(this.errors.INVALID_DEADLINES);
+        }
 
         const assignment = await Assignment.create(assignmentData);
         await assignment.setTaskPools(assignmentData.taskPoolIds);
