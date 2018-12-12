@@ -71,7 +71,7 @@ function setupAuthenticatedRoutes(app) {
     router.get('/task-pools', taskPoolController.getTaskPool);
     router.get('/task-pools/:id', taskPoolController.getTaskPoolById);
     router.post('/task-pools', taskPoolController.postTaskPool);
-    // TODO: PUT /task-pools/:id
+    router.put('/task-pools/:id', taskPoolController.updateTaskPoolById);
     router.delete('/task-pools/:id', taskPoolController.deleteTaskPoolById);
 
     // /task-answers

@@ -68,5 +68,27 @@ module.exports = {
             ]);
         }
 
+    },
+
+    async updateTaskPoolById(req,res){
+        const taskPoolId = parseInt(req.params.id);
+        const taskPoolUpdate = req.body;
+        const userMeId = req.user.id;
+
+        try{
+            const taskPoolUpdated = await TaskPoolService.updateTaskPoolById(taskPoolId,userMeId,taskPoolUpdate);
+            res.status(200).send(taskPoolUpdated); //se metto 204 non invia niente
+        } catch(e) {
+            ErrorMapper.map(res, e, [{
+                error: TaskPoolService.errors.TASK_POOL_NOT_FOUND,
+                status: 404
+            }, {
+                error: TaskPoolService.errors.USER_CANT_MANAGE_TASK_POOL,
+                status: 403
+            }, {
+                error: TaskPoolService.errors.NUM_QUESTIONS_TO_DRAW_TOO_HIGH,
+                status: 400
+            }]);
+        }
     }
 };
