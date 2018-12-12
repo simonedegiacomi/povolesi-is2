@@ -35,6 +35,28 @@ module.exports = {
         }
     },
 
+    async updateGroup(req, res) {
+        const {error, value} = Joi.validate(req.body, groupSchema);
+        if (error != null) {
+            return res.status(400).send({
+                errorMessage: "The body must contain the name of the group."
+            });
+        }
+
+        try {
+            await UserGroupService.updateGroup(req.params.id, value.name, req.user.id);
+            res.status(201).send();
+        } catch (e) {
+            ErrorMapper.map(res, e, [{
+                error: UserGroupService.errors.GROUP_NOT_FOUND,
+                status: 404
+            }, {
+                error: UserGroupService.errors.UNAUTHORIZED,
+                status: 403
+            }]);
+        }
+    },
+
     async getGroupById(req, res) {
         const id = req.params.id;
 

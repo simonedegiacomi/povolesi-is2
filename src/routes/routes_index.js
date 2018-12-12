@@ -51,7 +51,7 @@ function setupAuthenticatedRoutes(app) {
     router.get('/user-groups', userGroupsController.getAllGroups);
     router.get('/user-groups/:id', userGroupsController.getGroupById);
     router.post('/user-groups', userGroupsController.createUserGroup);
-    // TODO: PUT /user-groups/:id
+    router.put('/user-groups/:id', userGroupsController.updateGroup);
     router.delete('/user-groups/:id', userGroupsController.deleteGroupById);
 
     // /user-permissions

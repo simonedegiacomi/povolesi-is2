@@ -31,6 +31,39 @@ describe('Test the user group creation', () => {
 
 });
 
+// describe('Updating the user group', () => {
+//
+//     test('It should update the groups that the user has created', async () => {
+//         const group = await UserGroupHelper.createGroup();
+//         const user = await group.getCreatedBy();
+//
+//         const response = await request(app)
+//             .put(`/api/v1/user-groups/${group.id}`)
+//             .set('X-API-TOKEN', user.authToken)
+//             .send({name: "New name"});
+//
+//         expect(response.status).toBe(201);
+//
+//         const loadedFromDb = await UserGroup.findOne({
+//             where: {id: group.id}
+//         });
+//         expect(loadedFromDb.name).toBe("New name");
+//     });
+//
+//     test('It should not update the groups that the user has not created', async () => {
+//         const externalUser = await UserHelper.insertMario();
+//
+//         const group = await UserGroupHelper.createGroup();
+//
+//         const response = await request(app)
+//             .put(`/api/v1/user-groups/${group.id}`)
+//             .set('X-API-TOKEN', externalUser.authToken)
+//             .send({name: "New name"});
+//
+//         expect(response.status).toBe(403);
+//     });
+//
+// });
 
 describe('The user group collection', () => {
     test('It should return the list when of groups', async () => {

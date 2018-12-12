@@ -18,6 +18,34 @@ describe('The user group creation', () => {
     });
 });
 
+describe('The user group update', () => {
+
+    test('It should update the groups name', async () => {
+        let groupCreator = await UserHelper.insertNewRandom();
+        const group = await UserGroupService.createGroup({
+            name:      "Old name",
+            createdBy: groupCreator
+        });
+
+        await UserGroupService.updateGroup(group.id, "New name", groupCreator.id);
+
+        let updatedGroup = await UserGroupService.getGroupById(group.id);
+        expect(updatedGroup.name).toBe("New name");
+    });
+
+    test('It should not update the group created by others', async () => {
+        let groupCreator = await UserHelper.insertGiorgio();
+        const group = await UserGroupService.createGroup({
+            name:      "Group",
+            createdBy: groupCreator
+        });
+
+        let anotherUser = await UserHelper.insertMario();
+        expect(UserGroupService.updateGroup(group.id, "New name", anotherUser.id))
+            .rejects.toThrow(new Error(UserGroupService.errors.UNAUTHORIZED));
+    });
+});
+
 describe('The user group collection', () => {
     test('It should show created groups', async () => {
 

@@ -1,6 +1,10 @@
 const Models = require('../models/index');
 const {UserGroup} = Models;
 
+const {assertIsString, assertIsNumber} = require('./parameters_helper');
+
+const ArgumentError = require('../services/argument_error');
+
 module.exports = {
 
     errors: {
@@ -22,6 +26,26 @@ module.exports = {
             ...groupData,
             createdById: groupData.createdBy.id
         });
+    },
+
+    async updateGroup(groupId, newGroupName, userId) {
+        assertIsNumber(groupId);
+        assertIsNumber(userId);
+        assertIsString(newGroupName);
+
+        let group = await UserGroup.findOne({where: {
+            id: groupId
+        }});
+
+        if(group === null){
+            throw new ArgumentError(this.errors.GROUP_NOT_FOUND);
+        }
+
+        if(group.createdById !== userId){
+            throw new Error(this.errors.UNAUTHORIZED);
+        }
+
+        await group.update({name: newGroupName});
     },
 
     async getGroupById(id) {
