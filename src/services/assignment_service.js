@@ -29,6 +29,8 @@ module.exports = {
     async createAssignment(assignmentData) {
         ServiceUtils.validateSchemaOrThrowArgumentError(assignmentData, assignmentSchema);
 
+        // TODO: controlli sulle date
+
         const assignment = await Assignment.create(assignmentData);
         await assignment.setTaskPools(assignmentData.taskPoolIds);
 
