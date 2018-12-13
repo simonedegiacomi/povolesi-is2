@@ -18,9 +18,10 @@ module.exports = (app) => {
 };
 
 function setupUnauthenticatedRoutes(app) {
+    app.get('/', (req, res) => res.status(200).send(`Welcome!`));
+
     const router = express.Router();
 
-    router.get('/', (req, res) => res.status(200).send(`Welcome`));
     router.post('/register', userController.register);
     router.post('/login', userController.login);
 
