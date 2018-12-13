@@ -1,5 +1,6 @@
-# povolesi-is2
-[![Build Status](https://travis-ci.com/simonedegiacomi/povolesi-is2.svg?branch=master)](https://travis-ci.com/simonedegiacomi/povolesi-is2)
+# povolesi-is2 [![Build Status](https://travis-ci.com/simonedegiacomi/povolesi-is2.svg?branch=master)](https://travis-ci.com/simonedegiacomi/povolesi-is2) 
+[![Deploy](https://www.herokucdn.com/deploy/button.png)](https://heroku.com/deploy)
+
 
 Repository for the Software Engineering 2 course project at University of Trento.
 

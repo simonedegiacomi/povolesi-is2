@@ -1,0 +1,11 @@
+{
+  "name": "povolesi-is2",
+  "description": "Software Engineering 2 course project at University of Trento",
+  "repository": "https://github.com/simonedegiacomi/povolesi-is2",
+  "logo": "https://node-js-sample.herokuapp.com/node.svg",
+  "keywords": [
+    "node",
+    "jest",
+    "rest"
+  ]
+}
