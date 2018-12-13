@@ -24,12 +24,8 @@ function setupUnauthenticatedRoutes(app) {
     router.post('/register', userController.register);
     router.post('/login', userController.login);
 
-    //TODO: sposta nell autheticated
-    router.get('/users', userController.getAllUsers);
-
     router.get('/groups', userGroupsController.getAllGroups);
     router.post('/groups', userGroupsController.createUserGroup);
-
 
     app.use('/api/v1', router);
 }
@@ -40,6 +36,7 @@ function setupAuthenticatedRoutes(app) {
     router.use(authenticationMiddleware);
 
     // /user
+    router.get('/users', userController.getAllUsers);
     router.get('/users/me', userController.getCurrentUserData);
     router.get('/users/:id', userController.getUserById);
     router.put('/users/me', userController.updateUserData);

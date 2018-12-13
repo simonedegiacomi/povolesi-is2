@@ -58,6 +58,7 @@ function postLogin(credentials) {
         .send(credentials);
 }
 
+
 describe('Test the user login', () => {
     test('POST /login should return 200 and a new token', async () => {
         const existingUser = await UserHelper.insertMario();
@@ -96,16 +97,13 @@ describe('Test the user login', () => {
 
 describe('test the /users path', () => {
 
-    test('GET /users should return 200', async () => {
-        const response = await request(app).get('/api/v1/users');
+    test('GET /users should return 200 and a list of users (without their passwords)', async () => {
+        const user = await UserHelper.insertNewRandom();
+        const response = await request(app)
+            .get('/api/v1/users')
+            .set('X-API-TOKEN', user.authToken);
+
         expect(response.statusCode).toBe(200);
-    });
-
-    test('return of the users without passwords', async () => {
-        await UserHelper.insertNewRandom();
-
-        const response = await request(app).get('/api/v1/users');
-
         response.body.forEach(u => {
             expect(u.id).toBeAnInteger();
             expect(u.name).toBeDefinedAndNotNull();
